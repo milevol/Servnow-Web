@@ -1,7 +1,44 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
+html,
+body,
+#root {
+  height: 100%;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 400;
+  font-style: normal;
+
+  src: url("./fonts/Pretendard-Regular.otf") format("opentype"),
+    url("./fonts/Pretendard-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Pretendard Thin";
+  font-weight: 200;
+  font-style: normal;
+
+  src: url("./fonts/Pretendard-Thin.otf") format("opentype"),
+    url("./fonts/Pretendard-Thin.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Pretendard Bold";
+  font-weight: 600;
+  font-style: normal;
+
+  src: url("./fonts/Pretendard-Bold.otf") format("opentype"),
+    url("./fonts/Pretendard-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Pretendard Extra Bold";
+  font-weight: 800;
+  font-style: normal;
+
+  src: url("./fonts/Pretendard-ExtraBold.otf") format("opentype"),
+    url("./fonts/Pretendard-ExtraBold.woff") format("woff");
+}
 
 html,
 body,
@@ -88,10 +125,10 @@ video {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
+  font-family: "Pretendard";
   vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
+
 article,
 aside,
 details,
