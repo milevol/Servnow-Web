@@ -1,5 +1,11 @@
+import { Route, Routes } from "react-router";
+
 function App() {
-  return <></>;
+  return (
+    <Routes>
+      <Route path="/" />
+    </Routes>
+  );
 }
 
 export default App;
