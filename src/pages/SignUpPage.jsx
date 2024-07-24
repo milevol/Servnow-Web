@@ -4,9 +4,9 @@
 
 import React, { useState } from "react";
 import styled from "styled-components";
-import SignUp from "./SignUp";
-import SignUpComplete from "./SignUpComplete";
-import SignUpTermsAgreement from "./SignUpTermsAgreement";
+import SignUp from "../components/SignUpInputInfo";
+import SignUpComplete from "../components/SignUpComplete";
+import SignUpTermsAgreement from "../components/SignUpTermsAgreement";
 
 const Container = styled.div`
   .pageName {
@@ -52,7 +52,7 @@ const PageWrapper = styled.div`
   align-items: center;
 `;
 
-const SignUpToggle = () => {
+const SignUpPage = () => {
   const [activeStep, setActiveStep] = useState(0);
   const steps = ["약관동의", "정보입력", "가입완료"];
 
@@ -90,4 +90,4 @@ const SignUpToggle = () => {
   );
 };
 
-export default SignUpToggle;
+export default SignUpPage;
