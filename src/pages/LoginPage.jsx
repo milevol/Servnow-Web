@@ -31,7 +31,7 @@ const Title = styled.h1`
 const WelcomeText = styled.p`
   margin-bottom: 3rem; 
   color: white;
-  font-size: 20px;
+  font-size: 22px;
 `;
 
 const LoginPage = () => {

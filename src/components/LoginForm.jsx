@@ -4,6 +4,7 @@
 
 
 import React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 const FormContainer = styled.div`
@@ -36,10 +37,10 @@ const Input = styled.input`
 `;
 
 
-const Button1 = styled.button`
+const LoginButton= styled.button`
   width: 90%;
   padding: 0.8rem;
-  margin-top: 4rem;
+  margin-top: 2rem;
   background-color: #236ffc;
   color: white;
   border: none;
@@ -53,8 +54,9 @@ const Button1 = styled.button`
 `;
 
 
-const Button2 = styled.button`
-  width: 90%;
+const KakaoButton = styled.button`
+  width: 80%;
+  height: 50px;
   padding: 0.8rem;
   margin: 1.5rem 0;
   background-color: #fccf03;
@@ -63,6 +65,11 @@ const Button2 = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-size: 1.2rem;
+  background-image: url('/images/kakao_logo.png');
+  background-size: 30px 30px;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  padding-left: 40px;
 
   &:hover {
     background-color: #ebc415;
@@ -91,23 +98,87 @@ const PasswordText = styled.p`
   margin-bottom: 0.8rem;
 
 `
+const ErrorText = styled.p`
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+  color: red;
+
+`;
+
 const LoginForm = () => {
+
+  const [email, setEmail]  = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+
+  //서버에서 회원 정보 가져오기
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let hasError = false;
+
+    if(!email ) {
+      setEmailError('이메일을 입력해주세요.');
+      hasError = true;
+    } 
+    else if(!password) {
+      setPasswordError('비밀번호를 입력해주세요.');
+      setEmailError('');
+      hasError = true;
+    } else {
+      setEmailError('');
+      setPasswordError('');
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', 
+        {email,
+         password});
+     //토큰을 로컬스토리지에 저장하기
+     localStorage.setItem('token', response.data.token);
+     alert('로그인에 성공하셨습니다.');
+    }
+    catch (err) {
+      setError('! 유효하지 않은 이메일 또는 비밀번호 입니다.')
+    }
+  }
   return (
     <FormContainer>
-
-      <InputContainer>
-        <EmailText>이메일</EmailText>
-        <Input type="email" placeholder="이메일을 입력해주세요." />
-      </InputContainer>
-      <InputContainer>
-        <PasswordText>비밀번호</PasswordText>
-        <Input type="password" placeholder="비밀번호를 입력해주세요." />
-      </InputContainer>
-      <Button1>로그인</Button1>
+      <form onSubmit={handleSubmit}>
+        <InputContainer>
+          <EmailText>이메일</EmailText>
+          <Input 
+            type="email" 
+            placeholder="이메일을 입력해주세요."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)} />
+        </InputContainer>
+        <InputContainer>
+          <PasswordText>비밀번호</PasswordText>
+          <Input 
+            type="password"
+            placeholder="비밀번호를 입력해주세요."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} />
+            {error &&<ErrorText>{error}</ErrorText>}
+            {emailError &&<ErrorText>{emailError}</ErrorText>}
+            {passwordError &&<ErrorText>{passwordError}</ErrorText>}
+        </InputContainer>
+       
+        <LoginButton type='submit'>로그인</LoginButton>
+      </form>
       <Link>회원가입</Link>
       
       <KakaoText>간편로그인</KakaoText>
-      <Button2>카카오로 로그인</Button2>
+      <KakaoButton>카카오 로그인</KakaoButton>
     </FormContainer>
   );
 };
