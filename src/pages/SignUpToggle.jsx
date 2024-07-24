@@ -5,6 +5,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import SignUp from "./SignUp";
+import SignUpComplete from "./SignUpComplete";
+import SignUpTermsAgreement from "./SignUpTermsAgreement";
 
 const Container = styled.div`
   .pageName {
@@ -16,7 +18,7 @@ const Container = styled.div`
 `;
 
 const StateContainer = styled.div`
-  // 약관동의, 회원가입, 가입완료 버튼 컨테이너 css
+  // 약관동의, 정보입력, 가입완료 버튼 컨테이너 css
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -27,18 +29,21 @@ const StateContainer = styled.div`
 `;
 
 const Button = styled.button`
-  // 약관동의, 회원가입, 가입완료 버튼 css
+  // 약관동의, 정보입력, 가입완료 버튼 css
   flex: 1;
   padding: 10px;
   margin: 0 -20px;
   border: none;
   border-radius: 50px;
   background-color: ${(props) => (props.active ? "#3e77ff" : "#DBE1E9")};
-  color: ${(props) => (props.active ? "white" : "black")};
+  color: ${(props) => (props.active ? "white" : "#5d6670")};
   cursor: pointer;
-  /* transition: background-color 0.5s; */
   position: relative;
   z-index: ${(props) => (props.active ? 10 : 1)};
+
+  &.no-cursor-change {
+    cursor: default; /* 포커스 시 커서 변경 없음 */
+  }
 `;
 
 const PageWrapper = styled.div`
@@ -49,18 +54,11 @@ const PageWrapper = styled.div`
 
 const SignUpToggle = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [showSignUp, setShowSignUp] = useState(false);
-  const steps = ["약관동의", "회원가입", "가입완료"];
+  const steps = ["약관동의", "정보입력", "가입완료"];
 
-  const handleButtonClick = (index) => {
-    setActiveStep(index);
-    if (index === 1) {
-      // Show SignUp form when 'Sign Up' is clicked
-      setShowSignUp(true);
-    } else {
-      setShowSignUp(false);
-    }
-  };
+  // const handleButtonClick = (index) => {
+  //   setActiveStep(index);
+  // };
 
   return (
     <Container>
@@ -68,15 +66,26 @@ const SignUpToggle = () => {
       <StateContainer>
         {steps.map((step, index) => (
           <Button
+            id="btn"
             key={index}
+            className="no-cursor-change"
             active={activeStep === index}
-            onClick={() => handleButtonClick(index)}
+            // onClick={() => handleButtonClick(index)}
+            disabled
           >
             {step}
           </Button>
         ))}
       </StateContainer>
-      <PageWrapper>{showSignUp && <SignUp />}</PageWrapper>
+      <PageWrapper>
+        {activeStep === 0 && (
+          <div>
+            <SignUpTermsAgreement setActiveStep={setActiveStep} />
+          </div>
+        )}
+        {activeStep === 1 && <SignUp setActiveStep={setActiveStep} />}
+        {activeStep === 2 && <SignUpComplete />}
+      </PageWrapper>
     </Container>
   );
 };

@@ -1,61 +1,100 @@
-// 목적: 회원가입 화면 속 회원가입 버튼 시 작동할 화면 구현
+// 목적: 회원가입 화면 속 정복입력 화면 구현
 // 기능: 사용자 정보 입력
-// 2024.07.21/곤/장고은
+// 2024.07.25/곤/장고은
+// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기, 유효성 검사 재확인
 
 import React, { useState } from "react";
 import styled from "styled-components";
 
 const FormContainer = styled.div`
-  width: 1225px;
-  font-size: 17px;
-  margin-left: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #5d6670;
+  font-size: small;
 
   .checkBtn {
+    width: 100px;
+    height: 35px;
     color: white;
     background-color: #3e77ff;
     border: none;
-    padding: 5px 20px;
-    margin-left: 10px;
+    margin-left: 20px;
   }
 
-  .femaleBtn,
+  .femaleBtn {
+    font-weight: 500;
+    color: #fff;
+    background-color: #011b6c;
+  }
+
   .maleBtn {
-    background-color: #fff;
-    border: 0.5px solid #d9d9d9;
-  }
-
-  input {
-    height: 30px;
-    width: 900px;
-    border: 0.5px solid #d9d9d9;
+    font-weight: bold;
+    color: #061522;
+    background-color: #dbe1e9;
   }
 
   table {
-    width: 100%;
-    border-collapse: separate;
+    width: 630.38px;
+  }
+
+  input {
+    height: 33px;
+    width: 300px;
+    padding-left: 10px;
+    border-radius: 5px;
+    border: 0.5px solid #d9d9d9;
+  }
+
+  input:focus::placeholder {
+    opacity: 0;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  caption {
+    color: #000;
+    margin: 10px;
+    font-size: 20px;
+    font-weight: bold;
   }
 
   td {
-    padding: 20px 50px 10px 0px;
-    vertical-align: middle;
+    padding: 10px 30px 10px 20px;
   }
 
   button {
     border-radius: 5px;
     cursor: pointer;
+    border: none;
+  }
+
+  span {
+    color: #3e77ff;
   }
 `;
 
 const FormSection = styled.div`
   margin-bottom: 30px;
   &.add td {
-    padding-right: 100px;
+    padding-right: 70px;
   }
 
   &.add button {
-    height: 30px;
-    width: 445px;
+    width: 150px;
+    height: 35px;
     margin-right: 15px;
+  }
+
+  .birthDate {
+    width: 95px;
+    height: 35px;
+    margin-right: 15px;
+    text-align: right;
+    border-radius: 5px;
+    border: 0.5px solid #d9d9d9;
   }
 `;
 
@@ -66,6 +105,7 @@ const ButtonContainer = styled.div`
   gap: 20px;
 
   .back {
+    color: #000;
     background-color: #d9d9d9;
   }
 
@@ -75,14 +115,19 @@ const ButtonContainer = styled.div`
   }
 
   button {
-    width: 220px;
-    padding: 10px;
+    width: 200px;
+    height: 50px;
     border: none;
-    border-radius: 50px;
+    border-radius: 10px;
+    font-weight: bolder;
   }
 `;
+const ErrorMessage = styled.p`
+  margin-top: 5px;
+  color: red;
+`;
 
-const SignUp = () => {
+const SignUp = ({ setActiveStep }) => {
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -91,8 +136,101 @@ const SignUp = () => {
     verificationCode: "",
     nickname: "",
     gender: "",
-    birthDate: "",
+    birthYear: "",
+    birthMonth: "",
+    birthDay: "",
   });
+
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+    email: "",
+    verificationCode: "",
+  });
+
+  const [touched, setTouched] = useState({
+    username: false,
+    password: false,
+    confirmPassword: false,
+    email: false,
+    verificationCode: false,
+  });
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { ...errors };
+
+    /*   Validate username
+    if (!form.username) {
+      newErrors.username = "아이디를 입력해 주세요.";
+      isValid = false;
+    } else {
+      newErrors.username = "";
+    }
+*/
+    // Validate password
+    const passwordValidation =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+    if (!form.password) {
+      isValid = false;
+    } else if (!passwordValidation.test(form.password)) {
+      newErrors.password =
+        "비밀번호는 영문, 숫자, 특수문자를 포함해 8~20자이어야 합니다.";
+      isValid = false;
+    } else {
+      newErrors.password = "";
+    }
+
+    // Validate confirmPassword
+    if (form.confirmPassword !== form.password) {
+      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
+      isValid = false;
+    } else {
+      newErrors.confirmPassword = "";
+    }
+
+    // Validate email
+    const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email) {
+      newErrors.email = "이메일을 입력해 주세요.";
+      isValid = false;
+    } else if (!emailValidation.test(form.email)) {
+      newErrors.email = "올바른 이메일 형식이 아닙니다.";
+      isValid = false;
+    } else {
+      newErrors.email = "";
+    }
+
+    // Validate verificationCode
+    if (!form.verificationCode) {
+      newErrors.verificationCode = "인증번호를 입력해 주세요.";
+      isValid = false;
+    } else {
+      newErrors.verificationCode = "";
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const daysInMonth = (month, year) => {
+    const thirtyOneDays = [1, 3, 5, 7, 8, 10, 12];
+    const thirtyDays = [4, 6, 9, 11];
+
+    if (thirtyOneDays.includes(month)) {
+      return 31;
+    } else if (thirtyDays.includes(month)) {
+      return 30;
+    } else if (month === 2) {
+      if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+        return 29;
+      } else {
+        return 28;
+      }
+    }
+    return 30;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,6 +240,22 @@ const SignUp = () => {
     });
   };
 
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched({
+      ...touched,
+      [name]: true,
+    });
+    validateForm();
+  };
+
+  const handleFocus = (e) => {
+    const { name } = e.target;
+    setTouched({
+      ...touched,
+      [name]: false,
+    });
+  };
   const handleGenderSelect = (gender) => {
     setForm({
       ...form,
@@ -109,19 +263,36 @@ const SignUp = () => {
     });
   };
 
+  const handleMonthChange = (e) => {
+    const { value } = e.target;
+    const month = parseInt(value, 10);
+    const days = daysInMonth(month, parseInt(form.birthYear, 10));
+
+    setForm({
+      ...form,
+      birthMonth: value,
+      birthDay: form.birthDay > days ? days : form.birthDay,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(form);
+    if (validateForm()) {
+      setActiveStep(2);
+      console.log(form);
+    }
   };
 
   return (
     <FormContainer>
-      <form onSubmit={handleSubmit}>
+      <form method="post" onSubmit={handleSubmit}>
         <FormSection className="basic">
-          <h1>기본정보</h1>
           <table>
+            <caption>기본정보</caption>
             <tr>
-              <td htmlFor="username">아이디*</td>
+              <td htmlFor="username">
+                아이디 <span>*</span>
+              </td>
               <td>
                 <input
                   type="text"
@@ -129,13 +300,23 @@ const SignUp = () => {
                   name="username"
                   value={form.username}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
+                  placeholder="아이디를 입력해 주세요."
                   required
                 />
-                <button className="checkBtn">중복확인</button>
+                {touched.username && errors.username && (
+                  <ErrorMessage>{errors.username}</ErrorMessage>
+                )}
+                <button className="checkBtn" type="button">
+                  중복확인
+                </button>
               </td>
             </tr>
             <tr>
-              <td htmlFor="password">비밀번호*</td>
+              <td htmlFor="password">
+                비밀번호 <span>*</span>
+              </td>
               <td>
                 <input
                   type="password"
@@ -143,12 +324,20 @@ const SignUp = () => {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
+                  placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
                   required
                 />
+                {touched.password && errors.password && (
+                  <ErrorMessage>{errors.password}</ErrorMessage>
+                )}
               </td>
             </tr>
             <tr>
-              <td htmlFor="confirmPassword">비밀번호 재확인*</td>
+              <td htmlFor="confirmPassword">
+                비밀번호 재확인 <span>*</span>
+              </td>
               <td>
                 <input
                   type="password"
@@ -156,12 +345,19 @@ const SignUp = () => {
                   name="confirmPassword"
                   value={form.confirmPassword}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
                   required
                 />
+                {touched.confirmPassword && errors.confirmPassword && (
+                  <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
+                )}
               </td>
             </tr>
             <tr>
-              <td htmlFor="email">이메일*</td>
+              <td htmlFor="email">
+                이메일 <span>*</span>
+              </td>
               <td>
                 <input
                   type="email"
@@ -169,9 +365,13 @@ const SignUp = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
                   required
                 />
-                <button className="checkBtn">본인인증</button>
+                {touched.email && errors.email && (
+                  <ErrorMessage>{errors.email}</ErrorMessage>
+                )}
               </td>
             </tr>
             <tr>
@@ -183,8 +383,13 @@ const SignUp = () => {
                   name="verificationCode"
                   value={form.verificationCode}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
                   required
                 />
+                {touched.verificationCode && errors.verificationCode && (
+                  <ErrorMessage>{errors.verificationCode}</ErrorMessage>
+                )}
               </td>
             </tr>
           </table>
@@ -193,8 +398,8 @@ const SignUp = () => {
         <hr style={{ margin: "20px 0" }} />
 
         <FormSection className="add">
-          <h1>추가정보</h1>
           <table>
+            <caption>추가정보</caption>
             <tr>
               <td htmlFor="nickname">닉네임</td>
               <td>
@@ -211,37 +416,83 @@ const SignUp = () => {
               <td htmlFor="gender">성별</td>
               <td>
                 <button
-                  className="femaleBtn"
-                  selected={form.gender === "Female"}
-                  onClick={() => handleGenderSelect("Female")}
-                >
-                  여자
-                </button>
-                <button
+                  type="button"
                   className="maleBtn"
-                  selected={form.gender === "Male"}
-                  onClick={() => handleGenderSelect("Male")}
+                  selected={form.gender === "남성"}
+                  onClick={() => handleGenderSelect("남성")}
                 >
                   남자
+                </button>
+                <button
+                  type="button"
+                  className="femaleBtn"
+                  selected={form.gender === "여성"}
+                  onClick={() => handleGenderSelect("여성")}
+                >
+                  여자
                 </button>
               </td>
             </tr>
             <tr>
               <td htmlFor="birthDate">생년월일</td>
               <td>
-                <input
-                  type="date"
-                  id="birthDate"
-                  name="birthDate"
-                  value={form.birthDate}
+                <select
+                  className="birthDate"
+                  name="birthYear"
+                  value={form.birthYear}
                   onChange={handleChange}
-                />
+                >
+                  <option value="">년</option>
+                  {Array.from({ length: 125 }, (_, i) => 1900 + i).map(
+                    (year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    )
+                  )}
+                </select>
+                <select
+                  className="birthDate"
+                  name="birthMonth"
+                  value={form.birthMonth}
+                  onChange={handleMonthChange}
+                >
+                  <option value="">월</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="birthDate"
+                  name="birthDay"
+                  value={form.birthDay}
+                  onChange={handleChange}
+                >
+                  <option value="">일</option>
+                  {Array.from(
+                    {
+                      length: daysInMonth(
+                        parseInt(form.birthMonth, 10),
+                        parseInt(form.birthYear, 10)
+                      ),
+                    },
+                    (_, i) => i + 1
+                  ).map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
               </td>
             </tr>
           </table>
         </FormSection>
         <ButtonContainer>
-          <button className="back">이전</button>
+          <button className="back" onClick={() => setActiveStep(0)}>
+            이전
+          </button>
           <button className="signup" type="submit">
             회원가입
           </button>
