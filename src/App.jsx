@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router";
-import SignUpToggle from "./pages/SignUpToggle";
+import SignUpPage from "./pages/SignUpPage";
 
 function App() {
   return (
     <Routes>
       <Route path="/" />
-      <Route path="/signup" element={<SignUpToggle />} />
+      <Route path="/signup" element={<SignUpPage />} />
     </Routes>
   );
 }

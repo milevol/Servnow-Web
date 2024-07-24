@@ -127,7 +127,7 @@ const ErrorMessage = styled.p`
   color: red;
 `;
 
-const SignUp = ({ setActiveStep }) => {
+const SignUpInputInfo = ({ setActiveStep }) => {
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -502,4 +502,4 @@ const SignUp = ({ setActiveStep }) => {
   );
 };
 
-export default SignUp;
+export default SignUpInputInfo;
