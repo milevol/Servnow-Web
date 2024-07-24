@@ -4,9 +4,9 @@
 
 import React, { useState } from "react";
 import styled from "styled-components";
-import SignUp from "../components/SignUpInputInfo";
-import SignUpComplete from "../components/SignUpComplete";
-import SignUpTermsAgreement from "../components/SignUpTermsAgreement";
+import SignUp from "../components/signup/SignUpInputInfo";
+import SignUpComplete from "../components/signup/SignUpComplete";
+import SignUpTermsAgreement from "../components/signup/SignUpTermsAgreement";
 
 const Container = styled.div`
   .pageName {
