@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 //  prettier-ignore
 const Container = styled.div`
   margin: 50px;
-  padding: 50px 35px;
+  padding: 50px 35px 25px 35px;
   background-color: white;
   border-radius: 24px;
   opacity: ${(props) => (props.disabled ? "50%" : "100%")};
@@ -43,6 +43,7 @@ const AnswerContainer = styled.form`
 
   div:has(input:checked) {
     background-color: #c6d3ff;
+    border: 1px solid #4c76fe;
   }
 `;
 
@@ -53,6 +54,7 @@ const ChoiceContainer = styled.div`
   background-color: #f2f5ff;
   margin: 12px 0;
   padding: 16px 8px;
+  border: 1px solid #f2f5ff;
   border-radius: 8px;
   transition: all 0.05s ease-in-out;
 `;
@@ -111,6 +113,10 @@ const Answer = ({ type }) => {
           <ChoiceContainer>
             <ChoiceInput type="radio" name="1" id="c" value="c" />
             <ChoiceLabel htmlFor="c">3번</ChoiceLabel>
+          </ChoiceContainer>
+          <ChoiceContainer>
+            <ChoiceInput type="radio" name="1" id="d" value="d" />
+            <ChoiceLabel htmlFor="d">4번</ChoiceLabel>
           </ChoiceContainer>
         </AnswerContainer>
       );
