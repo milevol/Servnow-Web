@@ -1,10 +1,10 @@
-//목적: 로그인 버튼 클릭 시 작동할 로그인페이지 레이아웃 화면을 담당
-//기능: 사용자 로그인 정보 입력
-//2024.07.21 데이-이연
+//목적: 아이디 찾기 링크 클릭시 작동할 아이디 찾기 레이아웃 화면 스타일 담당
+//기능: 사용자 성명 전화번호 검증 및 아이디 찾기 기능
+//2024.07.25 데이-이연
 
 import React from 'react';
 import styled from 'styled-components';
-import LoginForm from '../components/login/LoginForm'; // 파일 경로와 default export 확인
+import FindIdForm from '../components/login/FindIdForm';
 
 const Container = styled.div`
   display: flex;
@@ -34,17 +34,17 @@ const WelcomeText = styled.p`
   font-size: 22px;
 `;
 
-const LoginPage = () => {
+const FindIdPage = () => {
   return (
     <Container>
       <Content>
-        <Title>로그인</Title>
-        <WelcomeText>서브나우에 오신 것을 환영합니다.</WelcomeText>
-        <LoginForm />
+        <Title>아이디 찾기</Title>
+        <WelcomeText>성명과 전화번호를 입력해주세요</WelcomeText>
+        <FindIdForm />
       </Content>
     </Container>
   );
 };
 
 
-export default LoginPage;
+export default FindIdPage;

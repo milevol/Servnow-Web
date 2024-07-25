@@ -2,7 +2,6 @@
 //기능: 사용자 로그인 정보 입력 검증 처리
 //2024.07.21 데이-이연
 
-
 import React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -89,7 +88,7 @@ const KakaoButton = styled.button`
   width: 65px;
   height: 65px;
   margin: 1.5rem 0;
-  background: url('../../images/kakao_logo.png') no-repeat center center / cover;
+  background: url('/public/kakao_logo.png') no-repeat center center / cover;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -180,7 +179,7 @@ const LoginForm = () => {
 
     if(!email ) {
       setEmailError('이메일을 입력해주세요.');
-      hasError = true;
+      hasError = true; //에러 존재하는지 확인
       setError('');
       setPasswordError('');
     } 
@@ -255,9 +254,9 @@ const LoginForm = () => {
       </form>
       
       <LinksContainer>
-        <SearchLink to="/">아이디 찾기</SearchLink>
+        <SearchLink to="/find-id">아이디 찾기</SearchLink>
         <Separator />
-        <SearchLink to="/">비밀번호 찾기</SearchLink>
+        <SearchLink to="/find-pswd">비밀번호 찾기</SearchLink>
       </LinksContainer>
       <Hr />
       

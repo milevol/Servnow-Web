@@ -4,7 +4,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import LoginForm from '../components/login/LoginForm'; // 파일 경로와 default export 확인
+import FindPasswordForm from '../components/login/FindPasswordForm';
 
 const Container = styled.div`
   display: flex;
@@ -34,17 +34,17 @@ const WelcomeText = styled.p`
   font-size: 22px;
 `;
 
-const LoginPage = () => {
+const FindPasswordPage = () => {
   return (
     <Container>
       <Content>
-        <Title>로그인</Title>
-        <WelcomeText>서브나우에 오신 것을 환영합니다.</WelcomeText>
-        <LoginForm />
+        <Title>비밀번호 찾기</Title>
+        <WelcomeText>이메일을 입력해주세요</WelcomeText>
+        <FindPasswordForm />
       </Content>
     </Container>
   );
 };
 
 
-export default LoginPage;
+export default FindPasswordPage;
