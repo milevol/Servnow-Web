@@ -23,7 +23,7 @@ const StateContainer = styled.div`
   justify-content: space-around;
   align-items: center;
   border-radius: 50px;
-  width: 1190px;
+  width: 70%;
   height: 60px;
   margin: 20px auto;
 `;

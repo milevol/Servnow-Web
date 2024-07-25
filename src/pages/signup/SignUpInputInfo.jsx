@@ -13,13 +13,21 @@ const FormContainer = styled.div`
   color: #5d6670;
   font-size: small;
 
-  .checkBtn {
+  .idCheckBtn,
+  .emailCheckBtn {
     width: 100px;
     height: 35px;
     color: white;
-    background-color: #3e77ff;
     border: none;
     margin-left: 20px;
+  }
+
+  .idCheckBtn {
+    background-color: #3e77ff;
+  }
+
+  .emailCheckBtn {
+    background-color: #011b6c;
   }
 
   .femaleBtn {
@@ -193,7 +201,6 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     // Validate email
     const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email) {
-      newErrors.email = "이메일을 입력해 주세요.";
       isValid = false;
     } else if (!emailValidation.test(form.email)) {
       newErrors.email = "올바른 이메일 형식이 아닙니다.";
@@ -308,7 +315,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                 {touched.username && errors.username && (
                   <ErrorMessage>{errors.username}</ErrorMessage>
                 )}
-                <button className="checkBtn" type="button">
+                <button className="idCheckBtn" type="button">
                   중복확인
                 </button>
               </td>
@@ -367,8 +374,12 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   onFocus={handleFocus}
+                  placeholder="이메일을 입력해 주세요."
                   required
                 />
+                <button className="emailCheckBtn" type="button">
+                  본인인증
+                </button>
                 {touched.email && errors.email && (
                   <ErrorMessage>{errors.email}</ErrorMessage>
                 )}
