@@ -11,7 +11,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to bottom, #236ffc 50%, #f0f2f5 50%);
+  background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
 `;
 
 const Content = styled.div`

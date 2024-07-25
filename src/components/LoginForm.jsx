@@ -6,10 +6,11 @@
 import React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const FormContainer = styled.div`
   width: 500px;
-  height: 600px;
+  height: 700px;
   padding: 2rem;
   background-color: white;
   border-radius: 30px;
@@ -24,87 +25,143 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-`
+  margin-top: 2.5rem;
+  `
 
 const Input = styled.input`
-  width: 400px;
-  height: 50;
+  width: 430px;
+  height: 1.5rem;
   padding: 0.8rem;
-  margin: 1rem 0 0e.5rem 0;
+  margin-top: 1rem;
   border: 3px solid #c2e0f2;
-  border-radius: 4px;
-  font-size: 1.2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+`;
+
+const RadioContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+`;
+
+const RadioLabel = styled.label`
+  margin-left: 0.5rem;
+  font-size: 1rem;
 `;
 
 
 const LoginButton= styled.button`
-  width: 90%;
+  width: 100%;
+
   padding: 0.8rem;
   margin-top: 2rem;
-  background-color: #236ffc;
+  background-color: #4C76FE;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
+  border: 3px solid #4C76FE ;
   cursor: pointer;
   font-size: 1.2rem;
+  font-weight: bold;
 
   &:hover {
-    background-color: #1c86ee;
+    background-color: #4b6bd1;
   }
 `;
+const SignupButton= styled.button`
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1rem;
+  background-color: white;
+  color: #4C76FE;
+  border: 3px solid #4C76FE ;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
 
+  &:hover {
+    background-color: white;
+  }
+`;
 
 const KakaoButton = styled.button`
-  width: 80%;
-  height: 50px;
-  padding: 0.8rem;
+  width: 65px;
+  height: 65px;
   margin: 1.5rem 0;
-  background-color: #fccf03;
-  color: white;
+  background: url('../../images/kakao_logo.png') no-repeat center center / cover;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1.2rem;
-  background-image: url('/images/kakao_logo.png');
-  background-size: 30px 30px;
-  background-repeat: no-repeat;
-  background-position: 10px center;
-  padding-left: 40px;
-
-  &:hover {
-    background-color: #ebc415;
-  }
 `;
 
-const Link = styled.a`
-  display: block;
-  margin: 1em 0 0 0;
-  color: #1e90ff;
-  cursor: pointer;
-  font-size: 1.3rem;
+// const Link = styled.a`
+//   display: block;
+//   margin: 1em 0 0 0;
+//   color: #1e90ff;
+//   cursor: pointer;
+//   font-size: 1.3rem;
+// `;
+
+const Hr = styled.hr`
+  width: 90%;
+  border: none;
+  border-top: 1px solid #cccccc;
+  margin: 0.7rem 0 0.8rem 0;
 `;
-const KakaoText = styled.p`
+
+const SnsText = styled.p`
   font-size: 1.2rem;
-  margin-top: 3rem;
-`
-const EmailText = styled.p`
-  font-size: 1.2rem;
-  margin-top: 3rem;
-  margin-bottom: 0.8rem;
-`
-const PasswordText = styled.p`
-  font-size: 1.2rem;
-  margin-top: 2.3rem;
-  margin-bottom: 0.8rem;
+  margin-top: 2.5rem;
 
 `
+const SnsSmallText = styled.span`
+  font-size: 0.8rem;
+  margin-top: 0.8rem;
+  color: #666666;
+`
+
+// const EmailText = styled.p`
+//   font-size: 1.2rem;
+//   margin-top: 3rem;
+//   margin-bottom: 0.8rem;
+// `
+// const PasswordText = styled.p`
+//   font-size: 1.2rem;
+//   margin-top: 2.3rem;
+//   margin-bottom: 0.8rem;
+
+// `
 const ErrorText = styled.p`
   font-size: 1rem;
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
+  margin-top: 0.3rem;
   color: red;
 
 `;
+
+const LinksContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+`;
+const SearchLink = styled(Link)`
+  margin: 0 1rem;
+  font-size: 1rem;
+  color: #666666;
+  cursuor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+const Separator = styled.div`
+  width: 1px;
+  height: 30px;
+  background-color: #cccccc;
+  margin: 0 1rem;
+`;
+
 
 const LoginForm = () => {
 
@@ -113,9 +170,9 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [stayedLoggedIn, setStayedLoggedIn] = useState(false);
 
-
-  //서버에서 회원 정보 가져오기
+  //서버에서 회원 정보 가져오기 검증
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -124,10 +181,13 @@ const LoginForm = () => {
     if(!email ) {
       setEmailError('이메일을 입력해주세요.');
       hasError = true;
+      setError('');
+      setPasswordError('');
     } 
     else if(!password) {
       setPasswordError('비밀번호를 입력해주세요.');
       setEmailError('');
+      setError('');
       hasError = true;
     } else {
       setEmailError('');
@@ -143,26 +203,34 @@ const LoginForm = () => {
         {email,
          password});
      //토큰을 로컬스토리지에 저장하기
-     localStorage.setItem('token', response.data.token);
+     if (stayedLoggedIn) {
+      localStorage.setItem('token', response.data.token);
+     } else {
+      sessionStorage.setItem('token', response.data.token);
+     }
      alert('로그인에 성공하셨습니다.');
     }
     catch (err) {
       setError('! 유효하지 않은 이메일 또는 비밀번호 입니다.')
     }
   }
+  // 카카오 간편로그인 REST API 이용 기능
+  const handleKakaoLogin = () => {
+    const REST_API_KEY = '4836fc77ee4a5dce2cd4d36ff3d7766d';
+    const REDIRECT_URI = 'http://localhost:5000/auth';
+    const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    window.location.href = kakaoAuthUrl;
+  };
   return (
     <FormContainer>
       <form onSubmit={handleSubmit}>
+        
         <InputContainer>
-          <EmailText>이메일</EmailText>
           <Input 
             type="email" 
             placeholder="이메일을 입력해주세요."
             value={email}
             onChange={(e) => setEmail(e.target.value)} />
-        </InputContainer>
-        <InputContainer>
-          <PasswordText>비밀번호</PasswordText>
           <Input 
             type="password"
             placeholder="비밀번호를 입력해주세요."
@@ -173,12 +241,29 @@ const LoginForm = () => {
             {passwordError &&<ErrorText>{passwordError}</ErrorText>}
         </InputContainer>
        
+        <RadioContainer>
+          <input
+            type="checkbox"
+            checked={stayedLoggedIn}
+            onChange={() => setStayedLoggedIn(!stayedLoggedIn)}
+          />
+          <RadioLabel>로그인 상태 유지</RadioLabel>
+        </RadioContainer>
+
         <LoginButton type='submit'>로그인</LoginButton>
+        <SignupButton>회원가입</SignupButton>
       </form>
-      <Link>회원가입</Link>
       
-      <KakaoText>간편로그인</KakaoText>
-      <KakaoButton>카카오 로그인</KakaoButton>
+      <LinksContainer>
+        <SearchLink to="/">아이디 찾기</SearchLink>
+        <Separator />
+        <SearchLink to="/">비밀번호 찾기</SearchLink>
+      </LinksContainer>
+      <Hr />
+      
+      <SnsText>SNS 계정으로 로그인</SnsText>
+      <SnsSmallText>비회원은 회원 가입 화면으로 이동합니다.</SnsSmallText>
+      <KakaoButton onClick={handleKakaoLogin}></KakaoButton>
     </FormContainer>
   );
 };
