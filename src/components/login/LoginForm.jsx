@@ -6,6 +6,7 @@ import React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import kakaoLogo from "../../assets/kakao_logo.png";
 
 const FormContainer = styled.div`
   width: 500px;
@@ -88,7 +89,7 @@ const KakaoButton = styled.button`
   width: 65px;
   height: 65px;
   margin: 1.5rem 0;
-  background: url('/public/kakao_logo.png') no-repeat center center / cover;
+  background: url(${kakaoLogo}) no-repeat center center / cover;
   border: none;
   border-radius: 4px;
   cursor: pointer;
