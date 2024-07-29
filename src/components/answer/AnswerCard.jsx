@@ -1,13 +1,18 @@
+// 목적: 사용자 답변 페이지 중 질문 카드 컴포넌트 구현
+// 기능: 사용자 답변 페이지 중 질문 카드 컴포넌트
+// 2024.07.26/엠마/신윤지
+// 추가되어야 할 기능: api 연결 후 데이터 props로 받아와 매핑 진행
+import React, { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import styled from "styled-components";
-import PropTypes from "prop-types";
 
-//  prettier-ignore
 const Container = styled.div`
-  margin: 50px;
+  margin: 30px 50px 50px 50px;
   padding: 50px 35px 25px 35px;
   background-color: white;
   border-radius: 24px;
   opacity: ${(props) => (props.disabled ? "50%" : "100%")};
+  box-shadow: 2px 2px 2px 2px rgb(0 0 0 / 20%);
 `;
 
 const QuestionContainer = styled.div``;
@@ -70,7 +75,7 @@ const ChoiceInput = styled.input`
 
   &:checked {
     border: 3px solid #4c76fe;
-    background: url("../../../public/check.png") no-repeat 50%/20px;
+    background: url("/check.png") no-repeat 50%/20px;
 
     &:after {
       content: "";
@@ -92,7 +97,17 @@ const ChoiceLabel = styled.label`
   color: #5d6670;
 `;
 
-const Text = styled.input``;
+const Text = styled.input`
+  width: 100%;
+  margin-top: 128px;
+  padding: 16px 8px;
+  border: 0px;
+  border-bottom: 6px solid #e1e8ff;
+  font-family: "Pretendard Thin";
+  font-size: 20px;
+  color: #5d6670;
+  outline: none;
+`;
 
 // 데이터 props로 받아와서 map 예정
 // key/name = 문제 번호, id/value = 선택지명 혹은 선택지번호
@@ -125,7 +140,22 @@ const Answer = ({ type }) => {
       // 객관식, 여러 개 선택
       return (
         <AnswerContainer>
-          <div />
+          <ChoiceContainer>
+            <ChoiceInput type="checkbox" name="1" id="a" value="a" />
+            <ChoiceLabel htmlFor="a">1번</ChoiceLabel>
+          </ChoiceContainer>
+          <ChoiceContainer>
+            <ChoiceInput type="checkbox" name="1" id="b" value="b" />
+            <ChoiceLabel htmlFor="b">2번</ChoiceLabel>
+          </ChoiceContainer>
+          <ChoiceContainer>
+            <ChoiceInput type="checkbox" name="1" id="c" value="c" />
+            <ChoiceLabel htmlFor="c">3번</ChoiceLabel>
+          </ChoiceContainer>
+          <ChoiceContainer>
+            <ChoiceInput type="checkbox" name="1" id="d" value="d" />
+            <ChoiceLabel htmlFor="d">4번</ChoiceLabel>
+          </ChoiceContainer>
         </AnswerContainer>
       );
 
@@ -133,7 +163,10 @@ const Answer = ({ type }) => {
       // 주관식
       return (
         <AnswerContainer>
-          <Text />
+          <Text
+            type="text"
+            placeholder="예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다.  예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다."
+          />
         </AnswerContainer>
       );
 
@@ -144,9 +177,23 @@ const Answer = ({ type }) => {
 };
 
 const AnswerCard = (props) => {
+  const [disabled, setDisabled] = useState(false);
+  const [ref, inView] = useInView({
+    threshold: 0.6,
+    delay: 100,
+  });
+
+  useEffect(() => {
+    if (!inView) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [inView]);
+
   return (
     // 현재 답변하고 있는 질문이 아닐 시 Container에 "disabled" props 전달
-    <Container>
+    <Container ref={ref} disabled={disabled}>
       <QuestionContainer>
         <QuestionTitle>
           <QuestionNumber>3.</QuestionNumber>
@@ -157,14 +204,6 @@ const AnswerCard = (props) => {
       <Answer type={props.type} />
     </Container>
   );
-};
-
-AnswerCard.propTypes = {
-  type: PropTypes.string,
-};
-
-Answer.propTypes = {
-  type: PropTypes.string,
 };
 
 export default AnswerCard;
