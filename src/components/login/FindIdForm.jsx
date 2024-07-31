@@ -7,8 +7,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 const FormContainer = styled.div`
-  width: 500px;
-  height: 400px;
+  width: 800px;
   padding: 2rem;
   background-color: white;
   border-radius: 30px;
@@ -18,35 +17,60 @@ const FormContainer = styled.div`
   flex-direction: column;
   align-items: center;
 `;
-
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 2rem;
+  margin-left:0px;
+  width: 700px;
+`;
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-top: 2.5rem;
+  width: 100%
+`;
+const InputText = styled.p`
+  font-size: 1.1rem;
+  margin-right: 1rem;
+  color: #5D6670;
+  width:20%;
+  text-align: left;
+`
+const Input = styled.input`
+  width: 23rem;
+  padding: 0.8rem;
+  border: 3px solid #c2e0f2;
+  border-radius: 8px;
+  font-size: 1rem;
 `;
 
-const Input = styled.input`
-  width: 430px;
-  height: 30px;
-  padding: 0.8rem;
-  margin-top: 1rem;
-  border: 3px solid #c2e0f2;
-  border-radius: 4px;
-  font-size: 1.1rem;
-`;
+const SendButton = styled.button`
+  width: 18%;
+  padding: 0.8rem 0;
+  background-color: #011b6c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 1rem;
+  font-weight: bold;
+  `
 
 const FindButton = styled.button`
   width: 100%;
   padding: 0.8rem;
-  margin-top: 2rem;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
   background-color: #4C76FE;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
-
+  font-weight: bold;
   &:hover {
     background-color: #4b6bd1;
   }
@@ -57,85 +81,182 @@ const ErrorText = styled.p`
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
   color: red;
-
 `;
-const SuccessMessage = styled.p`
-  font-size: 1.2rem;
-  margin-top: 2rem;
-  font-woight: bold;
+
+const ConfirmButton = styled.button`
+  width: 50%;
+  padding: 0.8rem;
+  background-color: #4C76FE;
+  margin-right: 1.5rem;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  &:hover {
+    background-color: #4b6bd1;
+  }
+`;
+const FindPswdButton = styled.button`
+  width: 50%;
+  padding: 0.8rem;
+  background-color: white;
+  margin-left: 1.5rem;
+  border: 2.3px solid #4C76FE ;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  &:hover {
+    background-color: white;
+  }
+`;
+const ButtonContainer =styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5rem;
+  width: 550px;
 `
 
+const FindText = styled.p`
+  font-size: 1.2rem;
+  margin-top: 4rem;
+  margin-bottom: 3.5rem;
+`;
+const SuccessMessage = styled.p`
+  font-size: 1.5rem;
+  margin: 2.5rem;
+  font-woight: bold;
+`
+const SuccessContainer = styled.div`
+  width: 550px;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 10px;
+  border: 3px solid #4C76FE;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const FindWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`
+const HighlightedUserId = styled.span`
+  color: #4C76FE;
+`;
 const FindIdForm = () => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+
   const [error, setError] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState('');
+  const [validNumber, setValidNumber] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
+
+  const handleVerificationSend = async () => {
+    if(!email) {
+      alert('이메일을 입력해주세요.');
+      setError('');
+      return
+    }
+    if (verificationSent === false){
+      try {
+        const response = await axios.post('http://localhost:5000/api/v1/auth/find/id', { email });
+        
+        if (response.data.success) {
+          setVerificationSent(true);
+          setVerificationCode(response.data.verificationCode)
+          alert('인증번호가 이메일로 전송되었습니다.');
+          setError('');
+        } else {
+          alert('이메일 전송에 실패했습니다.');
+          setVerificationSent(false);
+        } 
+      } catch (err) {
+        alert('등록되지 않은 이메일입니다.')
+        setVerificationSent(false);
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name) {
-      setNameError('이름을 입력해주세요.');
-      setError('');
-      setPhoneError('');
-
+    if (!email || !validNumber) {
+      alert('모든 필드를 작성해주세요.');
       return;
-
-    } else if(!phone) {
-        setPhoneError('전화번호를 입력해주세요.')
-        setError('');
-        setNameError('');
-
-        return;
     }
 
-    setNameError('');
-    setPhoneError('');
-    setError('');
+    if (validNumber !== verificationCode) {
+      alert('인증번호가 일치하지 않습니다.');
+      return;
+    }
 
     try {
       const response = await axios.post('http://localhost:5000/api/find-id', 
         { 
-            name, 
-            phone 
+           email,
+           validNumber
         });
 
       setUserId(response.data.userId);
-      setSuccessMessage('아이디 찾기 요청이 성공했습니다. 이메일을 확인해주세요.');
     } catch (err) {
-      setError('등록되지 않은 회원정보입니다.');
+
+      alert('등록되지 않은 이메일입니다.');
     }
   };
 
   return (
     <FormContainer>
+        {userId ? (
+            <FindWrapper>
+                <FindText>입력하신 정보와 일치하는 아이디는 다음과 같습니다.</FindText>
+                <SuccessContainer>
+                  <SuccessMessage>아이디는 <HighlightedUserId>{userId}</HighlightedUserId> 입니다.</SuccessMessage>
+                </SuccessContainer>
+
+                <ButtonContainer>
+                    <ConfirmButton>확인</ConfirmButton>
+                    <FindPswdButton>비밀번호 찾기</FindPswdButton>
+                </ButtonContainer>
+            </FindWrapper>
+        ) : (
       <form onSubmit={handleSubmit}>
-        <InputContainer>
+        <InputWrapper>
+          <InputText>이메일</InputText>
+          <Input
+            type="email"
+            placeholder="이메일을 입력해주세요."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <SendButton type='button' onClick={handleVerificationSend}>인증번호 전송</SendButton>
+        </InputWrapper>
+        {error && <ErrorText>{error}</ErrorText>}
+        <InputWrapper>
+          <InputText>인증번호</InputText>
           <Input
             type="text"
-            placeholder="이름을 입력해주세요."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="인증번호를 입력해주세요."
+            value={validNumber}
+            onChange={(e) => setValidNumber(e.target.value)}
           />
-          <Input
-            type="text"
-            placeholder="전화번호를 입력해주세요."
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          {nameError && <ErrorText>{nameError}</ErrorText>}
-          {phoneError && <ErrorText>{phoneError}</ErrorText>}
-          {error && <ErrorText>{error}</ErrorText>}
-        </InputContainer>
+        </InputWrapper>
 
         <FindButton type="submit">아이디 찾기</FindButton>
       </form>
+    )};
       
-      {userId && <SuccessMessage>당신의 아이디는 {userId}입니다.</SuccessMessage>}
     </FormContainer>
+  
   );
 };
 

@@ -2,13 +2,13 @@
 //기능: 사용자 이메일 검증 및 비밀번호 찾기 기능
 //2024.07.25 데이-이연
 
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
 const FormContainer = styled.div`
-  width: 500px;
-  height: 400px;
+  width: 800px;
   padding: 2rem;
   background-color: white;
   border-radius: 30px;
@@ -18,35 +18,60 @@ const FormContainer = styled.div`
   flex-direction: column;
   align-items: center;
 `;
-
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 2rem;
+  margin-left:0px;
+  width: 700px;
+`;
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-top: 2.5rem;
+  width: 100%
+`;
+const InputText = styled.p`
+  font-size: 1.1rem;
+  margin-right: 1rem;
+  color: #5D6670;
+  width:20%;
+  text-align: left;
+`
+const Input = styled.input`
+  width: 23rem;
+  padding: 0.8rem;
+  border: 3px solid #c2e0f2;
+  border-radius: 8px;
+  font-size: 1rem;
 `;
 
-const Input = styled.input`
-  width: 430px;
-  height: 30px;
-  padding: 0.8rem;
-  margin-top: 1rem;
-  border: 3px solid #c2e0f2;
-  border-radius: 4px;
-  font-size: 1.1rem;
-`;
+const SendButton = styled.button`
+  width: 18%;
+  padding: 0.8rem 0;
+  background-color: #011b6c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 1rem;
+  font-weight: bold;
+  `
 
 const FindButton = styled.button`
   width: 100%;
   padding: 0.8rem;
-  margin-top: 2rem;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
   background-color: #4C76FE;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
-
+  font-weight: bold;
   &:hover {
     background-color: #4b6bd1;
   }
@@ -62,7 +87,14 @@ const ErrorText = styled.p`
 const Password = styled.p`
   font-size: 1.2rem;
   margin-top: 2rem;
-  font-woight: bold;
+  font-weight: bold;
+`
+
+const Line = styled.hr`
+  width: 80%;
+  border:none;
+  border-top: 1px solid #c2e0f2;
+  margin: 4rem;
 `
 
 const FindPasswordForm = () => {
@@ -71,44 +103,115 @@ const FindPasswordForm = () => {
   const [emailError, setEmailError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordCheck, setPasswordCheck] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [certificationCode, setCertificationCode] = useState('');
+  const [validNumber, setValidNumber] = useState('');
+  const handleVerificationSend = async () => {
+    if(!email) {
+      alert('이메일을 입력해주세요.');
+      setError('');
+      return
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/send-verification-code', { email });
+      
+      if (response.data.success) {
+        setVerificationSent(true);
+        setCertificationCode(response.data.certificationCode)
+        alert('인증번호가 이메일로 전송되었습니다.');
+        setEmailError('');
+      } else {
+        alert('이메일 전송에 실패했습니다.');
+        setVerificationSent(false);
+      } 
+    } catch (err) {
+      alert('등록되지 않은 이메일입니다.')
+      setVerificationSent(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email) {
-      setEmailError('이메일을 입력해주세요.');
-      setError('');
+    if (!verificationSent) {
+      alert('먼저 이메일을 인증을 진행해주세요')
       return;
     }
-
-    setEmailError('');
+    if (!certificationCode) {
+      alert('인증번호를 입력해주세요.');
+      return;
+    }
+    if(password !== passwordCheck) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if(validNumber !== certificationCode) {
+      alert('인증번호가 일치하지 않습니다.');
+      return;
+    }
+    
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/find-pswd', { email });
+      const response = await axios.post('http://localhost:5000/api/v1/auth/find/pw', 
+        { email, 
+          validNumber, 
+          password 
+        });
 
       setPassword(response.data.password)
-      setSuccessMessage('비밀번호 찾기 요청이 성공했습니다. 이메일을 확인해주세요.');
+      setSuccessMessage('비밀번호 변경 요청이 성공했습니다.');
     } catch (err) {
-      setError('등록되지 않은 이메일입니다.');
+      setError('인증번호가 올바르지 않거나 다른 오류가 발생했습니다..');
     }
   };
 
   return (
     <FormContainer>
       <form onSubmit={handleSubmit}>
-        <InputContainer>
+      <InputWrapper>
+      <InputText>이메일</InputText>
           <Input
             type="email"
             placeholder="이메일을 입력해주세요."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-          />
-          {emailError && <ErrorText>{emailError}</ErrorText>}
-          {error && <ErrorText>{error}</ErrorText>}
-        </InputContainer>
+          />     
+      <SendButton type='button' onClick={handleVerificationSend}>인증번호 전송</SendButton>
+      </InputWrapper>
+      {emailError && <ErrorText>{emailError}</ErrorText>}
+      {error && <ErrorText>{error}</ErrorText>}
+      <InputWrapper>
+      <InputText>인증번호</InputText>
+          <Input
+            type="text"
+            placeholder="인증번호를 입력해주세요."
+            value={validNumber}
+            onChange={(e) => setValidNumber(e.target.value)}
+          />     
+      </InputWrapper>
+      <Line></Line>
+      <InputWrapper>
+      <InputText>새로운 비밀번호</InputText>
+          <Input
+            type="password"
+            placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />     
+      </InputWrapper>
 
-        <FindButton type="submit">비밀번호 찾기</FindButton>
+      <InputWrapper>
+      <InputText>비밀번호 확인</InputText>
+          <Input
+            type="password"
+            value={passwordCheck}
+            onChange={(e) => setPasswordCheck(e.target.value)}
+          />     
+      </InputWrapper>
+        <FindButton type="submit">비밀번호 변경</FindButton>
       </form>
       {successMessage && <p>{successMessage}</p>}
       {password && <Password>당신의 비밀번호는 {password}입니다.</Password>}

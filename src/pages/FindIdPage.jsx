@@ -31,7 +31,7 @@ const Title = styled.h1`
 const WelcomeText = styled.p`
   margin-bottom: 3rem; 
   color: white;
-  font-size: 22px;
+  font-size: 1.1rem;
 `;
 
 const FindIdPage = () => {
@@ -39,7 +39,7 @@ const FindIdPage = () => {
     <Container>
       <Content>
         <Title>아이디 찾기</Title>
-        <WelcomeText>성명과 전화번호를 입력해주세요</WelcomeText>
+        <WelcomeText>아이디를 잊으셨나요?</WelcomeText>
         <FindIdForm />
       </Content>
     </Container>

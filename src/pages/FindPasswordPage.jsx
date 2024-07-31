@@ -31,7 +31,7 @@ const Title = styled.h1`
 const WelcomeText = styled.p`
   margin-bottom: 3rem; 
   color: white;
-  font-size: 22px;
+  font-size: 1.1rem;
 `;
 
 const FindPasswordPage = () => {
@@ -39,7 +39,7 @@ const FindPasswordPage = () => {
     <Container>
       <Content>
         <Title>비밀번호 찾기</Title>
-        <WelcomeText>이메일을 입력해주세요</WelcomeText>
+        <WelcomeText>비밀번호를 잊으셨나요?</WelcomeText>
         <FindPasswordForm />
       </Content>
     </Container>

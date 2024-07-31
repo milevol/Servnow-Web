@@ -179,13 +179,13 @@ const LoginForm = () => {
     let hasError = false;
 
     if(!email ) {
-      setEmailError('이메일을 입력해주세요.');
+      setEmailError('! 이메일을 입력해주세요.');
       hasError = true; //에러 존재하는지 확인
       setError('');
       setPasswordError('');
     } 
     else if(!password) {
-      setPasswordError('비밀번호를 입력해주세요.');
+      setPasswordError('! 비밀번호를 입력해주세요.');
       setEmailError('');
       setError('');
       hasError = true;
@@ -199,7 +199,7 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/login', 
+      const response = await axios.post('http://localhost:5000/api/v1/auth/login', 
         {email,
          password});
      //토큰을 로컬스토리지에 저장하기
@@ -255,9 +255,9 @@ const LoginForm = () => {
       </form>
       
       <LinksContainer>
-        <SearchLink to="/find-id">아이디 찾기</SearchLink>
-        <Separator />
         <SearchLink to="/find-pswd">비밀번호 찾기</SearchLink>
+        <Separator />
+        <SearchLink to="/find-id">아이디 찾기</SearchLink>
       </LinksContainer>
       <Hr />
       
