@@ -1,7 +1,7 @@
-//목적: 비밀번호 찾기 시 작동할 비밀번호 찾기 폼기능 로직과 스타일을 담당
-//기능: 사용자 이메일 검증 및 비밀번호 찾기 기능
+//목적: 비밀번호 찾기 클릭 시 작동할 비밀번호 변경 폼기능 로직과 스타일을 담당
+//기능: 사용자 이메일 검증 및 비밀번호 변경 기능
 //2024.07.25 데이-이연
-
+//더 필요한기능: api연결, 비밀번호 검증
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
@@ -100,13 +100,14 @@ const Line = styled.hr`
 const FindPasswordForm = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [emailError, setEmailError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
   const [certificationCode, setCertificationCode] = useState('');
   const [validNumber, setValidNumber] = useState('');
+
+//인증번호 전송 버튼 클릭 시 작동할 기능
   const handleVerificationSend = async () => {
     if(!email) {
       alert('이메일을 입력해주세요.');
@@ -121,7 +122,7 @@ const FindPasswordForm = () => {
         setVerificationSent(true);
         setCertificationCode(response.data.certificationCode)
         alert('인증번호가 이메일로 전송되었습니다.');
-        setEmailError('');
+
       } else {
         alert('이메일 전송에 실패했습니다.');
         setVerificationSent(false);
@@ -131,7 +132,7 @@ const FindPasswordForm = () => {
       setVerificationSent(false);
     }
   };
-
+//비밀번호 변경 버튼 클릭시 작동 기능
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -160,7 +161,6 @@ const FindPasswordForm = () => {
           validNumber, 
           password 
         });
-
       setPassword(response.data.password)
       setSuccessMessage('비밀번호 변경 요청이 성공했습니다.');
     } catch (err) {
@@ -181,7 +181,6 @@ const FindPasswordForm = () => {
           />     
       <SendButton type='button' onClick={handleVerificationSend}>인증번호 전송</SendButton>
       </InputWrapper>
-      {emailError && <ErrorText>{emailError}</ErrorText>}
       {error && <ErrorText>{error}</ErrorText>}
       <InputWrapper>
       <InputText>인증번호</InputText>

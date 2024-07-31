@@ -1,6 +1,7 @@
 //목적: 로그인 버튼 클릭 시 작동할 로그인 폼기능 로직과 스타일을 담당
 //기능: 사용자 로그인 정보 입력 검증 처리
 //2024.07.21 데이-이연
+//더 필요한기능: api연결
 
 import React from 'react';
 import { useState } from 'react';
@@ -95,14 +96,6 @@ const KakaoButton = styled.button`
   cursor: pointer;
 `;
 
-// const Link = styled.a`
-//   display: block;
-//   margin: 1em 0 0 0;
-//   color: #1e90ff;
-//   cursor: pointer;
-//   font-size: 1.3rem;
-// `;
-
 const Hr = styled.hr`
   width: 90%;
   border: none;
@@ -121,17 +114,6 @@ const SnsSmallText = styled.span`
   color: #666666;
 `
 
-// const EmailText = styled.p`
-//   font-size: 1.2rem;
-//   margin-top: 3rem;
-//   margin-bottom: 0.8rem;
-// `
-// const PasswordText = styled.p`
-//   font-size: 1.2rem;
-//   margin-top: 2.3rem;
-//   margin-bottom: 0.8rem;
-
-// `
 const ErrorText = styled.p`
   font-size: 1rem;
   margin-top: 0.3rem;
@@ -202,6 +184,7 @@ const LoginForm = () => {
       const response = await axios.post('http://localhost:5000/api/v1/auth/login', 
         {email,
          password});
+
      //토큰을 로컬스토리지에 저장하기
      if (stayedLoggedIn) {
       localStorage.setItem('token', response.data.token);
@@ -221,6 +204,7 @@ const LoginForm = () => {
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = kakaoAuthUrl;
   };
+ 
   return (
     <FormContainer>
       <form onSubmit={handleSubmit}>

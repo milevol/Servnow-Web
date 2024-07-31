@@ -1,6 +1,7 @@
 //목적: 아이디 찾기 링크 클릭 시 작동할 아이디 찾기 폼기능 로직과 스타일을 담당
 //기능: 사용자 개인정보 검증 및 아이디 찾기 기능
 //2024.07.25 데이-이연
+//더 추가할기능: api 연결
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
@@ -151,6 +152,7 @@ const FindWrapper = styled.div`
 const HighlightedUserId = styled.span`
   color: #4C76FE;
 `;
+
 const FindIdForm = () => {
 
   const [error, setError] = useState('');
@@ -161,6 +163,7 @@ const FindIdForm = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
 
+  // 인증번호 전송 버튼 클릭시 작동할 기능
   const handleVerificationSend = async () => {
     if(!email) {
       alert('이메일을 입력해주세요.');
@@ -186,7 +189,8 @@ const FindIdForm = () => {
       }
     }
   };
-
+  
+// 아이디찾기 버튼 클릭 시 작동할 기능
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -250,7 +254,6 @@ const FindIdForm = () => {
             onChange={(e) => setValidNumber(e.target.value)}
           />
         </InputWrapper>
-
         <FindButton type="submit">아이디 찾기</FindButton>
       </form>
     )};
