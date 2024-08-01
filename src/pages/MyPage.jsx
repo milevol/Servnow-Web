@@ -48,7 +48,7 @@ const MyPageContainer = styled.div`
     height: 200px;
     background-color: #f2f5ff;
     border-radius: 15px;
-    margin: 30px 0;
+    margin: 25px 0;
   }
 
   #profile {
