@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import AnswerEndPage from "./pages/AnswerEndPage";
 import AnswerPage from "./pages/AnswerPage";
 import SignUpPage from "./pages/signup/SignUpPage";
+import MyPage from "./pages/MyPage";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/answer" element={<AnswerPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/mypage" element={<MyPage />} />
     </Routes>
   );
 }
