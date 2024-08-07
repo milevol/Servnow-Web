@@ -1,10 +1,10 @@
-//  HomePage.jsx
-//  목적: 메인 페이지 구현
-//  기능: 설문 목록 표시, 정렬 기능 제공, 마스코트 이미지 표시
-//  작성자: 임사랑
-//  작성일: 2024.07.19
+// HomePage.jsx
+// 목적: 메인 페이지 구현
+// 기능: 설문 목록 표시, 정렬 기능 제공, 마스코트 이미지 표시
+// 작성자: 임사랑
+// 작성일: 2024.07.19
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
@@ -85,16 +85,13 @@ function HomePage() {
   // 정렬 옵션 상태
   const [sortOption, setSortOption] = useState("day");
   // 설문 데이터 상태
-  const [data, setData] = useState(mockData);
+  const [data, setData] = useState([]);
 
-  // 정렬 옵션 변경 핸들러
-  // 선택된 옵션에 따라 데이터를 정렬
-  const handleSortChange = (e) => {
-    const option = e.target.value;
-    setSortOption(option);
-    const sortedData = [...data].sort((a, b) => {
+  // 데이터를 정렬하는 함수
+  const sortData = (option, dataToSort) => {
+    return [...dataToSort].sort((a, b) => {
       if (option === "day") {
-        return b.day - a.day;
+        return a.day - b.day;
       } else if (option === "title") {
         return a.title.localeCompare(b.title);
       } else if (option === "people") {
@@ -102,6 +99,19 @@ function HomePage() {
       }
       return 0;
     });
+  };
+
+  // 컴포넌트가 마운트될 때 데이터 정렬
+  useEffect(() => {
+    const sortedData = sortData("day", mockData);
+    setData(sortedData);
+  }, []);
+
+  // 정렬 옵션 변경 핸들러
+  const handleSortChange = (e) => {
+    const option = e.target.value;
+    setSortOption(option);
+    const sortedData = sortData(option, mockData);
     setData(sortedData);
   };
 

@@ -110,7 +110,7 @@ const PeopleIcon = styled.div`
 const Button = styled.div`
   width: 150px;
   height: 70px;
-  background: ${({ completed }) => (completed ? "#AAAAAA" : "#4c76fe")};
+  background: ${({ completed }) => (completed ? "#BFBFBF" : "#4c76fe")};
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -148,7 +148,7 @@ function SurveyCard({ title, day, date, people, completed }) {
           <PeopleIcon />
           <Percentage>
             <CurrentParticipants>{people}</CurrentParticipants>
-            <TotalParticipants>/100</TotalParticipants>
+            {/* <TotalParticipants>/100</TotalParticipants> */}
           </Percentage>
         </PercentageContainer>
       </LeftSection>

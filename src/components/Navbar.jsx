@@ -57,7 +57,8 @@ const SearchBar = styled.div`
   flex: 1;
   height: 100%;
   background: #f2f5ff;
-  border: 1px solid #e6e6e6;
+  border: ${({ isSearchPage }) =>
+    isSearchPage ? "1px solid #e6e6e6" : "none"};
   border-radius: 30px 0 0 30px;
   display: flex;
   align-items: center;
@@ -68,20 +69,21 @@ const SearchIconContainer = styled.div`
   width: 50px;
   height: 41px;
   background: ${({ isSearchPage }) => (isSearchPage ? "#C6D3FF" : "#f2f5ff")};
-  border: 1px solid #e6e6e6;
+  border: ${({ isSearchPage }) =>
+    isSearchPage ? "1px solid #e6e6e6" : "none"};
   border-left: none;
   border-radius: 0 30px 30px 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 `;
 
 const SearchIcon = styled.div`
   width: 29px;
   height: 29px;
   background: url(${searchImage}) no-repeat center center;
-  background-size: cover;
-  cursor: pointer;
+  background-size: contain;
 `;
 
 // 검색 입력 스타일
@@ -101,24 +103,24 @@ const SearchInput = styled.input`
 const IconContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: 20px;
 `;
 
-// 아이콘 스타일
-const Icon = styled.div`
-  width: 26px;
-  height: 26px;
-  margin-left: 20px;
-  background-size: cover;
-`;
-
-// 알림아이콘
-const AlarmIcon = styled(Icon)`
+// 알림 아이콘 스타일
+const AlarmIcon = styled.div`
+  width: 21.75px;
+  height: 22.584px;
   background: url(${alarmImage}) no-repeat center center;
+  background-size: contain;
+  cursor: pointer;
 `;
 
-// 프로필아이콘
-const ProfileIcon = styled(Icon)`
+// 프로필 아이콘 스타일
+const ProfileIcon = styled.div`
+  width: 21.75px;
+  height: 22.584px;
   background: url(${profileImage}) no-repeat center center;
+  background-size: contain;
   cursor: pointer;
 `;
 
@@ -154,11 +156,11 @@ const Navbar = () => {
   return (
     <>
       <NavbarContainer>
-        <SideMascot onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <SideMascot onClick={() => navigate("/")} />
         {!isSearchPage && (
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <SearchBarContainer isSearchPage={isSearchPage}>
-              <SearchBar>
+              <SearchBar isSearchPage={isSearchPage}>
                 <form
                   onSubmit={handleSearchSubmit}
                   style={{ display: "flex", width: "100%" }}
@@ -171,7 +173,10 @@ const Navbar = () => {
                 </form>
               </SearchBar>
               <SearchIconContainer isSearchPage={isSearchPage}>
-                <SearchIcon onClick={handleSearchSubmit} />
+                <SearchIcon
+                  isSearchPage={isSearchPage}
+                  onClick={handleSearchSubmit}
+                />
               </SearchIconContainer>
             </SearchBarContainer>
             <IconContainer>
@@ -183,7 +188,7 @@ const Navbar = () => {
         {isSearchPage && (
           <>
             <SearchBarContainer isSearchPage={isSearchPage}>
-              <SearchBar>
+              <SearchBar isSearchPage={isSearchPage}>
                 <form
                   onSubmit={handleSearchSubmit}
                   style={{ display: "flex", width: "100%" }}
@@ -196,7 +201,10 @@ const Navbar = () => {
                 </form>
               </SearchBar>
               <SearchIconContainer isSearchPage={isSearchPage}>
-                <SearchIcon onClick={handleSearchSubmit} />
+                <SearchIcon
+                  isSearchPage={isSearchPage}
+                  onClick={handleSearchSubmit}
+                />
               </SearchIconContainer>
             </SearchBarContainer>
             <IconContainer>
