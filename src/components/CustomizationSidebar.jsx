@@ -24,11 +24,11 @@ const CustomizationPanel = styled.div`
   flex-direction: column;
   padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 500px;
+  border-radius: 15px;
+  width: 773px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: 75vh;
+  max-height: 834px;
   overflow-y: auto;
 `;
 const TitleSection = styled.div`
@@ -46,12 +46,12 @@ const Title = styled.h2`
   margin-bottom: 10px;
   color: ${props => (props.selected ? '#4c76fe' : '#b6b6b6')};
   cursor: pointer;
-  margin-left: 6rem;
-  margin-right: 6rem;
+  margin-left: 10rem;
+  margin-right: 10rem;
 `;
 
 const HorizontalLine = styled.div`
-  width: 520px;
+  width: 795px;
   height: 2px;
   background: ${props =>
     props.selectedTab === 'customization'
@@ -71,6 +71,7 @@ const MainLabel = styled.label`
   margin-bottom: 1rem;
   margin-left: 0.5rem;
   font-weight: bold;
+  font-size: 18px;
 `;
 
 const Label = styled.label`
@@ -92,9 +93,9 @@ const FontLabel = styled.label`
 
 const ColorPickerWrapper = styled.div`
   margin-bottom: -10px;
-  margin-left: 1.5rem;
+  margin-left: 4rem;
   .chrome-picker {
-    width: 95% !important;
+    width: 90% !important;
     box-shadow: none !important;
     border-radius: 10px !important;
   }
@@ -123,11 +124,11 @@ const TextInput = styled.input`
   width: 16rem;
   padding: 0.8rem;
   padding-right: 3rem;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   border: 1px solid #E6E6E6;
   border-radius: 10px;
   box-sizing: border-box;
-  font-weight: bold;
+  cursor: pointer;
 `;
 const ColorBox = styled.div`
   position: absolute;
@@ -139,11 +140,12 @@ const ColorBox = styled.div`
   background-color: ${ props => props.color || 'transparent'};
   border: 1px solid #ccc;
   border-radius: 5px;
+
 `
 
 const FontInput = styled.input`
-  width: 29rem;
-  font-size: 1rem;
+  width: 35rem;
+  font-size: 1.1rem;
   padding: 0.8rem;
   border: 1px solid #E6E6E6;
   border-radius: 10px;
@@ -173,8 +175,8 @@ const CharacterSelectionContainer = styled.div`
   margin-left: 0rem;
 `
 const CharacterImage = styled.div`
-  width: 110px;
-  height: 150px;
+  width: 150px;
+  height: 200px;
   border: 5px solid ${props => (props.selected ? '#007bff' : '#ccc')};
   border-radius: 10px;
   background-color: #BAC5ED;
