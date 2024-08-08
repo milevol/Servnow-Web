@@ -106,7 +106,7 @@ const OptionButton = styled.button`
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: ${(props) => (props.center ? "center" : "right")};
+  justify-content: right;
   margin: 20px 0 0 27px;
 `;
 
