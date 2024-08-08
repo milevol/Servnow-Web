@@ -5,7 +5,6 @@
 import React from "react";
 import styled from "styled-components";
 import character from "../assets/logo1.png";
-import menu from "../assets/menu.png";
 
 const Container = styled.div`
   padding: 48px;
@@ -16,9 +15,23 @@ const SurveyContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  div:last-child {
-    padding: 48px 40px;
-    margin-top: 24px;
+  div:nth-child(2) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    div:first-child {
+      width: 70%;
+      padding: 48px 40px;
+      margin-top: 24px;
+
+      div {
+        width: fit-content;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+      }
+    }
   }
 `;
 
@@ -37,7 +50,6 @@ const SurveyWrapper = styled.div`
 `;
 
 const Survey = styled.div`
-  width: fit-content;
   padding: 16px 32px;
   border-radius: 12px;
   box-shadow: 1px 1px 1px 1px rgb(0 0 0 / 10%);
@@ -56,17 +68,49 @@ const Title = styled.div`
   justify-content: center;
   font-family: "Pretendard Bold";
   font-size: 26px;
-
-  img {
-    width: 32px;
-    margin: 0 0 0 36px;
-  }
+  padding-right: 18px;
 `;
 
 const Term = styled.p`
   margin-top: 12px;
   color: #5d6670;
   font-size: 20px;
+`;
+
+const Email = styled.div`
+  width: 30%;
+  padding: 32px 32px 52px 32px;
+  margin: 24px 0 0 24px;
+  border-radius: 12px;
+  box-shadow: 1px 1px 1px 1px rgb(0 0 0 / 10%);
+  background-color: white;
+  color: #061522;
+  font-size: 22px;
+
+  div:first-child {
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    span {
+      color: #3e77ff;
+    }
+  }
+`;
+
+const Text = styled.input`
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px 8px;
+  border: 0px;
+  border-bottom: 1px solid #dbe1e9;
+  font-size: 16px;
+  outline: none;
+
+  ::placeholder,
+  ::-ms-input-placeholder {
+    color: #dbe1e9;
+  }
 `;
 
 const DescriptionContainer = styled.div`
@@ -102,13 +146,19 @@ const AnswerStartPage = () => {
             <span>🎁</span> 스타벅스 아메리카노 기프티콘 추첨 10명
           </Survey>
         </SurveyWrapper>
-        <Survey>
-          <Title>
-            도서관에서의 가상현실(VR) 콘텐츠 이용자 경험 및 만족도 조사
-            <img src={menu} />
-          </Title>
-          <Term>2024.06.19. 오후 12:00~ 2024.07.19 오후 5:59</Term>
-        </Survey>
+        <div>
+          <Survey>
+            <Title>도서관에서의 가상현실(VR) 콘텐츠 이용자 경험 및 만족도 조사</Title>
+            <Term>2024.06.19. 오후 12:00~ 2024.07.19 오후 5:59</Term>
+          </Survey>
+          <Email>
+            <div>
+              이메일&nbsp;
+              <span>*</span>
+              <Text type="text" placeholder="응답을 받기 위해 필수적으로 입력해주세요." />
+            </div>
+          </Email>
+        </div>
       </SurveyContainer>
       <DescriptionContainer>
         <img src={character} />
