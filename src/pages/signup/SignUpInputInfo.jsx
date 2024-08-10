@@ -1,7 +1,7 @@
 // 목적: 회원가입 화면 속 정복입력 화면 구현
 // 기능: 사용자 정보 입력
-// 2024.07.25/곤/장고은
-// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기, 유효성 검사 재확인
+// 2024.08.08/곤/장고은
+// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기
 
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -132,7 +132,7 @@ const ButtonContainer = styled.div`
 `;
 const ErrorMessage = styled.p`
   margin-top: 5px;
-  color: red;
+  color: #011b6c;
 `;
 
 const SignUpInputInfo = ({ setActiveStep }) => {
@@ -155,6 +155,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     confirmPassword: "",
     email: "",
     verificationCode: "",
+    nickname: "",
   });
 
   const [touched, setTouched] = useState({
@@ -163,35 +164,34 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     confirmPassword: false,
     email: false,
     verificationCode: false,
+    nickname: false,
   });
 
   const validateForm = () => {
     let isValid = true;
     const newErrors = { ...errors };
 
-    /*   Validate username
+    //   Validate username
     if (!form.username) {
-      newErrors.username = "아이디를 입력해 주세요.";
+      newErrors.username = "아이디는 필수입력사항입니다.";
       isValid = false;
     } else {
       newErrors.username = "";
     }
-*/
+
     // Validate password
     const passwordValidation =
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-    if (!form.password) {
-      isValid = false;
-    } else if (!passwordValidation.test(form.password)) {
+    if (!form.password || !passwordValidation.test(form.password)) {
       newErrors.password =
-        "비밀번호는 영문, 숫자, 특수문자를 포함해 8~20자이어야 합니다.";
+        "비밀번호는 8~20자, 영문, 숫자, 특수문자 혼합으로 입력해주세요.";
       isValid = false;
     } else {
       newErrors.password = "";
     }
 
     // Validate confirmPassword
-    if (form.confirmPassword !== form.password) {
+    if (!form.confirmPassword || form.confirmPassword !== form.password) {
       newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
       isValid = false;
     } else {
@@ -200,10 +200,8 @@ const SignUpInputInfo = ({ setActiveStep }) => {
 
     // Validate email
     const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email) {
-      isValid = false;
-    } else if (!emailValidation.test(form.email)) {
-      newErrors.email = "올바른 이메일 형식이 아닙니다.";
+    if (!form.email || !emailValidation.test(form.email)) {
+      newErrors.email = "이메일 형식이 적합하지 않습니다.";
       isValid = false;
     } else {
       newErrors.email = "";
@@ -211,10 +209,28 @@ const SignUpInputInfo = ({ setActiveStep }) => {
 
     // Validate verificationCode
     if (!form.verificationCode) {
-      newErrors.verificationCode = "인증번호를 입력해 주세요.";
+      newErrors.verificationCode = "인증번호가 일치하지 않습니다.";
       isValid = false;
     } else {
       newErrors.verificationCode = "";
+    }
+
+    // Validate nickname
+    if (!form.nickname) {
+      newErrors.nickname = "멋진 닉네임이네요!";
+      isValid = false;
+    } else {
+      newErrors.nickname = "";
+    }
+
+    // Validate gender
+    if (!form.gender) {
+      isValid = false;
+    }
+
+    // Validate birth date
+    if (!form.birthYear || !form.birthMonth || !form.birthDay) {
+      isValid = false;
     }
 
     setErrors(newErrors);
@@ -284,6 +300,17 @@ const SignUpInputInfo = ({ setActiveStep }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 모든 필드를 touched 상태로 설정하여 에러 메시지를 표시
+    setTouched({
+      username: true,
+      password: true,
+      confirmPassword: true,
+      email: true,
+      verificationCode: true,
+      nickname: true,
+    });
+
     if (validateForm()) {
       setActiveStep(2);
       console.log(form);
@@ -310,14 +337,13 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onBlur={handleBlur}
                   onFocus={handleFocus}
                   placeholder="아이디를 입력해 주세요."
-                  required
                 />
-                {touched.username && errors.username && (
-                  <ErrorMessage>{errors.username}</ErrorMessage>
-                )}
                 <button className="idCheckBtn" type="button">
                   중복확인
                 </button>
+                {touched.username && errors.username && (
+                  <ErrorMessage>{errors.username}</ErrorMessage>
+                )}
               </td>
             </tr>
             <tr>
@@ -334,7 +360,6 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onBlur={handleBlur}
                   onFocus={handleFocus}
                   placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
-                  required
                 />
                 {touched.password && errors.password && (
                   <ErrorMessage>{errors.password}</ErrorMessage>
@@ -354,7 +379,6 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   onFocus={handleFocus}
-                  required
                 />
                 {touched.confirmPassword && errors.confirmPassword && (
                   <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
@@ -367,7 +391,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
               </td>
               <td>
                 <input
-                  type="email"
+                  type="text"
                   id="email"
                   name="email"
                   value={form.email}
@@ -375,7 +399,6 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onBlur={handleBlur}
                   onFocus={handleFocus}
                   placeholder="이메일을 입력해 주세요."
-                  required
                 />
                 <button className="emailCheckBtn" type="button">
                   본인인증
@@ -386,7 +409,9 @@ const SignUpInputInfo = ({ setActiveStep }) => {
               </td>
             </tr>
             <tr>
-              <td htmlFor="verificationCode">인증번호</td>
+              <td htmlFor="verificationCode">
+                인증번호 <span>*</span>
+              </td>
               <td>
                 <input
                   type="text"
@@ -396,8 +421,10 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   onFocus={handleFocus}
-                  required
                 />
+                <button className="emailCheckBtn" type="button">
+                  인증확인
+                </button>
                 {touched.verificationCode && errors.verificationCode && (
                   <ErrorMessage>{errors.verificationCode}</ErrorMessage>
                 )}
@@ -412,7 +439,9 @@ const SignUpInputInfo = ({ setActiveStep }) => {
           <table>
             <caption>추가정보</caption>
             <tr>
-              <td htmlFor="nickname">닉네임</td>
+              <td htmlFor="nickname">
+                닉네임 <span>*</span>
+              </td>
               <td>
                 <input
                   type="text"
@@ -420,11 +449,18 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   name="nickname"
                   value={form.nickname}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onFocus={handleFocus}
                 />
+                {touched.nickname && errors.nickname && (
+                  <ErrorMessage>{errors.nickname}</ErrorMessage>
+                )}
               </td>
             </tr>
             <tr>
-              <td htmlFor="gender">성별</td>
+              <td htmlFor="gender">
+                성별 <span>*</span>
+              </td>
               <td>
                 <button
                   type="button"
@@ -445,7 +481,9 @@ const SignUpInputInfo = ({ setActiveStep }) => {
               </td>
             </tr>
             <tr>
-              <td htmlFor="birthDate">생년월일</td>
+              <td htmlFor="birthDate">
+                생년월일 <span>*</span>
+              </td>
               <td>
                 <select
                   className="birthDate"
