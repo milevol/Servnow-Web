@@ -1,5 +1,5 @@
-//목적: 마이페이지 내정보 수정의 로직과 레이아웃 담당
-//기능: 사용자가 내정보 수정을 할 수 있도록 한다.
+//목적: 마이페이지 내정보 수정의 로직과 레이아웃 담당(일반 로그임)
+//기능: 사용자가 내정보 수정을 할 수 있도록 한다.(일반 로그인)
 //2024.07.31 데이-이연
 //더 추가할기능: api 연결
 
@@ -169,6 +169,7 @@ const MyInfoModifyPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
+  const [emailChange, setEmailChange] = useState(false);
   return (
     <PageContainer>
       <Header>내 정보 수정</Header>
@@ -189,15 +190,40 @@ const MyInfoModifyPage = () => {
           <InfoInput type="text" value={userId} readOnly />
           <OverlapButton>중복확인</OverlapButton>
         </InfoItem>
-        <InfoItem>
-          <InfoLabel>이메일 *</InfoLabel>
-          <InfoInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일을 입력해 주세요." />
-          <VerifyButton>본인인증</VerifyButton>
-        </InfoItem>
-        <InfoItem>
-          <InfoLabel>인증번호</InfoLabel>
-          <InfoInput type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} />
-        </InfoItem>
+        {emailChange ? (
+            <>
+              <InfoItem>
+                <InfoLabel>이메일 *</InfoLabel>
+                <InfoInput
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="이메일을 입력해 주세요."
+                />
+                <VerifyButton>본인인증</VerifyButton>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>인증번호</InfoLabel>
+                <InfoInput
+                  type="text"
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value)}
+                />
+                <VerifyButton>인증확인</VerifyButton>
+              </InfoItem>
+            </>
+          ) : (
+            <InfoItem>
+              <InfoLabel>이메일 *</InfoLabel>
+              <InfoInput
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="이메일을 입력해 주세요."
+              />
+              <OverlapButton onClick={() => setEmailChange(true)}>변경하기</OverlapButton>
+            </InfoItem>
+          )}
       </InfoContainer>
       <HorizontalSemiLine />
       <PasswordSection>

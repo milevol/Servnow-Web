@@ -4,9 +4,10 @@
 //더 추가할기능: api 연결
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import kakaoLogo from '../../../src/assets/kakao_logo.png'
+import axios from 'axios';
 
 const PageContainer = styled.div`
   margin: 0 auto;
@@ -191,9 +192,29 @@ const HorizontalSemiLine = styled.hr`
   margin: 2rem 0;
 `;
 const MyInfoModifyKakaoPage = () => {
-
+  const [nickname, setNickname] = useState('ari7717');
   const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
+  
+  useEffect(() => {
+    axios.get('')
+    .then(response => {
+      setNickname(response.data.nickname);
+    })
+    .catch(error => [
+      console.error('There was an error fetching the nickname!', error)
+    ]);
+  }, []);
 
+  const handleUpdateNickname = () => {
+    axios.post('', {nickname})
+      .then(response => {
+        alert('닉네임이 수정되었습니다.');
+      })
+      .catch(error => {
+        console.error('There was an error updating the nickname!', error);
+        alert('아이디 수정에 실패했습니다.');
+      });
+  }
   return (
     <PageContainer>
       <Header>내 정보 수정</Header>
@@ -205,8 +226,8 @@ const MyInfoModifyKakaoPage = () => {
       <ProfileContainer> 
         <NicknameContainer>
           <InfoLabel>닉네임</InfoLabel>
-          <NicknameInput type="text" value="ari7717" />
-          <UpdateButton>수정하기</UpdateButton>
+          <NicknameInput type="text" value={nickname} />
+          <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
         </NicknameContainer>
       </ProfileContainer>
       <HorizontalSemiLine/>
