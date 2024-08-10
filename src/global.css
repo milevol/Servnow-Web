@@ -1,5 +1,4 @@
 html,
-body,
 #root {
   height: 100%;
 }
@@ -9,8 +8,7 @@ body,
   font-weight: 400;
   font-style: normal;
 
-  src: url("./fonts/Pretendard-Regular.otf") format("opentype"),
-    url("./fonts/Pretendard-Regular.woff") format("woff");
+  src: url("./fonts/Pretendard-Regular.otf") format("opentype"), url("./fonts/Pretendard-Regular.woff") format("woff");
 }
 
 @font-face {
@@ -18,8 +16,7 @@ body,
   font-weight: 200;
   font-style: normal;
 
-  src: url("./fonts/Pretendard-Thin.otf") format("opentype"),
-    url("./fonts/Pretendard-Thin.woff") format("woff");
+  src: url("./fonts/Pretendard-Thin.otf") format("opentype"), url("./fonts/Pretendard-Thin.woff") format("woff");
 }
 
 @font-face {
@@ -27,8 +24,7 @@ body,
   font-weight: 600;
   font-style: normal;
 
-  src: url("./fonts/Pretendard-Bold.otf") format("opentype"),
-    url("./fonts/Pretendard-Bold.woff") format("woff");
+  src: url("./fonts/Pretendard-Bold.otf") format("opentype"), url("./fonts/Pretendard-Bold.woff") format("woff");
 }
 
 @font-face {
