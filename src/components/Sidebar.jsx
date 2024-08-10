@@ -59,10 +59,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       <SidebarItems>
         <SidebarItem
           fontWeight={500}
-          // active={activeItem === "mypage"}
-          // onClick={() => handleNavigation("/mypage", "mypage")}
-          active={activeItem === ""}
-          onClick={() => handleNavigation("/", "")}
+          active={activeItem === "mypage"}
+          onClick={() => handleNavigation("/mypage", "mypage")}
         >
           마이페이지
         </SidebarItem>

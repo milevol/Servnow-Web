@@ -1,12 +1,7 @@
-// Navbar.jsx
-// 목적: 상단 네비게이션 바를 구현
-// 기능: 사이드바 토글, 검색, 알림, 설정, 프로필 페이지 이동
-// 작성자: 임사랑
-// 작성일: 2024.07.19
-
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
+import { AiOutlineUser } from "react-icons/ai";
 import searchImage from "../assets/search.png";
 import alarmImage from "../assets/alarm.png";
 import profileImage from "../assets/profileOrigin.png";
@@ -17,11 +12,11 @@ import Sidebar from "./Sidebar";
 const NavbarContainer = styled.div`
   position: fixed;
   width: 100%;
-  height: 67px;
+  height: 60px;
   left: 0;
   top: 0;
   background: #ffffff;
-  box-shadow: 0px 0.550964px 0.550964px rgba(0, 0, 0, 0.25);
+  // box-shadow: 0px 0.550964px 0.550964px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -116,6 +111,7 @@ const AlarmIcon = styled.div`
 `;
 
 // 프로필 아이콘 스타일
+// 임시 수정해야됨
 const ProfileIcon = styled.div`
   width: 21.75px;
   height: 22.584px;
@@ -124,11 +120,30 @@ const ProfileIcon = styled.div`
   cursor: pointer;
 `;
 
-// Navbar 컴포넌트 함수
-// 네비게이션 바의 상태 관리 및 렌더링을 담당
+// 로그인 버튼 스타일
+const LoginButton = styled.button`
+  width: 119px;
+  height: 41px;
+  background: #3e77ff;
+  border: 1px solid #3e77ff;
+  border-radius: 30px;
+  font-family: "Pretendard", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* 아이콘과 텍스트 사이의 간격 */
+`;
+
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -140,7 +155,6 @@ const Navbar = () => {
   };
 
   // 검색 제출 핸들러
-  // 검색어가 있을 경우 검색 페이지로 이동
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -148,14 +162,21 @@ const Navbar = () => {
     }
   };
 
-  // 각 아이콘 클릭 핸들러 함수
+  // 프로필 클릭 핸들러
   const handleProfileClick = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // 로그인 버튼 클릭 핸들러
+  const handleLoginClick = () => {
+    // 로그인 페이지로 이동하거나 로그인 처리를 수행
+    navigate("/login");
   };
 
   return (
     <>
       <NavbarContainer>
+        {/* 랜딩페이지 연결 수정*/}
         <SideMascot onClick={() => navigate("/")} />
         {!isSearchPage && (
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
@@ -180,8 +201,16 @@ const Navbar = () => {
               </SearchIconContainer>
             </SearchBarContainer>
             <IconContainer>
-              <AlarmIcon />
-              <ProfileIcon onClick={handleProfileClick} />
+              {isLoggedIn ? (
+                <>
+                  <AlarmIcon />
+                  <ProfileIcon onClick={handleProfileClick} />
+                </>
+              ) : (
+                <LoginButton onClick={handleLoginClick}>
+                  <AiOutlineUser size={24} /> 로그인
+                </LoginButton>
+              )}
             </IconContainer>
           </div>
         )}
@@ -208,8 +237,16 @@ const Navbar = () => {
               </SearchIconContainer>
             </SearchBarContainer>
             <IconContainer>
-              <AlarmIcon />
-              <ProfileIcon onClick={handleProfileClick} />
+              {isLoggedIn ? (
+                <>
+                  <AlarmIcon />
+                  <ProfileIcon onClick={handleProfileClick} />
+                </>
+              ) : (
+                <LoginButton onClick={handleLoginClick}>
+                  <AiOutlineUser size={24} /> 로그인
+                </LoginButton>
+              )}
             </IconContainer>
           </>
         )}
