@@ -5,6 +5,7 @@ import SearchPage from "./pages/SearchPage";
 function App() {
   return (
     <Routes>
+      <Route path="/" />
       <Route path="/home" element={<HomePage />} />
       <Route path="/search" element={<SearchPage />} />
     </Routes>
