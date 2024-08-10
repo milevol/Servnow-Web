@@ -253,6 +253,7 @@ const FindIdForm = () => {
             value={validNumber}
             onChange={(e) => setValidNumber(e.target.value)}
           />
+           <SendButton type='button'>인증확인</SendButton>
         </InputWrapper>
         <FindButton type="submit">아이디 찾기</FindButton>
       </form>

@@ -42,7 +42,7 @@ const InputText = styled.p`
 const Input = styled.input`
   width: 23rem;
   padding: 0.8rem;
-  border: 3px solid #c2e0f2;
+  border: 3px solid #D9D9D9;
   border-radius: 8px;
   font-size: 1rem;
 `;
@@ -183,13 +183,14 @@ const FindPasswordForm = () => {
       </InputWrapper>
       {error && <ErrorText>{error}</ErrorText>}
       <InputWrapper>
-      <InputText>인증번호</InputText>
+        <InputText>인증번호</InputText>
           <Input
             type="text"
             placeholder="인증번호를 입력해주세요."
             value={validNumber}
             onChange={(e) => setValidNumber(e.target.value)}
           />     
+          <SendButton type='button'>인증확인</SendButton>
       </InputWrapper>
       <Line></Line>
       <InputWrapper>
