@@ -147,10 +147,10 @@ const Separator = styled.div`
 
 const LoginForm = () => {
 
-  const [email, setEmail]  = useState('');
+  const [id, setId]  = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [stayedLoggedIn, setStayedLoggedIn] = useState(false);
 
@@ -160,19 +160,19 @@ const LoginForm = () => {
 
     let hasError = false;
 
-    if(!email ) {
-      setEmailError('! 이메일을 입력해주세요.');
+    if(!id ) {
+      setIdError('! 아이디를 입력해주세요.');
       hasError = true; //에러 존재하는지 확인
       setError('');
       setPasswordError('');
     } 
     else if(!password) {
       setPasswordError('! 비밀번호를 입력해주세요.');
-      setEmailError('');
+      setIdError('');
       setError('');
       hasError = true;
     } else {
-      setEmailError('');
+      setIdError('');
       setPasswordError('');
     }
 
@@ -182,7 +182,7 @@ const LoginForm = () => {
 
     try {
       const response = await axios.post('http://localhost:5000/api/v1/auth/login', 
-        {email,
+        {id,
          password});
 
      //토큰을 로컬스토리지에 저장하기
@@ -211,17 +211,17 @@ const LoginForm = () => {
         
         <InputContainer>
           <Input 
-            type="email" 
-            placeholder="이메일을 입력해주세요."
-            value={email}
-            onChange={(e) => setEmail(e.target.value)} />
+            type="text" 
+            placeholder="아이디를 입력해주세요."
+            value={id}
+            onChange={(e) => setId(e.target.value)} />
           <Input 
             type="password"
             placeholder="비밀번호를 입력해주세요."
             value={password}
             onChange={(e) => setPassword(e.target.value)} />
             {error &&<ErrorText>{error}</ErrorText>}
-            {emailError &&<ErrorText>{emailError}</ErrorText>}
+            {idError &&<ErrorText>{idError}</ErrorText>}
             {passwordError &&<ErrorText>{passwordError}</ErrorText>}
         </InputContainer>
        
