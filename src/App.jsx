@@ -7,6 +7,9 @@ import AnswerPage from "./pages/AnswerPage";
 import SignUpPage from "./pages/signup/SignUpPage";
 import MyPage from "./pages/MyPage";
 import ResultPage from "./pages/ResultPage";
+import AnswerStartPage from "./pages/AnswerStartPage";
+import FindPasswordPage from "./pages/FindPasswordPage";
+import FindIdPage from "./pages/FindIdPage";
 
 function App() {
   return (
@@ -19,6 +22,9 @@ function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/result" element={<ResultPage />} />
+      <Route path="/answerstart" element={<AnswerStartPage />} />
+      <Route path="/find-id" element={<FindIdPage />} />
+      <Route path="/find-pswd" element={<FindPasswordPage />} />
     </Routes>
   );
 }
