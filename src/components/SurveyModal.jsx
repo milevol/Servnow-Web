@@ -1,3 +1,7 @@
+// 목적: 설문지 등록 모달
+// 기능: 설문지 등록
+// 2024.08.02/곤/장고은
+
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IoLinkSharp } from "react-icons/io5";
