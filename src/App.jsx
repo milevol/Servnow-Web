@@ -3,17 +3,16 @@ import AnswerEndPage from "./pages/AnswerEndPage";
 import AnswerPage from "./pages/AnswerPage";
 import SignUpPage from "./pages/signup/SignUpPage";
 import MyPage from "./pages/MyPage";
-import CustomizationSidebar from "./components/CustomizationSidebar";
+import SidebarWrapper from "./components/SidebarWrapper";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" />
+      <Route path="/" element={<SidebarWrapper />}/>
       <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/answer" element={<AnswerPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
-      <Route path="/custom" element={<CustomizationSidebar />} />
     </Routes>
   );
 }

@@ -6,18 +6,19 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ChromePicker } from 'react-color';
+import StructureDiagram from './StructureDiagram';
 
-import character1 from '../assets/servnow_character/character1.png';
-import character2 from '../assets/servnow_character/character2.png';
-import character3 from '../assets/servnow_character/character3.png';
-import character4 from '../assets/servnow_character/character4.png';
-import character5 from '../assets/servnow_character/character5.png';
-import character6 from '../assets/servnow_character/character6.png';
-import character7 from '../assets/servnow_character/character7.png';
-import character8 from '../assets/servnow_character/character8.png';
-import character9 from '../assets/servnow_character/character9.png';
-import character10 from '../assets/servnow_character/character10.png';
-import character11 from '../assets/servnow_character/character11.png';
+import character1 from '../../assets/servnow_character/character1.png';
+import character2 from '../../assets/servnow_character/character2.png';
+import character3 from '../../assets/servnow_character/character3.png';
+import character4 from '../../assets/servnow_character/character4.png';
+import character5 from '../../assets/servnow_character/character5.png';
+import character6 from '../../assets/servnow_character/character6.png';
+import character7 from '../../assets/servnow_character/character7.png';
+import character8 from '../../assets/servnow_character/character8.png';
+import character9 from '../../assets/servnow_character/character9.png';
+import character10 from '../../assets/servnow_character/character10.png';
+import character11 from '../../assets/servnow_character/character11.png';
 
 const CustomizationPanel = styled.div`
   display: flex;
@@ -28,7 +29,7 @@ const CustomizationPanel = styled.div`
   width: 773px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: 834px;
+  height: 834px;
   overflow-y: auto;
 `;
 const TitleSection = styled.div`
@@ -121,9 +122,8 @@ const TextInputContainer = styled.div`
 `;
 
 const TextInput = styled.input`
-  width: 16rem;
-  padding: 0.8rem;
-  padding-right: 3rem;
+  width: 18rem;
+  padding: 0.8rem 1rem;
   font-size: 1.1rem;
   border: 1px solid #E6E6E6;
   border-radius: 10px;
@@ -141,12 +141,13 @@ const ColorBox = styled.div`
   border: 1px solid #ccc;
   border-radius: 5px;
 
+
 `
 
 const FontInput = styled.input`
-  width: 35rem;
+  width: 46rem;
   font-size: 1.1rem;
-  padding: 0.8rem;
+  padding: 1rem;
   border: 1px solid #E6E6E6;
   border-radius: 10px;
   box-sizing: border-box;
@@ -157,7 +158,7 @@ const FontInput = styled.input`
 const MainCharacterSelection = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 0px;
+  margin-bottom: 30px;
 `;
 
 const CharacterLabel = styled.label`
@@ -182,7 +183,7 @@ const CharacterImage = styled.div`
   background-color: #BAC5ED;
   background-size: cover;
   background-position: center;
-  margin-right: 10px;
+  margin-right: 15px;
   cursor: pointer;
   flex-shrink: 0;
 
@@ -190,11 +191,18 @@ const CharacterImage = styled.div`
     border-color: #007bff;
   }
 `;
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+`;
 
 const SubmitButton = styled.button`
+  width: 102px;
+  height: 42px;
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   background-color: #007bff;
   color: #fff;
   cursor: pointer;
@@ -323,10 +331,13 @@ const CustomizationSidebar = () => {
           ))}
         </CharacterSelectionContainer>
       </MainCharacterSelection>
+      <ButtonContainer>
+        <SubmitButton>저장</SubmitButton>
+      </ButtonContainer>
       </>
       ) :
       (
-        <div></div>
+        <StructureDiagram />
       )}
     </CustomizationPanel>
   );
