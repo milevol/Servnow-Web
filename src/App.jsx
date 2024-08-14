@@ -7,6 +7,8 @@ import AnswerPage from "./pages/AnswerPage";
 import SignUpPage from "./pages/signup/SignUpPage";
 import MyPage from "./pages/MyPage";
 import SurveyModalPage from "./pages/SurveyModalPage";
+import MySurveyPage from "./pages/mysurveypage/MySurveyPage";
+import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/surveymodal" element={<SurveyModalPage />} />
+      <Route path="/mysurvey" element={<MySurveyPage />} />
+      <Route path="/myansweredsurvey" element={<MyAnsweredPage />} />
     </Routes>
   );
 }
