@@ -42,7 +42,7 @@ const InputText = styled.p`
 const Input = styled.input`
   width: 23rem;
   padding: 0.8rem;
-  border: 3px solid #D9D9D9;
+  border: 2px solid #D9D9D9;
   border-radius: 8px;
   font-size: 1rem;
 `;
@@ -116,7 +116,7 @@ const FindPasswordForm = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/send-verification-code', { email });
+      const response = await axios.post('', { email });
       
       if (response.data.success) {
         setVerificationSent(true);
@@ -156,7 +156,7 @@ const FindPasswordForm = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/auth/find/pw', 
+      const response = await axios.post('', 
         { email, 
           validNumber, 
           password 
