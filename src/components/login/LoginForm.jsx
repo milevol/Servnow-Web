@@ -171,7 +171,7 @@ const LoginForm = () => {
       setIdError('');
       setError('');
       hasError = true;
-    } else {
+    } else { 
       setIdError('');
       setPasswordError('');
     }
@@ -181,7 +181,7 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/v1/auth/login', 
+      const response = await axios.post('', 
         { id, password });
 
       // 토큰을 로컬스토리지에 저장하기
@@ -202,8 +202,8 @@ const LoginForm = () => {
 
   // 카카오 간편로그인 REST API 이용 기능
   const handleKakaoLogin = () => {
-    const REST_API_KEY = '81edc8661035881efc3646c4d8737c10';
-    const REDIRECT_URI = 'http://localhost:8080/api/v1/auth/kakao';
+    const REST_API_KEY = '';
+    const REDIRECT_URI = '';
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = kakaoAuthUrl;
   };

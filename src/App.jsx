@@ -12,6 +12,8 @@ import FindIdPage from './pages/FindIdPage';
 import MyInfoModifyPage from "./pages/mypage/MyInfoModifyPage";
 import MyInfoModifyKakaoPage from "./pages/mypage/MyInfoModifyKakaoPage";
 import KakaoAuthRedirectHandler from "./components/login/KakaoAuthRedirecteHandler";
+import MySurveyPage from "./pages/mysurveypage/MySurveyPage";
+import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
       <Route path="/find-pswd" element={<FindPasswordPage />} />
       <Route path="/myinfo" element={<MyInfoModifyPage />} />
       <Route path="/myinfo-k" element={<MyInfoModifyKakaoPage />} />
+      <Route path="/created-surveys" element={<MySurveyPage />} />
+      <Route path="/answered-surveys" element={<MyAnsweredPage />} />
     </Routes>
   );
 }
