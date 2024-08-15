@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import SurveyPrev from './MySurveyPrev';
+import SurveyPrev from '../../components/surveypage/MySurveyPrev';
 import styled, { css } from 'styled-components';
+import Navbar from '../../components/Navbar';
+import NewSurveyButton from '../../components/surveypage/NewSurveyButton';
 
 export const MyPageContainer = styled.div`
     height : auto;
@@ -56,21 +58,6 @@ export const NewSurveyBox = styled.div`
     align-content: center;
     justify-items: center;
     border-radius : 10px;
-`;
-
-export const NewSurveyButton = styled.button`
-    width : 80px;
-    height : 80px;
-    padding-top : 0px;
-    padding-bottom : 0px;
-    padding-left : 0px;
-    padding-right : 0px;
-    text-align : center;
-    border-radius : 40px;
-    background-color : #4C76FE;
-    color : white;
-    font-size : 50px;
-    font-weight : bolder;
 `;
 
 export const CreateNewSurvey = styled.div`
@@ -175,6 +162,7 @@ const MySurveyPage = () => {
 
     return (
         <MyPageContainer>
+            <Navbar />
             <MyPageTotalContainer>
                 <SurveyOnerContainer>
                     MY

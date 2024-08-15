@@ -33,6 +33,7 @@ export const SurveyStatusButton = styled.div`
     align-items : center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border : 0.5px solid rgba(0, 0, 0, 0.1);
+    justify-items : center;
 `;
 
 export const SurveyImageContainer = styled.div`

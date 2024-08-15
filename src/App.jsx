@@ -21,8 +21,8 @@ function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/surveymodal" element={<SurveyModalPage />} />
-      <Route path="/mysurvey" element={<MySurveyPage />} />
-      <Route path="/myansweredsurvey" element={<MyAnsweredPage />} />
+      <Route path="/created-surveys" element={<MySurveyPage />} />
+      <Route path="/answered-surveys" element={<MyAnsweredPage />} />
     </Routes>
   );
 }

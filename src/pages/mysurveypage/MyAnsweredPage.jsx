@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import SurveyPrev from './MySurveyPrev';
+import SurveyPrev from '../../components/surveypage/MySurveyPrev';
 import styled, { css } from 'styled-components';
+import Navbar from '../../components/Navbar';
 
 export const MyPageContainer = styled.div`
     height : auto;
@@ -216,6 +217,7 @@ const MyAnsweredPage = () => {
 
     return (
         <MyPageContainer>
+            <Navbar />
             <MyPageTotalContainer>
                 <SurveyOnerContainer>
                     MY
