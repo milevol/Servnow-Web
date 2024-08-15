@@ -37,7 +37,7 @@ const Input = styled.input`
   margin-top: 1rem;
   border: 1.5px solid #C8D5FF;
   border-radius: 10px;
-  font-size: 1.1rem;
+  font-size: 18px;
 `;
 
 const RadioContainer = styled.div`
@@ -61,7 +61,7 @@ const LoginButton = styled.button`
   border-radius: 10px;
   border: 2px solid #4C76FE;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 20px;
   font-weight: bold;
 
   &:hover {
@@ -78,7 +78,7 @@ const SignupButton = styled.button`
   border: 2px solid #4C76FE;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 20px;
   font-weight: bold;
 
   &:hover {
