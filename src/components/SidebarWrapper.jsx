@@ -1,6 +1,6 @@
 //목적: 꾸미기 구조도 사이드바를 화면에 표시해주기위한 컴포넌트
 //기능: 사이드 div클릭하면 만들어둔 CustomizationSidebar
-//2024.08.010 데이-이연
+//2024.08.10 데이-이연
 
 import React, { useState } from 'react';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import CustomizationSidebar from './CustomSidebar/CustomizationSidebar';
 
 const CustomizationPanel = styled.div`
   position: fixed;
-  top: 50px;
+  top: 90px;
   right: -8px;
   display: ${({ isOpen }) => (isOpen ? 'none' : 'flex')}; /* isOpen에 따라 display 속성 변경 */
   flex-direction: column;
@@ -18,7 +18,7 @@ const CustomizationPanel = styled.div`
   width: 170px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  height: 834px;
+  height: 730px;
   cursor: pointer;
   z-index: 997;
 `;
@@ -58,7 +58,7 @@ const HorizontalLine = styled.div`
 
 const SidebarContainer = styled.div`
   position: fixed;
-  top: 50px;
+  top: 90px;
   right: ${({ isOpen }) => (isOpen ? '0' : '-815px')};
   transition: right 0.2s ease;
   height: 100%;
@@ -77,12 +77,13 @@ const Backdrop = styled.div`
 `;
 
 const SidebarWrapper = () => {
-  const [isOpen, setIsOpen] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-
+  
+ //사이드바 바깥을 클릭하면 닫히는 기능 설정
   const handleBackdropClick = () => {
     if (isOpen) {
       setIsOpen(false);

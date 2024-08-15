@@ -26,10 +26,10 @@ const CustomizationPanel = styled.div`
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 15px;
-  width: 773px;
+  width: 773px;  
+  height: 730px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  height: 834px;
   overflow-y: auto;
 `;
 const TitleSection = styled.div`
@@ -84,14 +84,6 @@ const Label = styled.label`
   font-weight: bold;
 `;
 
-const FontLabel = styled.label`
-  display: block;
-  color: #061522;
-  margin-left: 0.5rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-`;
-
 const ColorPickerWrapper = styled.div`
   margin-bottom: -10px;
   margin-left: 4rem;
@@ -112,6 +104,7 @@ const ColorInput = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+    margin-left: 1rem;
 `;
 
 const TextInputContainer = styled.div`
@@ -144,6 +137,14 @@ const ColorBox = styled.div`
 
 `
 
+const FontLabel = styled.label`
+  display: block;
+  color: #061522;
+  margin-left: 1rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+`;
+
 const FontInput = styled.input`
   width: 46rem;
   font-size: 1.1rem;
@@ -151,7 +152,7 @@ const FontInput = styled.input`
   border: 1px solid #E6E6E6;
   border-radius: 10px;
   box-sizing: border-box;
-  margin-left: 0.5rem;
+  margin-left: 1rem;
   margin-top: 5px;
 `;
 
@@ -159,6 +160,7 @@ const MainCharacterSelection = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 30px;
+  margin-left: 0.5rem;
 `;
 
 const CharacterLabel = styled.label`
