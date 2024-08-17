@@ -68,7 +68,7 @@ const CustomCheckbox = styled.input.attrs({ type: "checkbox" })`
 
 /* 세부 항목 css */
 const CheckboxLabel = styled.label`
-  margin-left: 10px;
+  margin-left: 38px;
   font-size: 23px;
   font-weight: bold;
 `;
