@@ -1,7 +1,6 @@
 // 목적: 회원가입 화면 속 가입완료 화면 구현
 // 기능: 약관동의페이지
-// 2024.07.25/곤/장고은
-// 추가되어야 할 기능: 로그인 버튼 클릭 시 로그인 페이지로 이동
+// 2024.08.18/곤/장고은
 
 import React, { useState } from "react";
 import styled from "styled-components";
