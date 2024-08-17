@@ -1,7 +1,7 @@
-// 목적: 회원가입 화면 속 정복입력 화면 구현
+// 목적: 회원가입 화면 속 정보 입력 화면 구현
 // 기능: 사용자 정보 입력
 // 2024.08.08/곤/장고은
-// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기
+// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기, 닉네임 유효성 검사 멘트 수정, api 연결
 
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -539,7 +539,11 @@ const SignUpInputInfo = ({ setActiveStep }) => {
           </table>
         </FormSection>
         <ButtonContainer>
-          <button className="back" onClick={() => setActiveStep(0)}>
+          <button
+            className="back"
+            type="button"
+            onClick={() => setActiveStep(0)}
+          >
             이전
           </button>
           <button className="signup" type="submit">
