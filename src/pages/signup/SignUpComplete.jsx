@@ -1,9 +1,9 @@
 // 목적: 회원가입 화면 속 가입완료 화면 구현
 // 기능: 가입완료됨을 표시
-// 2024.07.25/곤/장고은
-// 추가되어야 할 기능: 로그인 버튼 클릭 시 로그인 페이지로 이동
+// 2024.08.18/곤/장고은
 
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -29,14 +29,21 @@ const Container = styled.div`
     color: #fff;
     border: none;
     border-radius: 10px;
+    cursor: pointer;
   }
 `;
 const SignUpComplete = () => {
+  const navigate = useNavigate(); // 페이지 이동을 위한 hook
+
+  const handleNextClick = () => {
+    navigate("/login"); // 로그인페이지로 이동
+  };
+
   return (
     <Container>
       <img src="src\assets\signupLogo.png"></img>
       <p>서브나우와 함께해 주셔서 감사합니다!</p>
-      <button>로그인</button>
+      <button onClick={handleNextClick}>로그인</button>
     </Container>
   );
 };
