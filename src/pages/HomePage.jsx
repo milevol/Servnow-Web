@@ -1,11 +1,6 @@
-// HomePage.jsx
-// 목적: 메인 페이지 구현
-// 기능: 설문 목록 표시, 정렬 기능 제공, 마스코트 이미지 표시
-// 작성자: 임사랑
-// 작성일: 2024.07.19
-
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import Select from "react-select";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
 import PlusButton from "../components/PlusButton";
@@ -64,20 +59,61 @@ const DropdownContainer = styled.div`
   margin-top: 300px;
 `;
 
-// 드롭다운 스타일
-const Dropdown = styled.select`
-  width: 120px;
-  height: 37px;
-  background: #ffffff;
-  box-shadow: 0px 1px 5px rgba(95, 108, 126, 0.25);
-  border-radius: 8px;
-  font-family: "Pretendard", sans-serif;
-  font-size: 16px;
-  color: #061522;
-  border: none;
-  padding: 0 10px;
-  cursor: pointer;
-`;
+// 커스텀 스타일을 적용한 Select 컴포넌트의 스타일링 설정
+const customStyles = {
+  control: (provided) => ({
+    ...provided,
+    width: 120,
+    height: 37,
+    backgroundColor: "#FFF",
+    borderRadius: "8px", // border-radius를 8px로 설정
+    border: "none", // 기본 상태에서는 border를 제거
+    boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)", // shadow1 추가
+    fontFamily: "Pretendard",
+    fontWeight: 500,
+    fontSize: "15.408px",
+    lineHeight: "normal",
+    color: "#21293A",
+    cursor: "pointer",
+    "&:hover": {
+      boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)", // hover 시에도 동일한 shadow 유지
+    },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    marginTop: 0,
+    borderRadius: "0 0 8px 8px", // border-radius 8px 적용
+    border: "1px solid #4C76FE", // 펼쳐졌을 때의 border 설정
+    overflow: "hidden",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    fontFamily: "Pretendard",
+    fontWeight: 600,
+    fontSize: "14px",
+    color: state.isSelected ? "#3E77FF" : "#061522",
+    backgroundColor: state.isSelected
+      ? "rgba(47, 53, 61, 0.1)"
+      : state.isFocused
+      ? "rgba(47, 53, 61, 0.05)"
+      : "#FFFFFF",
+    "&:hover": {
+      backgroundColor: "rgba(47, 53, 61, 0.05)",
+    },
+    cursor: "pointer",
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "#21293A",
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: "#21293A",
+  }),
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+};
 
 // HomePage 컴포넌트 함수
 // 메인 페이지의 렌더링과 상태 관리를 담당
@@ -108,12 +144,17 @@ function HomePage() {
   }, []);
 
   // 정렬 옵션 변경 핸들러
-  const handleSortChange = (e) => {
-    const option = e.target.value;
+  const handleSortChange = (selectedOption) => {
+    const option = selectedOption.value;
     setSortOption(option);
     const sortedData = sortData(option, mockData);
     setData(sortedData);
   };
+
+  const options = [
+    { value: "day", label: "기간 순" },
+    { value: "people", label: "참여자 순" },
+  ];
 
   return (
     <HomePageContainer>
@@ -121,11 +162,13 @@ function HomePage() {
       <ContentWrapper>
         <MascotIcon />
         <DropdownContainer>
-          <Dropdown value={sortOption} onChange={handleSortChange}>
-            <option value="day">기간순</option>
-            <option value="title">이름순</option>
-            <option value="people">참여자수순</option>
-          </Dropdown>
+          <Select
+            styles={customStyles}
+            value={options.find((option) => option.value === sortOption)}
+            onChange={handleSortChange}
+            options={options}
+            isSearchable={false}
+          />
         </DropdownContainer>
         <SurveyCardContainer>
           {data.map((item, index) => (
