@@ -1,8 +1,7 @@
 // 목적: 마이페이지와 포인트 페이지 화면 구현
 // 기능: 마이페이지, 포인트 페이지
-// 2024.08.02/곤/장고은
-// 추가되어야 할 기능: api 연결 후 필요한 데이터 전달, 등급 단계 표시, 포인트 별 이미지 잠금 여부, 내 정보 수정 링크 연결.. 등
-
+// 2024.08.11/곤/장고은
+// 추가되어야 할 기능: api 연결, 링크 연결
 import React, { useState } from "react";
 import styled from "styled-components";
 
@@ -19,6 +18,9 @@ const MyPageContainer = styled.div`
 
   #darkblueColor {
     color: #011b6c;
+    p {
+      margin-top: 10px;
+    }
   }
   .greyColor {
     color: #5d6670;
@@ -67,6 +69,12 @@ const MyPageContainer = styled.div`
       border: solid 3px black;
       border-radius: 3px;
     }
+
+    #point-rate {
+      width: 50%;
+      text-align: center;
+      font-size: 15px;
+    }
   }
 
   #container2 {
@@ -105,11 +113,13 @@ const MyPageContainer = styled.div`
 
   #surveyContainer {
     text-align: center;
+    font-size: 20px;
     span {
-      padding: 0 120px;
+      width: 33%;
     }
 
     .weight {
+      font-size: 30px;
       margin: 10px;
       color: #3e77ff;
     }
@@ -121,7 +131,7 @@ const MyPageContainer = styled.div`
   }
 
   #pointContainer {
-    gap: 150px;
+    gap: 100px;
   }
 `;
 
@@ -131,7 +141,7 @@ const PointContainer = styled.div`
   align-items: center;
   justify-content: center;
   margin: auto;
-  width: 90%;
+  width: 80%;
 
   .imgContainer {
     display: flex;
@@ -182,17 +192,137 @@ const Button = styled.button`
   border-color: ${(props) => (props.$active ? "#4C76FE" : "#ccd2da")};
 `;
 
+const ProgressBarWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background-color: #011b6c;
+  border-radius: 4px;
+  margin-top: 20px;
+`;
+
+const ProgressPoint = styled.div`
+  position: absolute;
+  top: -6px;
+  left: ${(props) => props.left}%;
+  width: 14px;
+  height: 14px;
+  background-color: #ffffff;
+  border: 2px solid #3e77ff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+`;
+
+const Labels = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #3e77ff;
+  span {
+    margin-left: -10px;
+  }
+`;
+
 const MyPage = () => {
   const [activePage, setActivePage] = useState("mypage");
+  const userPoints = 5500; // 현재 사용자 포인트
+
   const imageCount = 12;
+  const pointsRequired = [
+    0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500,
+  ]; // 각 이미지 잠금 해제에 필요한 포인트
+
+  // 캐릭터 이미지 배열
+  const characterImages = [
+    "src/assets/roundLogo1.png", // 0 포인트 이상
+    "src/assets/roundLogo1.png", // 500 포인트 이상
+    "src/assets/roundLogo1.png", // 1000 포인트 이상
+    "src/assets/roundLogo1.png", // 1500 포인트 이상
+    "src/assets/roundLogo1.png", // 2000 포인트 이상
+    "src/assets/roundLogo1.png", // 2500 포인트 이상
+    "src/assets/roundLogo1.png", // 3000 포인트 이상
+    "src/assets/roundLogo1.png", // 3500 포인트 이상
+    "src/assets/roundLogo1.png", // 4000 포인트 이상
+    "src/assets/roundLogo1.png", // 4500 포인트 이상
+    "src/assets/roundLogo1.png", // 5000 포인트 이상
+    "src/assets/roundLogo1.png", // 5500 포인트 이상
+    // 필요한 경우 추가 이미지 경로를 여기에 추가
+  ];
+
+  // 포인트페이지에서 포인트 이미지 불러오기 함수
   const images = Array.from({ length: imageCount }, (_, index) => {
-    const src = index < 4 ? "src/assets/roundLogo1.png" : "src/assets/lock.png";
+    const src =
+      userPoints >= pointsRequired[index]
+        ? characterImages[index] // 포인트가 충분할 경우 해당 캐릭터 이미지
+        : "src/assets/lock.png"; // 포인트가 부족할 경우 잠금 이미지
+
     return (
       <div key={index} className="image-container">
-        <img src={src} alt="Profile" />
+        <img src={src} alt={`Character ${index + 1}`} />
       </div>
     );
   });
+
+  //마이페이지에서 포인트 이미지 불러오기 함수
+  const getImageSrc = (index) => {
+    return userPoints >= pointsRequired[index]
+      ? characterImages[index] // 포인트가 충분할 경우 캐릭터 이미지
+      : "src/assets/lock.png"; // 포인트가 부족할 경우 잠금 이미지
+  };
+
+  const calculateRank = () => {
+    if (userPoints <= 1000) {
+      return "평민";
+    } else if (userPoints <= 2500) {
+      return "기사";
+    } else if (userPoints <= 4000) {
+      return "남작";
+    } else if (userPoints <= 5500) {
+      return "백작";
+    } else {
+      return "최고";
+    }
+  };
+
+  const calculateProgress = () => {
+    const thresholds = [1000, 2500, 4000, 5500]; // 각 등급에 도달하기 위한 포인트 경계
+    const progressPerLevel = 33.3; // 상태바에서 각 구간의 비율 (100 / 4)
+
+    if (userPoints <= thresholds[0]) {
+      return 0; // 평민 구간
+    } else if (userPoints <= thresholds[1]) {
+      return (
+        ((userPoints - thresholds[0]) / (thresholds[1] - thresholds[0])) *
+        progressPerLevel
+      ); // 기사 구간
+    } else if (userPoints <= thresholds[2]) {
+      return (
+        progressPerLevel +
+        ((userPoints - thresholds[1]) / (thresholds[2] - thresholds[1])) *
+          progressPerLevel
+      ); // 남작 구간
+    } else if (userPoints <= thresholds[3]) {
+      return (
+        2 * progressPerLevel +
+        ((userPoints - thresholds[2]) / (thresholds[3] - thresholds[2])) *
+          progressPerLevel
+      ); // 백작 구간
+    } else {
+      return 100; // 최고 단계에 도달한 경우 (5500 포인트 이상)
+    }
+  };
+
+  const nextLevelPoints = () => {
+    const thresholds = [1000, 2500, 4000, 5500];
+    for (let i = 0; i < thresholds.length; i++) {
+      if (userPoints < thresholds[i]) {
+        return thresholds[i] - userPoints;
+      }
+    }
+    return 0; // 최고 레벨에 도달한 경우
+  };
 
   const renderContent = () => {
     if (activePage === "mypage") {
@@ -214,21 +344,23 @@ const MyPage = () => {
               </Img>
               <div id="darkblueColor">
                 <p>아리님의 등급</p>
-                <p className="weight">평민</p>
+                <p className="weight">{calculateRank()}</p>
               </div>
-              <div>
+              <div id="point-rate">
                 <span className="blueColor">
-                  다음 캐릭터까지&nbsp;<span className="weight">565p</span>
+                  다음 캐릭터까지&nbsp;
+                  <span className="weight">{nextLevelPoints()}p</span>
                   &nbsp;남았어요!
                 </span>
-                <hr></hr>
-                <span id="rate">
-                  <p className="blueColor">평민</p>
-                  <p className="blueColor">기사</p>
-                  <p className="blueColor">남작</p>
-                  <p className="blueColor">백작</p>
-                  <p className="blueColor">공작</p>
-                </span>
+                <ProgressBarWrapper>
+                  <ProgressPoint left={calculateProgress()} />
+                </ProgressBarWrapper>
+                <Labels>
+                  <span>평민</span>
+                  <span>기사</span>
+                  <span>남작</span>
+                  <span>백작</span>
+                </Labels>
               </div>
             </div>
           </div>
@@ -256,12 +388,13 @@ const MyPage = () => {
                   <p>설문 참여 수</p>
                 </span>
                 <span>
-                  <p className="weight">1,435</p>
+                  <p className="weight">{userPoints}p</p>
                   <p>포인트</p>
                 </span>
               </div>
               <p className="weight">
-                포인트 <span className="blueColor">1,435p</span> &nbsp;&nbsp;
+                포인트 <span className="blueColor">{userPoints}p</span>{" "}
+                &nbsp;&nbsp;
                 <button
                   $active={activePage === "point"}
                   onClick={() => setActivePage("point")}
@@ -271,16 +404,16 @@ const MyPage = () => {
               </p>
               <div id="pointContainer">
                 <Img>
-                  <img src="src\assets\roundLogo1.png" alt="Profile" />
+                  <img src={getImageSrc(0)} alt="Profile" />
                 </Img>
                 <Img>
-                  <img src="src\assets\roundLogo1.png" alt="Profile" />
+                  <img src={getImageSrc(1)} alt="Profile" />
                 </Img>
                 <Img>
-                  <img src="src\assets\roundLogo1.png" alt="Profile" />
+                  <img src={getImageSrc(2)} alt="Profile" />
                 </Img>
                 <Img>
-                  <img src="src\assets\lock.png" alt="Profile" />
+                  <img src={getImageSrc(3)} alt="Profile" />
                 </Img>
               </div>
             </div>
@@ -292,7 +425,7 @@ const MyPage = () => {
         <PointContainer>
           <Paragraph>
             <p>
-              포인트 <span className="blueColor">1,435p</span>
+              포인트 <span className="blueColor">{userPoints}p</span>
             </p>
           </Paragraph>
           <div className="imgContainer">{images}</div>

@@ -5,12 +5,14 @@
 import React from "react";
 import styled from "styled-components";
 import ProgressBar from "../components/ProgressBar";
+import SectionCard from "../components/answer/SectionCard";
 import AnswerCard from "../components/answer/AnswerCard";
 
 const Container = styled.div`
   display: inline-block;
   height: 100%;
   width: 100%;
+  padding-bottom: 50px;
   background-color: #f2f5ff;
 `;
 
@@ -26,6 +28,18 @@ const Current = styled.div`
   color: #4c76fe;
 `;
 
+const Button = styled.input`
+  display: block;
+  text-align: center;
+  padding: 24px 0;
+  margin: auto;
+  border: 0px;
+  border-radius: 24px;
+  font-size: 30px;
+  color: white;
+  background-color: #4c76fe;
+`;
+
 const AnswerPage = () => {
   return (
     <Container>
@@ -34,9 +48,11 @@ const AnswerPage = () => {
         <Current>3</Current>
         /10
       </Progress>
+      <SectionCard />
       <AnswerCard type="radio" />
       <AnswerCard type="checkbox" />
       <AnswerCard type="text" />
+      <Button value={"제출 하기"} />
     </Container>
   );
 };
