@@ -1,12 +1,13 @@
 // InsightSection.jsx
-// 목적:
-// 기능:
+// 목적: 결과페이지의 인사이트 부분 구현
+// 기능: 인사이트&설문 구조도 토글, 질문 순 직접 나열, 메모장 자동저장
 // 작성자: 임사랑
 // 작성일: 2024.08.07
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
+// 스타일링된 컴포넌트들 정의
 const InsightContainer = styled.div`
   width: 559px;
   background: #ffffff;
@@ -27,6 +28,7 @@ const SectionTitleContainer = styled.div`
 
 const SectionTitleWrapper = styled.div`
   display: flex;
+  justify-content: space-between;
   width: 100%;
   position: relative;
 
@@ -51,10 +53,10 @@ const SectionTitle = styled.div`
   text-align: center;
   color: ${(props) => (props.active ? "#4C76FE" : "#B6B6B6")};
   padding-bottom: 15px;
-  flex-grow: 1;
-  text-align: center;
   cursor: pointer;
   position: relative;
+  flex: 1;
+  text-align: center;
 
   &::after {
     content: "";
@@ -90,7 +92,7 @@ const Button = styled.div`
   font-size: 16px;
   color: ${(props) => (props.active ? "#011B6C" : "#B6B6B6")};
   cursor: pointer;
-  margin: 0 10px;
+  margin: 0 60px;
 `;
 
 const InsightCard = styled.div`
@@ -131,7 +133,7 @@ const QuestionContent = styled.span`
   color: #061522;
 `;
 
-const ChartContainer = styled.div`
+const NoteContainer = styled.div`
   width: 141px;
   height: 141px;
   background: #e1e8ff;
@@ -144,27 +146,47 @@ const ChartContainer = styled.div`
   margin-bottom: 46px;
 `;
 
-const PercentageText = styled.div`
+const NoteContent = styled.textarea`
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
   font-family: "Pretendard", sans-serif;
-  font-style: normal;
-  font-weight: 500;
   font-size: 14px;
   color: #061522;
-  align-self: flex-start;
-  padding: 10px;
+  resize: none;
+  outline: none;
 `;
 
-const ChartContent = styled.div`
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-`;
-
+// InsightSection 컴포넌트 정의
 const InsightSection = () => {
+  // 활성화된 탭 (인사이트/설문 구조도) 상태 관리
   const [activeTab, setActiveTab] = useState("insight");
+
+  // 활성화된 버튼 (질문 순/직접 나열) 상태 관리
   const [activeButton, setActiveButton] = useState("질문 순");
+
+  // 메모 내용 상태 관리 (로컬 스토리지에서 초기값을 가져옴)
+  const [notes, setNotes] = useState(() => {
+    const savedNotes = {
+      note1: localStorage.getItem("note1") || "",
+      note2: localStorage.getItem("note2") || "",
+      note3: localStorage.getItem("note3") || "",
+    };
+    return savedNotes;
+  });
+
+  // notes 상태가 변경될 때마다 로컬 스토리지에 자동 저장
+  useEffect(() => {
+    localStorage.setItem("note1", notes.note1);
+    localStorage.setItem("note2", notes.note2);
+    localStorage.setItem("note3", notes.note3);
+  }, [notes]);
+
+  // 메모 내용 변경 시 호출되는 함수
+  const handleNoteChange = (e, noteKey) => {
+    setNotes({ ...notes, [noteKey]: e.target.value });
+  };
 
   return (
     <InsightContainer>
@@ -193,12 +215,6 @@ const InsightSection = () => {
           질문 순
         </Button>
         <Button
-          active={activeButton === "최신 순"}
-          onClick={() => setActiveButton("최신 순")}
-        >
-          최신 순
-        </Button>
-        <Button
           active={activeButton === "직접 나열"}
           onClick={() => setActiveButton("직접 나열")}
         >
@@ -213,10 +229,13 @@ const InsightSection = () => {
             <QuestionContent>질문을 적어주세요</QuestionContent>
           </QuestionText>
         </QuestionContainer>
-        <ChartContainer>
-          <PercentageText>예 65.6%</PercentageText>
-          <ChartContent>{/* 차트 내용 */}</ChartContent>
-        </ChartContainer>
+        <NoteContainer>
+          <NoteContent
+            value={notes.note1}
+            onChange={(e) => handleNoteChange(e, "note1")}
+            placeholder="메모를 입력하세요"
+          />
+        </NoteContainer>
       </InsightCard>
 
       <InsightCard>
@@ -226,10 +245,13 @@ const InsightSection = () => {
             <QuestionContent>질문을 적어주세요</QuestionContent>
           </QuestionText>
         </QuestionContainer>
-        <ChartContainer>
-          <PercentageText>예 65.6%</PercentageText>
-          <ChartContent>{/* 차트 내용 */}</ChartContent>
-        </ChartContainer>
+        <NoteContainer>
+          <NoteContent
+            value={notes.note2}
+            onChange={(e) => handleNoteChange(e, "note2")}
+            placeholder="메모를 입력하세요"
+          />
+        </NoteContainer>
       </InsightCard>
 
       <InsightCard>
@@ -239,10 +261,13 @@ const InsightSection = () => {
             <QuestionContent>질문을 적어주세요</QuestionContent>
           </QuestionText>
         </QuestionContainer>
-        <ChartContainer>
-          <PercentageText>예 65.6%</PercentageText>
-          <ChartContent>{/* 차트 내용 */}</ChartContent>
-        </ChartContainer>
+        <NoteContainer>
+          <NoteContent
+            value={notes.note3}
+            onChange={(e) => handleNoteChange(e, "note3")}
+            placeholder="메모를 입력하세요"
+          />
+        </NoteContainer>
       </InsightCard>
     </InsightContainer>
   );
