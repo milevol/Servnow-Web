@@ -11,10 +11,10 @@ import { useNavigate } from "react-router-dom";
 // 사이드바 전체 컨테이너 스타일
 const SidebarContainer = styled.div`
   position: fixed;
-  top: 67px;
+  top: 60px;
   right: 0;
   width: 300px;
-  height: calc(100% - 67px);
+  height: calc(100% - 60px);
   background: #ffffff;
   z-index: 1001;
   transition: transform 0.3s ease-in-out;

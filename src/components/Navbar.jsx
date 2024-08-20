@@ -151,7 +151,7 @@ const LoginButton = styled.button`
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 관리
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 열림/닫힘 상태 관리
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
   const navigate = useNavigate();
   const location = useLocation();
 
