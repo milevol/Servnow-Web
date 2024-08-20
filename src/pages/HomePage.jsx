@@ -1,3 +1,9 @@
+// HomePage.jsx
+// 목적: 메인 페이지 구현
+// 기능: 설문 목록 표시, 정렬 기능 제공, 마스코트 이미지 표시
+// 작성자: 임사랑
+// 작성일: 2024.07.19
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Select from "react-select";
@@ -7,7 +13,7 @@ import PlusButton from "../components/PlusButton";
 import mascotImage from "../assets/mascot.png";
 import mockData from "../data/mockData.json";
 
-// 메인 컨테이너 스타일
+// 메인 페이지 전체 컨테이너 스타일
 const HomePageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -29,7 +35,7 @@ const ContentWrapper = styled.div`
   position: relative;
 `;
 
-// 마스코트 이미지 스타일
+// 마스코트 아이콘 스타일
 const MascotIcon = styled.div`
   width: 300px;
   height: 350px;
@@ -59,16 +65,16 @@ const DropdownContainer = styled.div`
   margin-top: 300px;
 `;
 
-// 커스텀 스타일을 적용한 Select 컴포넌트의 스타일링 설정
+// 커스텀 Select 스타일 설정
 const customStyles = {
   control: (provided) => ({
     ...provided,
     width: 120,
     height: 37,
     backgroundColor: "#FFF",
-    borderRadius: "8px", // border-radius를 8px로 설정
-    border: "none", // 기본 상태에서는 border를 제거
-    boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)", // shadow1 추가
+    borderRadius: "8px",
+    border: "none",
+    boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)",
     fontFamily: "Pretendard",
     fontWeight: 500,
     fontSize: "15.408px",
@@ -76,14 +82,14 @@ const customStyles = {
     color: "#21293A",
     cursor: "pointer",
     "&:hover": {
-      boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)", // hover 시에도 동일한 shadow 유지
+      boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)",
     },
   }),
   menu: (provided) => ({
     ...provided,
     marginTop: 0,
-    borderRadius: "0 0 8px 8px", // border-radius 8px 적용
-    border: "1px solid #4C76FE", // 펼쳐졌을 때의 border 설정
+    borderRadius: "0 0 8px 8px",
+    border: "1px solid #4C76FE",
     overflow: "hidden",
   }),
   option: (provided, state) => ({
@@ -115,35 +121,33 @@ const customStyles = {
   }),
 };
 
-// HomePage 컴포넌트 함수
-// 메인 페이지의 렌더링과 상태 관리를 담당
+// HomePage 컴포넌트
+// 메인 페이지에서 설문 카드 리스트를 보여주고 정렬 기능을 제공
 function HomePage() {
-  // 정렬 옵션 상태
-  const [sortOption, setSortOption] = useState("day");
-  // 설문 데이터 상태
-  const [data, setData] = useState([]);
+  const [sortOption, setSortOption] = useState("day"); // 현재 선택된 정렬 옵션 상태
+  const [data, setData] = useState([]); // 설문 데이터 상태
 
   // 데이터를 정렬하는 함수
+  // 선택된 옵션에 따라 데이터를 정렬하여 반환
   const sortData = (option, dataToSort) => {
     return [...dataToSort].sort((a, b) => {
       if (option === "day") {
-        return a.day - b.day;
-      } else if (option === "title") {
-        return a.title.localeCompare(b.title);
+        return a.day - b.day; // 기간 순으로 정렬
       } else if (option === "people") {
-        return b.people - a.people;
+        return b.people - a.people; // 참여자 순으로 정렬
       }
       return 0;
     });
   };
 
-  // 컴포넌트가 마운트될 때 데이터 정렬
+  // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 정렬
   useEffect(() => {
     const sortedData = sortData("day", mockData);
     setData(sortedData);
   }, []);
 
-  // 정렬 옵션 변경 핸들러
+  // 정렬 옵션이 변경될 때 호출되는 핸들러
+  // 새로운 정렬 옵션에 따라 데이터를 다시 정렬
   const handleSortChange = (selectedOption) => {
     const option = selectedOption.value;
     setSortOption(option);
