@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import styled from "styled-components";
+import TextAreaAutoSize from "react-textarea-autosize";
 
 const Container = styled.div`
   margin: 30px 50px 50px 50px;
@@ -49,6 +50,19 @@ const AnswerContainer = styled.form`
   div:has(input:checked) {
     background-color: #c6d3ff;
     border: 1px solid #4c76fe;
+  }
+
+  textarea {
+    width: 100%;
+    margin-top: 32px;
+    padding: 16px 8px;
+    border: 0px;
+    border-bottom: 6px solid #e1e8ff;
+    font-family: "Pretendard Thin";
+    font-size: 20px;
+    color: #5d6670;
+    outline: none;
+    resize: none;
   }
 `;
 
@@ -95,18 +109,6 @@ const ChoiceLabel = styled.label`
   font-family: "Pretendard Bold";
   font-size: 16px;
   color: #5d6670;
-`;
-
-const Text = styled.input`
-  width: 100%;
-  margin-top: 128px;
-  padding: 16px 8px;
-  border: 0px;
-  border-bottom: 6px solid #e1e8ff;
-  font-family: "Pretendard Thin";
-  font-size: 20px;
-  color: #5d6670;
-  outline: none;
 `;
 
 // 데이터 props로 받아와서 map 예정
@@ -163,9 +165,9 @@ const Answer = ({ type }) => {
       // 주관식
       return (
         <AnswerContainer>
-          <Text
-            type="text"
-            placeholder="예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다.  예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다."
+          <TextAreaAutoSize
+            cacheMeasurements
+            placeholder="예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다. 예시 답안입니다."
           />
         </AnswerContainer>
       );

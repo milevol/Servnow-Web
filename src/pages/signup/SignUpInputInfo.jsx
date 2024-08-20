@@ -1,10 +1,11 @@
 // 목적: 회원가입 화면 속 정보 입력 화면 구현
 // 기능: 사용자 정보 입력
-// 2024.08.08/곤/장고은
-// 추가되어야 할 기능: 아이디 중복확인, 이메일 본인인증하기, 닉네임 유효성 검사 멘트 수정, api 연결
+// 2024.08.20/곤/장고은
+// 추가되어야 할 기능: 아이디 중복확인, 본인인증 api 각각 분리 연결
 
 import React, { useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 const FormContainer = styled.div`
   display: flex;
@@ -167,6 +168,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     nickname: false,
   });
 
+  //유효성 검사
   const validateForm = () => {
     let isValid = true;
     const newErrors = { ...errors };
@@ -217,7 +219,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
 
     // Validate nickname
     if (!form.nickname) {
-      newErrors.nickname = "멋진 닉네임이네요!";
+      newErrors.nickname = "닉네임은 필수입력사항입니다.";
       isValid = false;
     } else {
       newErrors.nickname = "";
@@ -255,6 +257,19 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     return 30;
   };
 
+  const handleMonthChange = (e) => {
+    const { value } = e.target;
+    const month = parseInt(value, 10);
+    const days = daysInMonth(month, parseInt(form.birthYear, 10));
+
+    setForm({
+      ...form,
+      birthMonth: value,
+      birthDay: form.birthDay > days ? days : form.birthDay,
+    });
+  };
+
+  //data 변경되는 값 저장
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({
@@ -279,28 +294,112 @@ const SignUpInputInfo = ({ setActiveStep }) => {
       [name]: false,
     });
   };
-  const handleGenderSelect = (gender) => {
+
+  // Enter 키 눌렀을 때 기본 폼 제출 방지
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
+
+  // 성별 저장
+  const handleGenderSelect = (value) => {
+    const genderValue = value == "남성" ? "male" : "female";
     setForm({
       ...form,
-      gender,
+      gender: genderValue,
     });
   };
 
-  const handleMonthChange = (e) => {
-    const { value } = e.target;
-    const month = parseInt(value, 10);
-    const days = daysInMonth(month, parseInt(form.birthYear, 10));
+  // api 연결
+  // id 중복확인 api
+  /*  const handleIdCheck = async () => {
+    try {
+      const body = {
+        serialId: form.username,
+      };
+      const response = await axios.post(
+        "/api/v1/auth/join/id",
+        body
+      );
 
-    setForm({
-      ...form,
-      birthMonth: value,
-      birthDay: form.birthDay > days ? days : form.birthDay,
-    });
+      if (response.status === 200) {
+        alert("사용 가능한 아이디입니다.");
+      } else {
+        alert("이미 사용 중인 아이디입니다.");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("이미 사용 중인 아이디입니다.");
+      } else {
+        console.error("아이디 중복확인 중 오류 발생:", error);
+        alert("아이디 중복확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
+    }
+  };
+*/
+
+  // 이메일 인증 api
+  const handleEmailVerification = async () => {
+    try {
+      const body = {
+        email: form.email,
+      };
+      const response = await axios.post(
+        "/api/v1/auth/join/identity-verification",
+        body
+      );
+
+      console.log("인증번호 전송 성공:", response.data);
+      alert("인증번호가 이메일로 전송되었습니다.");
+    } catch (error) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 500) {
+          console.error("서버 내부 오류:", data.message);
+          alert(data.message || "서버 내부 오류가 발생했습니다.");
+        } else {
+          console.error("본인인증 중 알 수 없는 오류 발생:", data.message);
+          alert(data.message || "본인인증 중 알 수 없는 오류가 발생했습니다.");
+        }
+      } else {
+        console.error("본인인증 중 네트워크 오류 발생:", error.message);
+        alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+      }
+    }
   };
 
-  const handleSubmit = (e) => {
+  // 인증번호 인증확인 api
+  /*  const handleEmailCodeCheck = async () => {
+    try {
+      const body = {
+        certificationNumber: form.verificationCode,
+      };
+      const response = await axios.post(
+        "/api/v1/auth/join/~",
+        body
+      );
+
+      if (response.status === 200) {
+        alert("인증이 완료되었습니다.");
+      } 
+    } catch (error) {
+      if (error.response && error.response.status === ) {
+        alert("인증번호가 올바르지 않습니다.");
+      } else {
+        console.error("아이디 중복확인 중 오류 발생:", error);
+        alert("인증확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      }
+    }
+  };
+*/
+
+  // 회원가입 api 연결
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const birthValue =
+      form.birthYear + "-" + form.birthMonth + "-" + form.birthDay;
     // 모든 필드를 touched 상태로 설정하여 에러 메시지를 표시
     setTouched({
       username: true,
@@ -312,14 +411,52 @@ const SignUpInputInfo = ({ setActiveStep }) => {
     });
 
     if (validateForm()) {
-      setActiveStep(2);
-      console.log(form);
+      try {
+        const body = {
+          serialId: form.username,
+          password: form.password,
+          repassword: form.confirmPassword,
+          email: form.email,
+          certificationNumber: form.verificationCode,
+          nickname: form.nickname,
+          gender: form.gender,
+          birth: birthValue,
+        };
+
+        const response = await axios.post("/api/v1/auth/join", body);
+        alert("회원가입 성공");
+        console.log("회원가입 성공:", response.data);
+        setActiveStep(2); // 회원가입 성공 후 페이지 이동 수행
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response;
+          if (status === 401) {
+            // 인증번호 불일치
+            alert("인증번호가 일치하지 않습니다.");
+          } else if (status === 409) {
+            // 아이디 중복
+            alert(data.message);
+          } else if (status === 400) {
+            // request 요청사항 타입 오류
+            console.error("오류: ", data.message);
+            alert(data.message);
+          } else {
+            // 그 외의 상태 코드 처리
+            console.error("회원가입 중 알 수 없는 오류 발생:", data.message);
+            alert("회원가입 중 알 수 없는 오류가 발생했습니다.");
+          }
+        } else {
+          // 네트워크 오류나 기타 원인으로 서버에 접근하지 못한 경우
+          console.error("회원가입 중 네트워크 오류 발생:", error.message);
+          alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+        }
+      }
     }
   };
 
   return (
     <FormContainer>
-      <form method="post" onSubmit={handleSubmit}>
+      <form method="post" onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
         <FormSection className="basic">
           <table>
             <caption>기본정보</caption>
@@ -338,7 +475,11 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onFocus={handleFocus}
                   placeholder="아이디를 입력해 주세요."
                 />
-                <button className="idCheckBtn" type="button">
+                <button
+                  className="idCheckBtn"
+                  type="button"
+                  //onClick={handleIdCheck}
+                >
                   중복확인
                 </button>
                 {touched.username && errors.username && (
@@ -400,7 +541,11 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onFocus={handleFocus}
                   placeholder="이메일을 입력해 주세요."
                 />
-                <button className="emailCheckBtn" type="button">
+                <button
+                  className="emailCheckBtn"
+                  type="button"
+                  onClick={handleEmailVerification}
+                >
                   본인인증
                 </button>
                 {touched.email && errors.email && (
@@ -422,7 +567,11 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                   onBlur={handleBlur}
                   onFocus={handleFocus}
                 />
-                <button className="emailCheckBtn" type="button">
+                <button
+                  className="emailCheckBtn"
+                  type="button"
+                  //onClick={handleEmailCodeCheck}
+                >
                   인증확인
                 </button>
                 {touched.verificationCode && errors.verificationCode && (
@@ -539,11 +688,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
           </table>
         </FormSection>
         <ButtonContainer>
-          <button
-            className="back"
-            type="button"
-            onClick={() => setActiveStep(0)}
-          >
+          <button className="back" onClick={() => setActiveStep(0)}>
             이전
           </button>
           <button className="signup" type="submit">
