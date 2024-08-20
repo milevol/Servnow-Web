@@ -313,34 +313,43 @@ const SignUpInputInfo = ({ setActiveStep }) => {
 
   // api 연결
   // id 중복확인 api
-  /*  const handleIdCheck = async () => {
+  const handleIdCheck = async () => {
+    // 유효성 검사: username이 빈 값이면 에러 메시지 설정
+    if (!form.username || form.username.trim() === "") {
+      setTouched({ ...touched, username: true });
+      setErrors({ ...errors, username: "아이디는 필수입력사항입니다." });
+      return; // 빈 값일 경우 함수 실행 중지
+    }
+
     try {
-      const body = {
-        serialId: form.username,
-      };
-      const response = await axios.post(
-        "/api/v1/auth/join/id",
-        body
-      );
+      const body = { serialId: form.username };
+      const response = await axios.post("/api/v1/auth/duplicate/id", body);
 
       if (response.status === 200) {
-        alert("사용 가능한 아이디입니다.");
-      } else {
-        alert("이미 사용 중인 아이디입니다.");
+        if (response.data.data) {
+          alert("이미 사용중인 아이디입니다.");
+        } else {
+          alert("사용 가능한 아이디입니다.");
+        }
       }
     } catch (error) {
-      if (error.response && error.response.status === 409) {
-        alert("이미 사용 중인 아이디입니다.");
+      if (error.response && error.response.status === 500) {
+        alert(error.response.data.message);
       } else {
-        console.error("아이디 중복확인 중 오류 발생:", error);
-        alert("아이디 중복확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        console.error("아이디 중복확인 중 오류 발생:", error.message);
+        alert("아이디 중복확인 중 오류가 발생했습니다.");
       }
     }
   };
-*/
 
   // 이메일 인증 api
   const handleEmailVerification = async () => {
+    const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email || !emailValidation.test(form.email)) {
+      setTouched({ ...touched, email: true });
+      setErrors({ ...errors, email: "이메일 형식이 적합하지 않습니다." });
+      return;
+    }
     try {
       const body = {
         email: form.email,
@@ -356,43 +365,51 @@ const SignUpInputInfo = ({ setActiveStep }) => {
       if (error.response) {
         const { status, data } = error.response;
         if (status === 500) {
-          console.error("서버 내부 오류:", data.message);
+          //console.error("서버 내부 오류:", data.message);
           alert(data.message || "서버 내부 오류가 발생했습니다.");
         } else {
-          console.error("본인인증 중 알 수 없는 오류 발생:", data.message);
+          //console.error("본인인증 중 알 수 없는 오류 발생:", data.message);
           alert(data.message || "본인인증 중 알 수 없는 오류가 발생했습니다.");
         }
       } else {
-        console.error("본인인증 중 네트워크 오류 발생:", error.message);
+        //console.error("본인인증 중 네트워크 오류 발생:", error.message);
         alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
       }
     }
   };
 
   // 인증번호 인증확인 api
-  /*  const handleEmailCodeCheck = async () => {
+  const handleEmailCodeCheck = async () => {
+    if (!form.verificationCode || form.verificationCode.trim() === "") {
+      setTouched({ ...touched, verificationCode: true });
+      setErrors({
+        ...errors,
+        verificationCode: "인증번호가 일치하지 않습니다.",
+      });
+      return;
+    }
+
     try {
       const body = {
         certificationNumber: form.verificationCode,
       };
       const response = await axios.post(
-        "/api/v1/auth/join/~",
+        "/api/v1/auth/join/certification",
         body
       );
 
       if (response.status === 200) {
         alert("인증이 완료되었습니다.");
-      } 
+      }
     } catch (error) {
-      if (error.response && error.response.status === ) {
-        alert("인증번호가 올바르지 않습니다.");
+      if (error.response && error.response.status === 401) {
+        alert("인증번호가 일치하지 않습니다.");
       } else {
-        console.error("아이디 중복확인 중 오류 발생:", error);
-        alert("인증확인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+        console.error("인증번호 인증확인 중 오류 발생:", error);
+        alert(data.message);
       }
     }
   };
-*/
 
   // 회원가입 api 연결
   const handleSubmit = async (e) => {
@@ -478,7 +495,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                 <button
                   className="idCheckBtn"
                   type="button"
-                  //onClick={handleIdCheck}
+                  onClick={handleIdCheck}
                 >
                   중복확인
                 </button>
@@ -570,7 +587,7 @@ const SignUpInputInfo = ({ setActiveStep }) => {
                 <button
                   className="emailCheckBtn"
                   type="button"
-                  //onClick={handleEmailCodeCheck}
+                  onClick={handleEmailCodeCheck}
                 >
                   인증확인
                 </button>
