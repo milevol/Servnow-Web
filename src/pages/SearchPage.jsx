@@ -64,12 +64,13 @@ const KeywordTag = styled.div`
 const ExcludeCompletedButton = styled.div`
   width: 53px;
   height: 30px;
-  background: ${({ isActive }) => (isActive ? "#4C76FE" : "#FFFFFF")};
+  background: ${({ $isActive }) => ($isActive ? "#4C76FE" : "#FFFFFF")};
   border: 1px solid #4c76fe;
   border-radius: 22.3358px;
   display: flex;
   align-items: center;
-  justify-content: ${({ isActive }) => (isActive ? "flex-end" : "flex-start")};
+  justify-content: ${({ $isActive }) =>
+    $isActive ? "flex-end" : "flex-start"};
   cursor: pointer;
   position: relative;
   padding: 0 5px;
@@ -83,14 +84,14 @@ const ExcludeCompletedIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({ isActive }) => (isActive ? "#FFFFFF" : "#4C76FE")};
+  background: ${({ $isActive }) => ($isActive ? "#FFFFFF" : "#4C76FE")};
   border-radius: 50%;
   box-shadow: 0px 1px 5px rgba(95, 108, 126, 0.25);
   transition: background-color 0.3s;
 `;
 
 const ExcludeIcon = styled(SlPresent)`
-  color: ${({ isActive }) => (isActive ? "#4C76FE" : "#FFFFFF")};
+  color: ${({ $isActive }) => ($isActive ? "#4C76FE" : "#FFFFFF")};
   font-size: 16px;
 `;
 
@@ -146,11 +147,11 @@ function SearchPage() {
             ))}
           </KeywordContainer>
           <ExcludeCompletedButton
-            isActive={excludeCompleted}
+            $isActive={excludeCompleted}
             onClick={() => setExcludeCompleted(!excludeCompleted)}
           >
-            <ExcludeCompletedIcon isActive={excludeCompleted}>
-              <ExcludeIcon isActive={excludeCompleted} />
+            <ExcludeCompletedIcon $isActive={excludeCompleted}>
+              <ExcludeIcon $isActive={excludeCompleted} />
             </ExcludeCompletedIcon>
           </ExcludeCompletedButton>
         </FilterContainer>

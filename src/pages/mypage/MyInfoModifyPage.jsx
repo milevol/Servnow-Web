@@ -186,7 +186,7 @@ const MyInfoModifyPage = () => {
   const [idNumber, setIdNumber] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [passwordValid, setPasswordValid] = useState(true);
+  const [EmailValid, setEmaildValid] = useState(true);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png');
   const [emailChange, setEmailChange] = useState(false);
@@ -222,7 +222,7 @@ const MyInfoModifyPage = () => {
   };
 
   const handleSave = () => {
-    if (validatePasswords()) {
+    if (validatePasswords() && emailValid) {
       // 여기에서 API 호출 로직을 추가하면 됩니다.
       alert('비밀번호가 성공적으로 변경되었습니다.');
     }

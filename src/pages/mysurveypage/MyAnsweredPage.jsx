@@ -14,19 +14,17 @@ export const MyPageContainer = styled.div`
 
 export const MyPageTotalContainer = styled.div`
     height : 100%;
-    width : 80%;
-    margin-left : 10%;
-    margin-right : 10%;
+    width : 100%;
+    margin-left : 143px;
 `;
 
 export const SurveyOnerContainer = styled.div`
-    height : 80px;
-    margin-top : 100px;
-    padding-top : 10px;
-    padding-bottom : 10px;
+    height : 57px;
+    width : 78px;
+    margin-top : 116px;
     text-align : left;
-    font-size : 55px;
-    font-weight : bolder;
+    font-size : 48px;
+    font-weight : 800;
     display: flex;
     align-items: center;
 `;
@@ -34,9 +32,9 @@ export const SurveyOnerContainer = styled.div`
 export const TortalSurveyContainer = styled.div`
     display : flex;
     flex-wrap : wrap;
-    height : auto;
+    padding-top : 44px;
     align-self : center;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-content: flex-start;
 `;
 
@@ -59,21 +57,6 @@ export const NewSurveyBox = styled.div`
     border-radius : 10px;
 `;
 
-export const NewSurveyButton = styled.button`
-    width : 80px;
-    height : 80px;
-    padding-top : 0px;
-    padding-bottom : 0px;
-    padding-left : 0px;
-    padding-right : 0px;
-    text-align : center;
-    border-radius : 40px;
-    background-color : #4C76FE;
-    color : white;
-    font-size : 50px;
-    font-weight : bolder;
-`;
-
 export const CreateNewSurvey = styled.div`
     padding-top : 10px;
     color : black;
@@ -84,16 +67,18 @@ export const CreateNewSurvey = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
-  margin-top : 10px;
-  margin-left: 70px;
+  margin-left: 44px;
+  padding-top: 11px;
+  padding-bottom: 9px;
 `;
 
 const DropdownButton = styled.button`
-  background-color: white;
+  background-color: #f8f9fa;
   border: 1px solid #ced4da;
-  width : 150px;
-  height : 50px;
-  padding: 10px 16px;
+  width : 120px;
+  height : 37px;
+  border-radius: 8px;
+  padding: 10px 12px 10px 15px;
   font-size: 14px;
   font-weight : 600;
   color: #212529;
@@ -102,14 +87,14 @@ const DropdownButton = styled.button`
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  ${props => (props.isOpen ? 'border-radius' : '10px 10px 0px 0px')};
 `;
 
 const DropdownMenu = styled.div`
   display: ${props => (props.isOpen ? 'block' : 'none')};
   position: absolute;
   background-color: #fff;
-  min-width: 150px;
+  min-width: 120px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   border-radius: 0px 0px 10px 10px;
@@ -130,7 +115,7 @@ const DropdownItem = styled.div`
 
 const Arrow = styled.span`
   margin-left: 10px;
-  font-size : 24px;
+  font-size : 12px;
   transform: rotate(90deg);
   ${props => props.isOpen && css`
     transform: rotate(270deg);
