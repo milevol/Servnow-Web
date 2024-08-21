@@ -13,13 +13,3 @@ export default ({ mode }) => {
     },
   });
 };
-
-// https://vitejs.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-//   server: {
-//     proxy: {
-//       "/api": import.meta.env.VITE_API_URL,
-//     },
-//   },
-// });
