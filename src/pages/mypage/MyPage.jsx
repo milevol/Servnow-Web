@@ -1,10 +1,12 @@
 // 목적: 마이페이지 화면 구현
 // 기능: 마이페이지
 // 2024.08.21/곤/장고은
-// 추가되어야 할 기능: api 연결, 링크 연결
+
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Container = styled.div`
   width: 100%;
@@ -43,7 +45,8 @@ const MyPageContainer = styled.div`
   #container1,
   #container2,
   #surveyContainer,
-  #pointContainer {
+  #pointContainer,
+  #loding {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -219,27 +222,58 @@ const Labels = styled.div`
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const userPoints = 2500; // 현재 사용자 포인트
+  const [data, setData] = useState([]); // 유저 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
 
+  // API 함수
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem("accessToken"); // "token" 키로 토큰 가져오기
+      const response = await axios.get("/api/v1/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setData(response.data.data || []);
+    } catch (err) {
+      console.error(err.response ? err.message : "Network error");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const userPoints = data.point; // 현재 사용자 포인트
   const pointsRequired = [
     0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500,
   ];
 
   // 캐릭터 이미지 배열
   const characterImages = [
-    "/roundLogo.png", // 0 포인트 이상
-    "/roundLogo.png", // 500 포인트 이상
-    "/roundLogo.png", // 1000 포인트 이상
-    "/roundLogo.png", // 1500 포인트 이상
-    "/roundLogo.png", // 2000 포인트 이상
-    "/roundLogo.png", // 2500 포인트 이상
-    "/roundLogo.png", // 3000 포인트 이상
-    "/roundLogo.png", // 3500 포인트 이상
-    "/roundLogo.png", // 4000 포인트 이상
-    "/roundLogo.png", // 4500 포인트 이상
-    "/roundLogo.png", // 5000 포인트 이상
-    "/roundLogo.png", // 5500 포인트 이상
+    "/roundLogo1.png", // 0 포인트 이상
+    "/roundLogo2.png", // 500 포인트 이상
+    "/roundLogo3.png", // 1000 포인트 이상
+    "/roundLogo4.png", // 1500 포인트 이상
+    "/roundLogo5.png", // 2000 포인트 이상
+    "/roundLogo6.png", // 2500 포인트 이상
+    "/roundLogo7.png", // 3000 포인트 이상
+    "/roundLogo8.png", // 3500 포인트 이상
+    "/roundLogo9.png", // 4000 포인트 이상
+    "/roundLogo10.png", // 4500 포인트 이상
+    "/roundLogo11.png", // 5000 포인트 이상
   ];
+
+  // 등급 이미지 인덱스를 계산
+  const imageIndex = characterImages.findIndex(
+    (_, index) => userPoints < (index + 1) * 500
+  );
+  const selectedImage =
+    characterImages[imageIndex >= 0 ? imageIndex : characterImages.length - 1];
 
   //마이페이지에서 포인트 이미지 불러오기 함수
   const getImageSrc = (index) => {
@@ -248,22 +282,9 @@ const MyPage = () => {
       : "/lock.png";
   };
 
-  const calculateRank = () => {
-    if (userPoints <= 1000) {
-      return "평민";
-    } else if (userPoints <= 2500) {
-      return "기사";
-    } else if (userPoints <= 4000) {
-      return "남작";
-    } else if (userPoints <= 5500) {
-      return "백작";
-    } else {
-      return "최고";
-    }
-  };
-
+  // 포인트 바 함수
   const calculateProgress = () => {
-    const thresholds = [1000, 2500, 4000, 5500]; // 각 등급에 도달하기 위한 포인트 경계
+    const thresholds = [1000, 2500, 4000, 5500];
     const progressPerLevel = 33.3; // 상태바에서 각 구간의 비율 (100 / 4)
 
     if (userPoints <= thresholds[0]) {
@@ -290,6 +311,22 @@ const MyPage = () => {
     }
   };
 
+  // 등급 계산 함수
+  const calculateRank = () => {
+    if (userPoints <= 1000) {
+      return "평민";
+    } else if (userPoints <= 2500) {
+      return "기사";
+    } else if (userPoints <= 4000) {
+      return "남작";
+    } else if (userPoints <= 5500) {
+      return "백작";
+    } else {
+      return "최고";
+    }
+  };
+
+  // 다음 레벨까지 남은 포인트 계산 함수
   const nextLevelPoints = () => {
     const thresholds = [1000, 2500, 4000, 5500];
     for (let i = 0; i < thresholds.length; i++) {
@@ -305,6 +342,12 @@ const MyPage = () => {
     navigate("/mypage/point");
   };
 
+  // // 내 정보 수정 페이지로 이동하는 함수
+  const goToMyInfoModify = () => {
+    if (data.platform === "KAKAO") navigate("/myinfo-k");
+    else navigate("/myinfo");
+  };
+
   return (
     <Container>
       <Navbar />
@@ -315,93 +358,105 @@ const MyPage = () => {
         </button>
       </PageBtnContainer>
       <MyPageContainer>
-        <div id="container1">
-          <div id="profile">
-            <Img>
-              <img id="proImg" src="src\assets\roundLogo1.png" alt="Profile" />
-            </Img>
-            <div id="pro">
-              <h1>아리 님</h1>
-              <p className="greyColor">안녕, 오늘도 좋은 하루 보내세요!</p>
+        {loading ? (
+          <div id="loding">Loading...</div>
+        ) : (
+          <div>
+            <div id="container1">
+              <div id="profile">
+                <Img>
+                  <img id="proImg" src={data.profileUrl} alt="Profile" />
+                </Img>
+                <div id="pro">
+                  <h1>{data.nickname} 님</h1>
+                  <p className="greyColor">안녕, 오늘도 좋은 하루 보내세요!</p>
+                </div>
+              </div>
+              <div id="rating">
+                <Img>
+                  <img src={selectedImage} alt="Profile" />
+                </Img>
+                <div id="darkblueColor">
+                  <p>{data.nickname}님의 등급</p>
+                  <p className="weight">{calculateRank()}</p>
+                </div>
+                <div id="point-rate">
+                  <span className="blueColor">
+                    다음 캐릭터까지&nbsp;
+                    <span className="weight">{nextLevelPoints()}p</span>
+                    &nbsp;남았어요!
+                  </span>
+                  <ProgressBarWrapper>
+                    <ProgressPoint left={calculateProgress()} />
+                  </ProgressBarWrapper>
+                  <Labels>
+                    <span>평민</span>
+                    <span>기사</span>
+                    <span>남작</span>
+                    <span>백작</span>
+                  </Labels>
+                </div>
+              </div>
+            </div>
+            <div id="container2">
+              <div id="etc1">
+                <div>
+                  <p className="weight">나의 계정 설정</p>
+                  <p
+                    className="greyColor"
+                    onClick={goToMyInfoModify}
+                    style={{ cursor: "pointer" }}
+                  >
+                    내 정보 수정
+                  </p>
+                </div>
+                <hr></hr>
+                <div>
+                  <p className="weight">고객센터</p>
+                  <p className="greyColor">문의하기</p>
+                </div>
+              </div>
+              <div id="etc2">
+                <p className="weight">나의 설문지</p>
+                <div id="surveyContainer">
+                  <span>
+                    <p className="weight">{data.userCreatedSurveyCount}</p>
+                    <p>설문 제작 수</p>
+                  </span>
+                  <span id="lineCss">
+                    <p className="weight">{data.userParticipatedSurveyCount}</p>
+                    <p>설문 참여 수</p>
+                  </span>
+                  <span>
+                    <p className="weight">{userPoints}p</p>
+                    <p>포인트</p>
+                  </span>
+                </div>
+                <p className="weight">
+                  포인트 <span className="blueColor">{userPoints}p</span>
+                  &nbsp;&nbsp;
+                  <button onClick={goToPoint}>
+                    <img src="src\assets\arrow.png" id="arrow"></img>
+                  </button>
+                </p>
+                <div id="pointContainer">
+                  <Img>
+                    <img src={getImageSrc(0)} alt="Profile" />
+                  </Img>
+                  <Img>
+                    <img src={getImageSrc(1)} alt="Profile" />
+                  </Img>
+                  <Img>
+                    <img src={getImageSrc(2)} alt="Profile" />
+                  </Img>
+                  <Img>
+                    <img src={getImageSrc(3)} alt="Profile" />
+                  </Img>
+                </div>
+              </div>
             </div>
           </div>
-          <div id="rating">
-            <Img>
-              <img src="src\assets\roundLogo1.png" alt="Profile" />
-            </Img>
-            <div id="darkblueColor">
-              <p>아리님의 등급</p>
-              <p className="weight">{calculateRank()}</p>
-            </div>
-            <div id="point-rate">
-              <span className="blueColor">
-                다음 캐릭터까지&nbsp;
-                <span className="weight">{nextLevelPoints()}p</span>
-                &nbsp;남았어요!
-              </span>
-              <ProgressBarWrapper>
-                <ProgressPoint left={calculateProgress()} />
-              </ProgressBarWrapper>
-              <Labels>
-                <span>평민</span>
-                <span>기사</span>
-                <span>남작</span>
-                <span>백작</span>
-              </Labels>
-            </div>
-          </div>
-        </div>
-        <div id="container2">
-          <div id="etc1">
-            <div>
-              <p className="weight">나의 계정 설정</p>
-              <p className="greyColor">내 정보 수정</p>
-            </div>
-            <hr></hr>
-            <div>
-              <p className="weight">고객센터</p>
-              <p className="greyColor">문의하기</p>
-            </div>
-          </div>
-          <div id="etc2">
-            <p className="weight">나의 설문지</p>
-            <div id="surveyContainer">
-              <span>
-                <p className="weight">10</p>
-                <p>설문 제작 수</p>
-              </span>
-              <span id="lineCss">
-                <p className="weight">18</p>
-                <p>설문 참여 수</p>
-              </span>
-              <span>
-                <p className="weight">{userPoints}p</p>
-                <p>포인트</p>
-              </span>
-            </div>
-            <p className="weight">
-              포인트 <span className="blueColor">{userPoints}p</span>
-              &nbsp;&nbsp;
-              <button onClick={goToPoint}>
-                <img src="src\assets\arrow.png" id="arrow"></img>
-              </button>
-            </p>
-            <div id="pointContainer">
-              <Img>
-                <img src={getImageSrc(0)} alt="Profile" />
-              </Img>
-              <Img>
-                <img src={getImageSrc(1)} alt="Profile" />
-              </Img>
-              <Img>
-                <img src={getImageSrc(2)} alt="Profile" />
-              </Img>
-              <Img>
-                <img src={getImageSrc(3)} alt="Profile" />
-              </Img>
-            </div>
-          </div>
-        </div>
+        )}
       </MyPageContainer>
     </Container>
   );

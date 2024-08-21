@@ -1,10 +1,12 @@
 // 목적: 포인트 페이지 화면 구현
 // 기능: 포인트 페이지
 // 2024.08.21/곤/장고은
-// 추가되어야 할 기능: api 연결, 링크 연결
+
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import axios from "axios";
 
 const Container = styled.div`
   width: 100%;
@@ -24,6 +26,12 @@ const PointContainer = styled.div`
   margin: auto;
   width: 80%;
 
+  p {
+    width: 100%;
+    margin: 30px 0px;
+    font-size: 20px;
+    font-weight: bold;
+  }
   .imgContainer {
     display: flex;
     flex-wrap: wrap;
@@ -41,12 +49,6 @@ const PointContainer = styled.div`
   .image-container img {
     max-width: 50%;
   }
-`;
-const Paragraph = styled.p`
-  width: 100%;
-  margin: 30px 0px;
-  font-size: 20px;
-  font-weight: bold;
 `;
 
 const PageBtnContainer = styled.div`
@@ -75,28 +77,52 @@ const PageBtnContainer = styled.div`
 
 const MyPagePoint = () => {
   const navigate = useNavigate();
+  const [data, setData] = useState([]); // 유저 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
 
-  const userPoints = 2500; // 현재 사용자 포인트
+  // API 함수
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem("accessToken"); // "token" 키로 토큰 가져오기
+      const response = await axios.get("/api/v1/users/me/point", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setData(response.data.data || []);
+    } catch (err) {
+      console.error(err.response ? err.message : "Network error");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const imageCount = 12;
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const userPoints = data.point; // 현재 사용자 포인트
+
+  const imageCount = 11;
   const pointsRequired = [
-    0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500,
+    0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000,
   ];
 
   // 캐릭터 이미지 배열
   const characterImages = [
-    "/roundLogo.png", // 0 포인트 이상
-    "/roundLogo.png", // 500 포인트 이상
-    "/roundLogo.png", // 1000 포인트 이상
-    "/roundLogo.png", // 1500 포인트 이상
-    "/roundLogo.png", // 2000 포인트 이상
-    "/roundLogo.png", // 2500 포인트 이상
-    "/roundLogo.png", // 3000 포인트 이상
-    "/roundLogo.png", // 3500 포인트 이상
-    "/roundLogo.png", // 4000 포인트 이상
-    "/roundLogo.png", // 4500 포인트 이상
-    "/roundLogo.png", // 5000 포인트 이상
-    "/roundLogo.png", // 5500 포인트 이상
+    "/roundLogo1.png", // 0 포인트 이상
+    "/roundLogo2.png", // 500 포인트 이상
+    "/roundLogo3.png", // 1000 포인트 이상
+    "/roundLogo4.png", // 1500 포인트 이상
+    "/roundLogo5.png", // 2000 포인트 이상
+    "/roundLogo6.png", // 2500 포인트 이상
+    "/roundLogo7.png", // 3000 포인트 이상
+    "/roundLogo8.png", // 3500 포인트 이상
+    "/roundLogo9.png", // 4000 포인트 이상
+    "/roundLogo10.png", // 4500 포인트 이상
+    "/roundLogo11.png", // 5000 포인트 이상
   ];
 
   // 포인트 이미지 불러오기 함수
@@ -128,12 +154,16 @@ const MyPagePoint = () => {
         <button className="pointBtn">포인트</button>
       </PageBtnContainer>
       <PointContainer>
-        <Paragraph>
-          <p>
-            포인트 <span className="blueColor">{userPoints}p</span>
-          </p>
-        </Paragraph>
-        <div className="imgContainer">{images}</div>
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <div>
+            <p>
+              포인트 <span className="blueColor">{userPoints}p</span>
+            </p>
+            <div className="imgContainer">{images}</div>
+          </div>
+        )}
       </PointContainer>
     </Container>
   );
