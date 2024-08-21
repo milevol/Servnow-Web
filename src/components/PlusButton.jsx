@@ -30,9 +30,14 @@ const PlusIcon = styled.div`
   font-style: normal;
   font-weight: 400;
   font-size: 70px;
-  line-height: 70px;
   color: #ffffff;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 0; // 추가: 텍스트의 기본 line-height 제거
+  padding-bottom: 8px; // 추가: 시각적 중앙 조정
 `;
 
 const PlusButton = () => {

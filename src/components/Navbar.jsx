@@ -1,3 +1,9 @@
+// Navbar.jsx
+// 목적: 상단 네비게이션 바를 구현
+// 기능: 사이드바 토글, 검색, 알림, 설정, 프로필 페이지 이동
+// 작성자: 임사랑
+// 작성일: 2024.07.19
+
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,7 +14,7 @@ import profileImage from "../assets/profileOrigin.png";
 import navMascotImage from "../assets/navMascot.png";
 import Sidebar from "./Sidebar";
 
-// Navbar 컨테이너 스타일
+// 네비게이션 바 전체 컨테이너 스타일
 const NavbarContainer = styled.div`
   position: fixed;
   width: 100%;
@@ -16,7 +22,6 @@ const NavbarContainer = styled.div`
   left: 0;
   top: 0;
   background: #ffffff;
-  // box-shadow: 0px 0.550964px 0.550964px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,7 +30,7 @@ const NavbarContainer = styled.div`
   box-sizing: border-box;
 `;
 
-// NavMascot 컴포넌트 스타일
+// 마스코트 아이콘 스타일
 const SideMascot = styled.div`
   width: 40px;
   height: 40px;
@@ -34,38 +39,40 @@ const SideMascot = styled.div`
   cursor: pointer;
 `;
 
-// 검색 바 스타일
+// 검색 바 컨테이너 스타일
 const SearchBarContainer = styled.div`
-  width: ${({ isSearchPage }) => (isSearchPage ? "60%" : "305px")};
+  width: ${({ $isSearchPage }) => ($isSearchPage ? "60%" : "305px")};
   height: 41px;
   display: flex;
   align-items: center;
-  position: ${({ isSearchPage }) => (isSearchPage ? "absolute" : "relative")};
-  left: ${({ isSearchPage }) => (isSearchPage ? "50%" : "auto")};
-  transform: ${({ isSearchPage }) =>
-    isSearchPage ? "translateX(-50%)" : "none"};
+  position: ${({ $isSearchPage }) => ($isSearchPage ? "absolute" : "relative")};
+  left: ${({ $isSearchPage }) => ($isSearchPage ? "50%" : "auto")};
+  transform: ${({ $isSearchPage }) =>
+    $isSearchPage ? "translateX(-50%)" : "none"};
   transition: width 0.3s ease-in-out, left 0.3s ease-in-out,
     transform 0.3s ease-in-out;
 `;
 
+// 검색 바 스타일
 const SearchBar = styled.div`
   flex: 1;
   height: 100%;
   background: #f2f5ff;
-  border: ${({ isSearchPage }) =>
-    isSearchPage ? "1px solid #e6e6e6" : "none"};
+  border: ${({ $isSearchPage }) =>
+    $isSearchPage ? "1px solid #e6e6e6" : "none"};
   border-radius: 30px 0 0 30px;
   display: flex;
   align-items: center;
   padding: 0 10px;
 `;
 
+// 검색 아이콘 컨테이너 스타일
 const SearchIconContainer = styled.div`
   width: 50px;
   height: 41px;
-  background: ${({ isSearchPage }) => (isSearchPage ? "#C6D3FF" : "#f2f5ff")};
-  border: ${({ isSearchPage }) =>
-    isSearchPage ? "1px solid #e6e6e6" : "none"};
+  background: ${({ $isSearchPage }) => ($isSearchPage ? "#C6D3FF" : "#f2f5ff")};
+  border: ${({ $isSearchPage }) =>
+    $isSearchPage ? "1px solid #e6e6e6" : "none"};
   border-left: none;
   border-radius: 0 30px 30px 0;
   display: flex;
@@ -74,6 +81,7 @@ const SearchIconContainer = styled.div`
   cursor: pointer;
 `;
 
+// 검색 아이콘 스타일
 const SearchIcon = styled.div`
   width: 29px;
   height: 29px;
@@ -81,7 +89,7 @@ const SearchIcon = styled.div`
   background-size: contain;
 `;
 
-// 검색 입력 스타일
+// 검색 입력창 스타일
 const SearchInput = styled.input`
   width: 100%;
   height: 100%;
@@ -94,7 +102,7 @@ const SearchInput = styled.input`
   font-family: "Pretendard", sans-serif;
 `;
 
-// 아이콘 컨테이너 스타일
+// 네비게이션 바 오른쪽 아이콘 컨테이너 스타일
 const IconContainer = styled.div`
   display: flex;
   align-items: center;
@@ -111,7 +119,6 @@ const AlarmIcon = styled.div`
 `;
 
 // 프로필 아이콘 스타일
-// 임시 수정해야됨
 const ProfileIcon = styled.div`
   width: 21.75px;
   height: 22.584px;
@@ -137,17 +144,17 @@ const LoginButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px; /* 아이콘과 텍스트 사이의 간격 */
+  gap: 8px;
 `;
 
 const Navbar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 관리
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 열림/닫힘 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isSearchPage = location.pathname === "/search";
+  const isSearchPage = location.pathname === "/search"; // 현재 경로가 검색 페이지인지 확인
 
   // 검색어 입력 핸들러
   const handleSearchChange = (e) => {
@@ -162,26 +169,30 @@ const Navbar = () => {
     }
   };
 
-  // 프로필 클릭 핸들러
+  // 프로필 클릭 핸들러 (사이드바 열기/닫기)
   const handleProfileClick = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   // 로그인 버튼 클릭 핸들러
   const handleLoginClick = () => {
-    // 로그인 페이지로 이동하거나 로그인 처리를 수행
     navigate("/login");
+  };
+
+  // 마스코트 클릭 핸들러
+  const handleMascotClick = () => {
+    navigate("/landing");
   };
 
   return (
     <>
       <NavbarContainer>
-        {/* 랜딩페이지 연결 수정*/}
-        <SideMascot onClick={() => navigate("/")} />
+        <SideMascot onClick={handleMascotClick} />{" "}
+        {/* 마스코트 클릭 시 /landing으로 이동 */}
         {!isSearchPage && (
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <SearchBarContainer isSearchPage={isSearchPage}>
-              <SearchBar isSearchPage={isSearchPage}>
+            <SearchBarContainer $isSearchPage={isSearchPage}>
+              <SearchBar $isSearchPage={isSearchPage}>
                 <form
                   onSubmit={handleSearchSubmit}
                   style={{ display: "flex", width: "100%" }}
@@ -193,9 +204,9 @@ const Navbar = () => {
                   />
                 </form>
               </SearchBar>
-              <SearchIconContainer isSearchPage={isSearchPage}>
+              <SearchIconContainer $isSearchPage={isSearchPage}>
                 <SearchIcon
-                  isSearchPage={isSearchPage}
+                  $isSearchPage={isSearchPage}
                   onClick={handleSearchSubmit}
                 />
               </SearchIconContainer>
@@ -216,8 +227,8 @@ const Navbar = () => {
         )}
         {isSearchPage && (
           <>
-            <SearchBarContainer isSearchPage={isSearchPage}>
-              <SearchBar isSearchPage={isSearchPage}>
+            <SearchBarContainer $isSearchPage={isSearchPage}>
+              <SearchBar $isSearchPage={isSearchPage}>
                 <form
                   onSubmit={handleSearchSubmit}
                   style={{ display: "flex", width: "100%" }}
@@ -229,9 +240,9 @@ const Navbar = () => {
                   />
                 </form>
               </SearchBar>
-              <SearchIconContainer isSearchPage={isSearchPage}>
+              <SearchIconContainer $isSearchPage={isSearchPage}>
                 <SearchIcon
-                  isSearchPage={isSearchPage}
+                  $isSearchPage={isSearchPage}
                   onClick={handleSearchSubmit}
                 />
               </SearchIconContainer>
@@ -251,7 +262,11 @@ const Navbar = () => {
           </>
         )}
       </NavbarContainer>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        setIsLoggedIn={setIsLoggedIn}
+      />
     </>
   );
 };
