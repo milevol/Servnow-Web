@@ -11,8 +11,6 @@ import AnswerStartPage from "./pages/AnswerStartPage";
 import FindPasswordPage from "./pages/FindPasswordPage";
 import FindIdPage from "./pages/FindIdPage";
 import SurveyModalPage from "./pages/SurveyModalPage";
-import FindPasswordPage from "./pages/FindPasswordPage";
-import FindIdPage from './pages/FindIdPage';
 import MyInfoModifyPage from "./pages/mypage/MyInfoModifyPage";
 import MyInfoModifyKakaoPage from "./pages/mypage/MyInfoModifyKakaoPage";
 import KakaoAuthRedirectHandler from "./components/login/KakaoAuthRedirecteHandler";
