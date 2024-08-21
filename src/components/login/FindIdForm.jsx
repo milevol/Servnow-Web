@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const FormContainer = styled.div`
   width: 800px;
@@ -154,14 +155,15 @@ const HighlightedUserId = styled.span`
 `;
 
 const FindIdForm = () => {
+  const navigate = useNavigate();
 
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [certificationSuccess, setCertificationSuccess] = useState(false);
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
   const [validNumber, setValidNumber] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
+  const [userIdExist, setUserIdExist] = useState(false);
 
   // 인증번호 전송 버튼 클릭시 작동할 기능
   const handleVerificationSend = async () => {
@@ -170,57 +172,107 @@ const FindIdForm = () => {
       setError('');
       return
     }
-    if (verificationSent === false){
+    if (!verificationSent){
       try {
-        const response = await axios.post('', { email });
+        const response = await axios.post(
+          '/api/v1/find/email/identity-verification', 
+          { 
+            email: email
+          },
+        );
         
-        if (response.data.success) {
+        if (response.data.code === 200) {
           setVerificationSent(true);
-          setVerificationCode(response.data.verificationCode)
           alert('인증번호가 이메일로 전송되었습니다.');
           setError('');
         } else {
-          alert('이메일 전송에 실패했습니다.');
+          alert('등록되지 않은 이메일입니다.');
           setVerificationSent(false);
         } 
-      } catch (err) {
-        alert('등록되지 않은 이메일입니다.')
-        setVerificationSent(false);
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response;
+          if (status === 500) {
+            console.error("서버 내부 오류:", data.message);
+            alert(data.message || "서버 내부 오류가 발생했습니다.");
+          } else if (status === 404){
+            console.error("인증번호 전송 중 오류 발생:", data.message);
+            alert(data.message || "사용자를 찾을 수 없습니다.");
+          } else {
+            console.error("인증번호 전송 중 오류 발생:", data.message);
+            alert("인증번호 전송 중 오류가 발생했습니다.");
+          }
+        } else {
+          console.error("인증번호 전송 중 네트워크 오류 발생:", error.message);
+          alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+        }
       }
     }
   };
+
+  const handleVerificationConfirm = async () => {
+    if (!validNumber) {
+      alert('인증번호를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        '/api/v1/find/email/certification',
+        {
+          certificationNumber: validNumber
+        },
+      );
+      if (response.data.code === 200) {
+        console.log('User ID:', response.data.data);
+        console.log('message:', response.data.message);
+        setUserId(response.data.data);
+        setCertificationSuccess(true);
+        alert('인증이 완료되었습니다.');
+        setError('');
+      } else {
+        alert('인증번호가 일치하지 않습니다.');
+      }
+    } catch(error) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 500) {
+          console.error("서버 내부 오류:", data.message);
+          alert(data.message || "서버 내부 오류가 발생했습니다.");
+        } else if (status === 404){
+          console.error("인증번호 확인 중 오류 발생:", data.message);
+          alert(data.message || "사용자를 찾을 수 없습니다.");
+        } else {
+          console.error("인증번호 확인 중 오류 발생:", data.message);
+          alert("본인증번호 확인 중 오류가 발생했습니다.");
+        }
+      } else {
+        console.error("인증번호 확인 중 네트워크 오류 발생:", error.message);
+        alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+      }
+    }
+  } 
   
 // 아이디찾기 버튼 클릭 시 작동할 기능
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !validNumber) {
-      alert('모든 필드를 작성해주세요.');
+    if (!certificationSuccess) {
+      alert('이메일 인증을 먼저 진행해주세요.');
       return;
     }
+      if(certificationSuccess){
+        setUserIdExist(true);
+      }
+  };
 
-    if (validNumber !== verificationCode) {
-      alert('인증번호가 일치하지 않습니다.');
-      return;
-    }
-
-    try {
-      const response = await axios.post('', 
-        { 
-           email,
-           validNumber
-        });
-
-      setUserId(response.data.userId);
-    } catch (err) {
-
-      alert('등록되지 않은 이메일입니다.');
-    }
+  const handleFindPasswordClick = () => {
+    navigate('/find-pswd');
   };
 
   return (
     <FormContainer>
-        {userId ? (
+        {userIdExist ? (
             <FindWrapper>
                 <FindText>입력하신 정보와 일치하는 아이디는 다음과 같습니다.</FindText>
                 <SuccessContainer>
@@ -229,7 +281,7 @@ const FindIdForm = () => {
 
                 <ButtonContainer>
                     <ConfirmButton>확인</ConfirmButton>
-                    <FindPswdButton>비밀번호 찾기</FindPswdButton>
+                    <FindPswdButton onClick={handleFindPasswordClick}>비밀번호 찾기</FindPswdButton>
                 </ButtonContainer>
             </FindWrapper>
         ) : (
@@ -253,7 +305,9 @@ const FindIdForm = () => {
             value={validNumber}
             onChange={(e) => setValidNumber(e.target.value)}
           />
-           <SendButton type='button'>인증확인</SendButton>
+           <SendButton type='button' onClick={handleVerificationConfirm}>
+            인증확인
+            </SendButton>
         </InputWrapper>
         <FindButton type="submit">아이디 찾기</FindButton>
       </form>

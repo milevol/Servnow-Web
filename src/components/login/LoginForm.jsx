@@ -9,6 +9,8 @@ import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import kakaoLogo from "../../assets/kakao_logo.png";
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/authSlice';
 
 const FormContainer = styled.div`
   width: 500px;
@@ -89,7 +91,7 @@ const SignupButton = styled.button`
 const KakaoButton = styled.button`
   width: 65px;
   height: 65px;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   background: url(${kakaoLogo}) no-repeat center center / cover;
   border: none;
   border-radius: 4px;
@@ -152,7 +154,8 @@ const LoginForm = () => {
   const [idError, setIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [stayedLoggedIn, setStayedLoggedIn] = useState(false);
-
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 서버에서 회원 정보 가져오기 검증
@@ -163,9 +166,9 @@ const LoginForm = () => {
 
     if (!id) {
       setIdError('! 아이디를 입력해주세요.');
-      hasError = true; // 에러 존재하는지 확인
       setError('');
       setPasswordError('');
+      hasError = true; // 에러 존재하는지 확인
     } else if (!password) {
       setPasswordError('! 비밀번호를 입력해주세요.');
       setIdError('');
@@ -181,32 +184,83 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await axios.post('', 
-        { id, password });
+      const response = await axios.post(
+        "/api/v1/auth/login",
+        {
+           serialId: id,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 5000, // 타임아웃 5초 설정
+        }
+      );
 
-      // 토큰을 로컬스토리지에 저장하기
-      if (stayedLoggedIn) {
-        localStorage.setItem('token', response.data.token);
-      } else {
-        sessionStorage.setItem('token', response.data.token);
-      }
-      alert('로그인에 성공하셨습니다.');
-    } catch (err) {
+      if (response.status === 200) {
+        console.log("로그인 요청 성공:", response.data.message);
+
+        const { accessToken, refreshToken, isRegistered } = response.data.data;
+
+
+        if (isRegistered) {
+          alert('로그인에 성공하셨습니다.');
+          // Redux에 로그인 상태를 저장
+          dispatch(login({ accessToken: accessToken, refreshToken: refreshToken, userId: id })); 
+          // 토큰을 로컬스토리지에 저장하기
+          if (stayedLoggedIn) {
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+          } else {
+            sessionStorage.setItem('accessToken', accessToken);
+            sessionStorage.setItem('refreshToken', refreshToken);
+          }
+     
+          navigate('/');
+        } else {
+          alert('등록되지 않은 사용자입니다.');
+          navigate('/signup');
+        }
+      } 
+      
+    } catch (error) {
       setError('! 유효하지 않은 이메일 또는 비밀번호 입니다.');
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 404) {
+          console.error("로그인 오류: 사용자를 찾을 수 없습니다.");
+          alert("사용자를 찾을 수 없습니다.");
+        } 
+        else if(status === 401) {
+          console.error("로그인 중 오류 발생:", data.message);
+          alert(data.message || "로그인 중 오류가 발생했습니다.");
+        }
+        else {
+          console.error("기타 에러발생:", status);
+          alert(`로그인 중 오류가 발생했습니다. 상태 코드: ${status}`);
+        }
+      } 
+      else {
+        // 네트워크 오류 등 기타 오류 처리
+        console.error("로그인 중 네트워크 오류 발생:", error.message);
+        alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+      }
     }
-  };
+  }
 
   const handleSignupClick = () => {
     navigate('/signup');
   };
 
   // 카카오 간편로그인 REST API 이용 기능
-  const handleKakaoLogin = () => {
-    const REST_API_KEY = '';
-    const REDIRECT_URI = '';
+const handleKakaoLogin = () => {
+    const REST_API_KEY = '81edc8661035881efc3646c4d8737c10';
+    const REDIRECT_URI = 'http://localhost:5173/oauth/kakao';
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = kakaoAuthUrl;
-  };
+  };  
 
   return (
     <FormContainer>

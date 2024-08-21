@@ -205,11 +205,12 @@ const HorizontalSemiLine = styled.hr`
 const MyInfoModifyKakaoPage = () => {
   const [nickname, setNickname] = useState('ari7717');
   const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
-  
+  const [originalNickname, setOriginalNickname] = useState('ari7717');
   useEffect(() => {
     axios.get('')
     .then(response => {
       setNickname(response.data.nickname);
+      setOriginalNickname(response.data.nickname);
     })
     .catch(error => [
       console.error('There was an error fetching the nickname!', error)
@@ -220,6 +221,7 @@ const MyInfoModifyKakaoPage = () => {
     axios.post('', {nickname})
       .then(response => {
         alert('닉네임이 수정되었습니다.');
+        setOriginalNickname(nickname);
       })
       .catch(error => {
         console.error('There was an error updating the nickname!', error);
@@ -254,8 +256,15 @@ const MyInfoModifyKakaoPage = () => {
       <ProfileContainer> 
         <NicknameContainer>
           <InfoLabel>닉네임</InfoLabel>
-          <NicknameInput type="text" value={nickname} />
-          <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
+          <NicknameInput 
+            type="text" 
+            value={nickname} 
+            onChange={(e) => setNickname(e.target.value)}
+            />
+            {nickname !== originalNickname && (
+              <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
+              )
+            }
         </NicknameContainer>
       </ProfileContainer>
       <HorizontalSemiLine/>

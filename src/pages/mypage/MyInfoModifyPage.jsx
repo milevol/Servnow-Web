@@ -4,7 +4,7 @@
 //더 추가할기능: api 연결
 
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const PageContainer = styled.div`
@@ -16,6 +16,7 @@ const PageContainer = styled.div`
   align-items: center;
   border-radius: 10px;
   overflow-x: hidden;
+  white-space: nowrap;
 `;
 
 const Header = styled.h2`
@@ -170,6 +171,13 @@ const HorizontalSemiLine = styled.hr`
   border-top: 1px solid #C8D5FF;
   margin: 2rem 0 1rem;
 `;
+const ErrorMessage = styled.p`
+  margin-top: 45px;
+  position: fixed;
+  left: 260px;  /* 왼쪽에서 10px 고정 */
+  color: #011b6c;
+  font-size: 14px;
+`;
 
 const MyInfoModifyPage = () => {
   const [nickname, setNickname] = useState('아리');
@@ -177,8 +185,10 @@ const MyInfoModifyPage = () => {
   const [email, setEmail] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordValid, setPasswordValid] = useState(true);
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
+  const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png');
   const [emailChange, setEmailChange] = useState(false);
  
   const handleImageChange = (e) => {
@@ -188,23 +198,53 @@ const MyInfoModifyPage = () => {
       setProfileImage(imageUrl);
     }
   };
- 
+  const passwordValidation = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,20}$/;
+
+  const handlePasswordChange = (password) => {
+    setNewPassword(password);
+  };
+
+  const handleConfirmPasswordChange = (password) => {
+    setConfirmPassword(password);
+  };
+
+  const validatePasswords = () => {
+    if (!passwordValidation.test(newPassword)) {
+      setPasswordError('비밀번호는 8~20자, 영문, 숫자, 특수문자 혼합으로 입력해주세요.');
+      return false;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
+  const handleSave = () => {
+    if (validatePasswords()) {
+      // 여기에서 API 호출 로직을 추가하면 됩니다.
+      alert('비밀번호가 성공적으로 변경되었습니다.');
+    }
+  };
+
+
   return (
     <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine />
-        <ProfileImageWrapper>
-          <ProfileImage src={profileImage} alt="Profile" />
-          <HiddenFileInput 
-            type='file'
-            accept='image/*'
-            id='profileImageInput'
-            onChange={handleImageChange}
-          />
-          <IconButton 
-            onClick={ () => document.getElementById('profileImageInput').click()}
-            style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
-        </ProfileImageWrapper>
+      <ProfileImageWrapper>
+        <ProfileImage src={profileImage} alt="Profile" />
+        <HiddenFileInput 
+          type='file'
+          accept='image/*'
+          id='profileImageInput'
+          onChange={handleImageChange}
+        />
+        <IconButton 
+          onClick={ () => document.getElementById('profileImageInput').click()}
+          style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
+      </ProfileImageWrapper>
 
       <InfoContainer>
         <InfoItem>
@@ -213,7 +253,7 @@ const MyInfoModifyPage = () => {
         </InfoItem>
         <InfoItem>
           <InfoLabel>아이디 *</InfoLabel>
-          <InfoInput type="text" value={userId} readOnly />
+          <InfoInput type="text" value={userId} onChange={(e) => setUserId(e.target.value)}/>
           <OverlapButton>중복확인</OverlapButton>
         </InfoItem>
         {emailChange ? (
@@ -257,17 +297,26 @@ const MyInfoModifyPage = () => {
         <PasswordContainer>
           <InfoItem>
             <InfoLabel>새로운 비밀번호 *</InfoLabel>
-            <PasswordInput type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="영문 숫자 특수문자 포함 8~20자 입니다." />
+            <PasswordInput 
+              type="password" 
+              value={newPassword} 
+              onChange={(e) => handlePasswordChange(e.target.value)} 
+              placeholder="영문 숫자 특수문자 포함 8~20자 입니다."  />
           </InfoItem>
           <InfoItem>
             <InfoLabel>비밀번호 재확인 *</InfoLabel>
-            <PasswordInput type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            <PasswordInput 
+              type="password" 
+              value={confirmPassword} 
+              onChange={(e) => handleConfirmPasswordChange(e.target.value)} 
+            />
           </InfoItem>
+          {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
         </PasswordContainer>
       </PasswordSection>
       <ButtonContainer>
         <PrevButton>이전</PrevButton>
-        <SaveButton>저장하기</SaveButton>
+        <SaveButton onClick={handleSave}>저장하기</SaveButton>
       </ButtonContainer>
     </PageContainer>
   );

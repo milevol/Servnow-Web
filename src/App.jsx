@@ -22,7 +22,7 @@ function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/auth/kakao" element={<KakaoAuthRedirectHandler />} />
+      <Route path="/oauth/kakao" element={<KakaoAuthRedirectHandler />} />
       <Route path="/answer" element={<AnswerPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />

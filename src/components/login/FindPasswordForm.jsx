@@ -104,8 +104,8 @@ const FindPasswordForm = () => {
   const [password, setPassword] = useState('');
   const [passwordCheck, setPasswordCheck] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
-  const [certificationCode, setCertificationCode] = useState('');
   const [validNumber, setValidNumber] = useState('');
+  const [certificationSuccess, setCertificationSuccess] = useState(false);
 
 //인증번호 전송 버튼 클릭 시 작동할 기능
   const handleVerificationSend = async () => {
@@ -114,57 +114,123 @@ const FindPasswordForm = () => {
       setError('');
       return
     }
-
-    try {
-      const response = await axios.post('', { email });
-      
-      if (response.data.success) {
-        setVerificationSent(true);
-        setCertificationCode(response.data.certificationCode)
-        alert('인증번호가 이메일로 전송되었습니다.');
-
-      } else {
-        alert('이메일 전송에 실패했습니다.');
-        setVerificationSent(false);
-      } 
-    } catch (err) {
-      alert('등록되지 않은 이메일입니다.')
-      setVerificationSent(false);
+    if (!verificationSent){
+      try {
+        const response = await axios.post(
+          '/api/v1/find/email/identity-verification', 
+          { 
+            email: email
+          },
+        );
+        
+        if (response.data.code === 200) {
+          setVerificationSent(true);
+          alert('인증번호가 이메일로 전송되었습니다.');
+          setError('');
+        } else {
+          alert('등록되지 않은 이메일입니다.');
+          setVerificationSent(false);
+        } 
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response;
+          if (status === 500) {
+            console.error("서버 내부 오류:", data.message);
+            alert(data.message || "서버 내부 오류가 발생했습니다.");
+          } else if (status === 404){
+            console.error("인증번호 전송 중 오류 발생:", data.message);
+            alert(data.message || "사용자를 찾을 수 없습니다.");
+          } else {
+            console.error("인증번호 전송 중 오류 발생:", data.message);
+            alert("인증번호 전송 중 오류가 발생했습니다.");
+          }
+        } else {
+          console.error("인증번호 전송 중 네트워크 오류 발생:", error.message);
+          alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+        }
+      }
     }
   };
+  const handleVerificationConfirm = async () => {
+    if (!validNumber) {
+      alert('인증번호를 입력해주세요.');
+      return;
+    }
+    try {
+      const response = await axios.post(
+        '/api/v1/find/email/certification',
+        {
+          certificationNumber: validNumber
+        },
+      );
+      if (response.data.code === 200) {
+        setCertificationSuccess(true);
+        alert('인증이 완료되었습니다.');
+        setError('');
+      } else {
+        alert('인증번호가 일치하지 않습니다.');
+      }
+    } catch(error) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 500) {
+          console.error("서버 내부 오류:", data.message);
+          alert(data.message || "서버 내부 오류가 발생했습니다.");
+        } else if (status === 404){
+          console.error("인증번호 확인 중 오류 발생:", data.message);
+          alert(data.message || "사용자를 찾을 수 없습니다.");
+        } else {
+          console.error("인증번호 확인 중 오류 발생:", data.message);
+          alert("본인증번호 확인 중 오류가 발생했습니다.");
+        }
+      } else {
+        console.error("인증번호 확인 중 네트워크 오류 발생:", error.message);
+        alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+      }
+    }
+  } 
 //비밀번호 변경 버튼 클릭시 작동 기능
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!verificationSent) {
+    if (!certificationSuccess) {
       alert('먼저 이메일을 인증을 진행해주세요')
-      return;
-    }
-    if (!certificationCode) {
-      alert('인증번호를 입력해주세요.');
       return;
     }
     if(password !== passwordCheck) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    if(validNumber !== certificationCode) {
-      alert('인증번호가 일치하지 않습니다.');
-      return;
-    }
-    
-    setError('');
-
     try {
-      const response = await axios.post('', 
-        { email, 
-          validNumber, 
-          password 
+      const response = await axios.post(
+        '/api/v1/change/pw', 
+        { 
+          password: password,
+          repassword: passwordCheck
         });
-      setPassword(response.data.password)
-      setSuccessMessage('비밀번호 변경 요청이 성공했습니다.');
-    } catch (err) {
-      setError('인증번호가 올바르지 않거나 다른 오류가 발생했습니다..');
+        if (response.data.code === 200) {
+          alert('비밀번호 변경이 완료되었습니다.');
+          setError('');
+        } else {
+          alert('비밀번호 변경에 실패했습니다.');
+        } 
+    } catch(error) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 500) {
+          console.error("서버 내부 오류:", data.message);
+          alert(data.message || "서버 내부 오류가 발생했습니다.");
+        } else if (status === 404){
+          console.error("비밀번호 변경 중 오류 발생:", data.message);
+          alert(data.message || "사용자를 찾을 수 없습니다.");
+        } else {
+          console.error("비밀번호 변경 중 오류 발생:", data.message);
+          alert("본인증번호 확인 중 오류가 발생했습니다.");
+        }
+      } else {
+        console.error("비밀번호 변경 중 네트워크 오류 발생:", error.message);
+        alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
+      }
     }
   };
 
@@ -190,7 +256,7 @@ const FindPasswordForm = () => {
             value={validNumber}
             onChange={(e) => setValidNumber(e.target.value)}
           />     
-          <SendButton type='button'>인증확인</SendButton>
+          <SendButton type='button' onClick={handleVerificationConfirm}>인증확인</SendButton>
       </InputWrapper>
       <Line></Line>
       <InputWrapper>
@@ -213,8 +279,6 @@ const FindPasswordForm = () => {
       </InputWrapper>
         <FindButton type="submit">비밀번호 변경</FindButton>
       </form>
-      {successMessage && <p>{successMessage}</p>}
-      {password && <Password>당신의 비밀번호는 {password}입니다.</Password>}
     </FormContainer>
   );
 };
