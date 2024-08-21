@@ -1,16 +1,16 @@
 import styled from "styled-components";
 
 export const SurveyBox = styled.div`
-    width : 50%;
-    height : 300px;
-    margin-top : 20px;
-    margin-bottom : 20px;
+    width : 552px;
+    height : 272px;
+    margin-bottom : 53px;
+    margin-right : 57px;
 `;
 
 export const SurveyContainer = styled.div`
     position: relative;
-    height : 300px;
-    width : 600px;
+    height : 272px;
+    width : 552px;
     align-content : grid;
     background-color : white;
     border-radius : 10px;
@@ -19,26 +19,25 @@ export const SurveyContainer = styled.div`
 
 export const SurveyStatusButton = styled.div`
     position: absolute;
-    top: 10px;
-    left: 10px;
-    height : 50px;
-    width : 100px;
+    margin-top: 9px;
+    margin-left: 8px;
+    height : 25px;
+    width : 60px;
+    padding : 15px 27px 14.8px;
     background-color: white;
     color: ${props => props.finished === 'yes' ? '#5D6670' : '#4C76FE'};
     font-weight: bold;
-    font-size : 20px;
-    padding: 5px 10px;
-    border-radius: 10px;
+    font-size : 21px;
+    border-radius: 12px;
     display: grid;
     align-items : center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border : 0.5px solid rgba(0, 0, 0, 0.1);
     justify-items : center;
 `;
 
 export const SurveyImageContainer = styled.div`
-    width : 600px;
-    height : 180px;
+    width : 552px;
+    height : 182px;
     display: grid;
     align-content:center;
     font-weight : bolder;
@@ -47,21 +46,21 @@ export const SurveyImageContainer = styled.div`
 `;
 
 export const SurveyTitleBox = styled.div`
-    width : 600px;
-    height : 60px;
+    width : 552px;
+    height : 51px;
     background-color : ${props => props.finished === 'yes' ? '#C5CCD5' : '#C6D3FF'};
     display: grid;
     align-content:center;
-    font-weight : bolder;
-    font-size : 20px;
-    border-bottom : 2px solid black;
+    font-weight : 600;
+    font-size : 22px;
+    border-bottom : 1px solid #5d6670;
     justify-content:center;
 `;
 
 export const SurveyDateBox = styled.div`
-    width : 600px;
-    height : 60px;
-    font-weight : bolder;
+    width : 552px;
+    height : 38px;
+    color: #5d6670;
     font-size : 20px;
     display: grid;
     align-content:center;
