@@ -8,6 +8,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 // 사이드바 전체 컨테이너 스타일
 const SidebarContainer = styled.div`
@@ -41,7 +42,8 @@ const SidebarItem = styled.div`
   font-weight: ${({ fontWeight }) => fontWeight};
   margin-bottom: 20px;
   cursor: pointer;
-  color: ${({ $active }) => ($active ? "#4C76FE" : "inherit")};
+  color: ${({ $active }) =>
+    $active ? "#4C76FE" : "#061522"}; // 기본 색상 및 활성화된 항목 색상 설정
   padding: 10px;
   border-radius: 5px;
   &:hover {
@@ -51,21 +53,24 @@ const SidebarItem = styled.div`
 
 const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
   const navigate = useNavigate();
-  const [activeItem, setActiveItem] = useState(null); // 현재 활성화된 사이드바 항목 상태
+  const location = useLocation(); // 현재 경로를 가져옴
   const [points, setPoints] = useState(null); // 사용자 포인트 상태
   const [loading, setLoading] = useState(true); // 로딩 상태 관리
   const [error, setError] = useState(null); // 오류 상태 관리
 
+  const getToken = () => {
+    return (
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken")
+    );
+  };
+
   useEffect(() => {
     const fetchUserPoints = async () => {
-      const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
-      if (!token) {
-        setError("토큰이 없습니다.");
-        setLoading(false);
-        return;
-      }
+      setLoading(true);
 
       try {
+        const token = getToken();
         const response = await axios.get("/api/v1/users/me/point", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,15 +90,14 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
   }, []);
 
   // 네비게이션 핸들러 (사이드바 항목 클릭 시 페이지 이동)
-  const handleNavigation = (path, item) => {
-    setActiveItem(item);
+  const handleNavigation = (path) => {
     navigate(path);
     onClose(); // 사이드바 닫기
   };
 
   // 로그아웃 핸들러
   const handleLogout = async () => {
-    const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+    const token = getToken();
     if (!token) {
       console.error("토큰이 없습니다.");
       return;
@@ -109,29 +113,76 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
           },
         }
       );
-      console.log("Logout response:", response.data); // 서버 응답을 콘솔에 출력
+      console.log("Logout response:", response.data);
 
-      // 로그아웃 성공 시 로컬 스토리지에서 토큰 제거
-      localStorage.removeItem("token");
-      setIsLoggedIn(false); // 로그아웃 성공 시 isLoggedIn을 false로 설정
-      onClose(); // 사이드바 닫기
-      // navigate("/login"); // 로그인 페이지로 리다이렉트
+      // 로그아웃 성공 시 세션 스토리지와 로컬 스토리지에서 토큰 제거
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      setIsLoggedIn(false);
+      onClose();
+      navigate("/login");
     } catch (error) {
       console.error("Logout failed: ", error);
     }
   };
+
+  // Axios 인터셉터 설정
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          try {
+            const refreshToken =
+              localStorage.getItem("refreshToken") ||
+              sessionStorage.getItem("refreshToken");
+            const response = await axios.post("/api/v1/auth/refresh", {
+              refreshToken,
+            });
+            const { accessToken } = response.data.data;
+            if (localStorage.getItem("accessToken")) {
+              localStorage.setItem("accessToken", accessToken);
+            } else {
+              sessionStorage.setItem("accessToken", accessToken);
+            }
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(error.config);
+          } catch (err) {
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            setIsLoggedIn(false);
+            navigate("/login");
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [navigate]);
 
   return (
     <SidebarContainer $isOpen={isOpen}>
       <SidebarItems>
         <SidebarItem
           fontWeight={500}
-          $active={activeItem === "mypage"}
-          onClick={() => handleNavigation("/mypage", "mypage")}
+          $active={location.pathname === "/mypage"} // 현재 경로가 "/mypage"일 때 활성화
+          onClick={() => handleNavigation("/mypage")}
         >
           마이페이지
         </SidebarItem>
-        <SidebarItem fontWeight={500} $active={false}>
+        <SidebarItem
+          fontWeight={500}
+          $active={location.pathname === "/mypage/point"} // 현재 경로가 "/mypage/point"일 때 활성화
+          onClick={() => handleNavigation("/mypage/point")}
+        >
           {loading
             ? "Loading..."
             : error
@@ -140,26 +191,22 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
         </SidebarItem>
         <SidebarItem
           fontWeight={600}
-          $active={activeItem === "created-surveys"}
-          onClick={() =>
-            handleNavigation("/created-surveys", "created-surveys")
-          }
+          $active={location.pathname === "/created-surveys"} // 현재 경로가 "/created-surveys"일 때 활성화
+          onClick={() => handleNavigation("/created-surveys")}
         >
           내가 제작한 설문지
         </SidebarItem>
         <SidebarItem
           fontWeight={600}
-          $active={activeItem === "answered-surveys"}
-          onClick={() =>
-            handleNavigation("/answered-surveys", "answered-surveys")
-          }
+          $active={location.pathname === "/answered-surveys"} // 현재 경로가 "/answered-surveys"일 때 활성화
+          onClick={() => handleNavigation("/answered-surveys")}
         >
           내가 답변한 설문지
         </SidebarItem>
       </SidebarItems>
       <SidebarItem
         fontWeight={500}
-        $active={activeItem === "logout"}
+        $active={false} // 로그아웃은 활성화 색상 유지가 필요하지 않음
         onClick={handleLogout} // 로그아웃 핸들러 호출
       >
         로그아웃

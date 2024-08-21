@@ -128,18 +128,27 @@ function HomePage() {
   const [loading, setLoading] = useState(true); // 로딩 상태 관리
   const [error, setError] = useState(null); // 오류 상태 관리
 
+  const getToken = () => {
+    return (
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken")
+    );
+  };
+
   // 데이터를 API로부터 가져오는 함수
   const fetchSurveyData = async (sort) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token"); // "token" 키로 토큰 가져오기
+      const token = getToken();
       const response = await axios.get(`/api/v1/survey/home?sort=${sort}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setData(response.data.data || []);
+
+      // 설문 데이터 배열 접근 방식 수정
+      setData(response.data.data.survey || []);
     } catch (err) {
       setError(err.response ? err.response.data.message : "Network error");
       setData([]);
@@ -151,6 +160,44 @@ function HomePage() {
   // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 가져옴
   useEffect(() => {
     fetchSurveyData("deadline");
+  }, []);
+
+  // Axios 인터셉터 설정
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          try {
+            const refreshToken =
+              localStorage.getItem("refreshToken") ||
+              sessionStorage.getItem("refreshToken");
+            const response = await axios.post("/api/v1/auth/refresh", {
+              refreshToken,
+            });
+            const { accessToken } = response.data.data;
+            if (localStorage.getItem("accessToken")) {
+              localStorage.setItem("accessToken", accessToken);
+            } else {
+              sessionStorage.setItem("accessToken", accessToken);
+            }
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(error.config);
+          } catch (err) {
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            window.location.href = "/login";
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
   }, []);
 
   // 정렬 옵션이 변경될 때 호출되는 핸들러
@@ -190,10 +237,10 @@ function HomePage() {
                 <SurveyCard
                   key={item.surveyId}
                   title={item.title}
-                  day={item.dDay}
+                  dDay={item.dDay}
                   createdAt={item.createdAt}
                   expiredAt={item.expiredAt}
-                  people={item.participants}
+                  participants={item.participants}
                   completed={item.status}
                 />
               ))

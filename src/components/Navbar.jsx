@@ -4,15 +4,15 @@
 // 작성자: 임사랑
 // 작성일: 2024.07.19
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
 import searchImage from "../assets/search.png";
 import alarmImage from "../assets/alarm.png";
-import profileImage from "../assets/profileOrigin.png";
 import navMascotImage from "../assets/navMascot.png";
 import Sidebar from "./Sidebar";
+import axios from "axios";
 
 // 네비게이션 바 전체 컨테이너 스타일
 const NavbarContainer = styled.div`
@@ -120,10 +120,12 @@ const AlarmIcon = styled.div`
 
 // 프로필 아이콘 스타일
 const ProfileIcon = styled.div`
-  width: 21.75px;
-  height: 22.584px;
-  background: url(${profileImage}) no-repeat center center;
-  background-size: contain;
+  width: 30px;
+  height: 30px;
+  background: ${({ profileUrl }) =>
+    `url(${profileUrl}) no-repeat center center`};
+  background-size: cover;
+  border-radius: 50%;
   cursor: pointer;
 `;
 
@@ -150,11 +152,81 @@ const LoginButton = styled.button`
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 검색어 상태 관리
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 열림/닫힘 상태 관리
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken")
+  ); // 로그인 상태 관리
+  const [profileUrl, setProfileUrl] = useState("/roundLogo1.png"); // 기본 프로필 이미지 URL
   const navigate = useNavigate();
   const location = useLocation();
 
   const isSearchPage = location.pathname === "/search"; // 현재 경로가 검색 페이지인지 확인
+
+  // 프로필 정보를 가져오는 함수
+  const fetchProfile = async () => {
+    try {
+      const token =
+        sessionStorage.getItem("accessToken") ||
+        localStorage.getItem("accessToken");
+      const response = await axios.get("/api/v1/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const { profileUrl } = response.data.data;
+      if (profileUrl) {
+        setProfileUrl(profileUrl);
+      }
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
+    }
+  };
+
+  // Axios 인터셉터 설정
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          try {
+            const refreshToken =
+              localStorage.getItem("refreshToken") ||
+              sessionStorage.getItem("refreshToken");
+            const response = await axios.post("/api/v1/auth/refresh", {
+              refreshToken,
+            });
+            const { accessToken } = response.data.data;
+            if (localStorage.getItem("accessToken")) {
+              localStorage.setItem("accessToken", accessToken);
+            } else {
+              sessionStorage.setItem("accessToken", accessToken);
+            }
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(error.config);
+          } catch (err) {
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            setIsLoggedIn(false);
+            navigate("/login"); // 로그인 페이지로 리다이렉트
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [navigate]);
+
+  // 로그인된 상태일 때 프로필 이미지 가져오기
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchProfile();
+    }
+  }, [isLoggedIn]);
 
   // 검색어 입력 핸들러
   const handleSearchChange = (e) => {
@@ -188,7 +260,6 @@ const Navbar = () => {
     <>
       <NavbarContainer>
         <SideMascot onClick={handleMascotClick} />{" "}
-        {/* 마스코트 클릭 시 /landing으로 이동 */}
         {!isSearchPage && (
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <SearchBarContainer $isSearchPage={isSearchPage}>
@@ -215,7 +286,10 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   <AlarmIcon />
-                  <ProfileIcon onClick={handleProfileClick} />
+                  <ProfileIcon
+                    profileUrl={profileUrl}
+                    onClick={handleProfileClick}
+                  />
                 </>
               ) : (
                 <LoginButton onClick={handleLoginClick}>
@@ -251,7 +325,10 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   <AlarmIcon />
-                  <ProfileIcon onClick={handleProfileClick} />
+                  <ProfileIcon
+                    profileUrl={profileUrl}
+                    onClick={handleProfileClick}
+                  />
                 </>
               ) : (
                 <LoginButton onClick={handleLoginClick}>

@@ -628,7 +628,7 @@ const ResultMain = () => {
   useEffect(() => {
     const fetchSurveyData = async () => {
       try {
-        const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+        const token = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
         const response = await axios.get("/api/v1/users/me/survey/1", {
           headers: {
             Authorization: `Bearer ${token}`,
