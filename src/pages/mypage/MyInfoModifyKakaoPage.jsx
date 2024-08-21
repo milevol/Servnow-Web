@@ -10,24 +10,24 @@ import kakaoLogo from '../../../src/assets/kakao_logo.png'
 import axios from 'axios';
 
 const PageContainer = styled.div`
-  margin: 0 auto;
+  margin-top: -40px;
   padding: 5rem;
   background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-
   border-radius: 10px;
 `;
 
 const Header = styled.h2`
-  font-size: 1.8rem;
+  font-size: 30px;
   color: #4C76FE;
   margin-bottom: 1rem;
 `;
 
 const HorizontalLine = styled.hr`
-  width: 100%;
+  margin-left: -100px;
+  width: 100vw;
   border: none;
   border-top: 3px solid #4C76FE;
   margin-bottom: 1.5rem;
@@ -35,7 +35,7 @@ const HorizontalLine = styled.hr`
 const ProfileContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 `;
 const ProfileImageWrapper = styled.div`
   position: relative;
@@ -47,6 +47,10 @@ const ProfileImage = styled.img`
   margin-bottom: 2rem;
   object-fit: cover;
 `;
+
+const HiddenFileInput = styled.input`
+  display: none;
+`
 const IconButton = styled.button`
   width: 120px;
   height: 35px;
@@ -60,24 +64,26 @@ const IconButton = styled.button`
 const NicknameContainer = styled.div`
   display: flex;
   align-items: center;
+  margin-left: 110px;
 `;
 
 const NicknameInput = styled.input`
-  width: 280px;
+  width: 300px;
   padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #D9D9D9;
+  border-radius: 10px;
   font-size: 1rem;
   margin-right: 3rem;
 `;
 
 const UpdateButton = styled.button`
-  width:18%;
+  width: 139px;
+  height: 47px;    
   padding: 0.8rem 1.55rem;
   background-color: #4C76FE;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
 `;
 
@@ -98,10 +104,11 @@ const SectionTitle = styled.h2`
 const SectionSubTitle = styled.p`
   font-size: 1rem;
   color: #3a3a3a;
-  margin-bottom: 2.5rem;
+  margin-bottom: 18px;
 `
 const KakaoButton = styled.button`
-  width: 360px;
+  width: 411px;
+  height: 66px;
   padding: 0.8rem;
   background-color: #f9e000;
   margin-bottom: 1rem;
@@ -109,7 +116,7 @@ const KakaoButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 20px;
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -123,7 +130,7 @@ const KakaoIcon = styled.img`
 `;
 
 const SecondSectionTitle = styled.p`
-  font-size: 1.1rem;
+  font-size: 20px;
   margin-top: 0rem;
   margin-bottom: 2.5rem;
 `;
@@ -144,61 +151,66 @@ const InfoLabel = styled.label`
   width: 100px;
   font-size: 1rem;
   color: #3a3a3a;
-  margin-right: 3rem;
+  margin-right: 4rem;
   text-align: left;
 `;
 
 const InfoInput = styled.input`
-  width: 270px;
+  width: 348px;
   padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #D9D9D9;
+  border-radius: 8px;
   font-size: 1rem;
-
+  margin-bottom: 10px;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   margin-top: 2rem;
-  width: 420px;
+  margin-bottom: -40px;
 `;
 
 const PrevButton = styled.button`
-  width: 50%;
+  width: 278px;
+  height: 74px;
   padding: 1rem 2rem;
-  background-color: #ddd;
-  color: #3a3a3a;
+  background-color: #C5CCD5;
+  color: #061522;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 20px;
   margin-right: 1rem;
+  font-weight: bold;
 `;
 
 const ReAuthButton = styled.button`
-  width: 50%;
+  width: 278px;
+  height: 74px;
   padding: 1rem 2rem;
-  background-color: #4C76FE;
+  background-color: #3E77FF;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 20px;
+
 `;
 const HorizontalSemiLine = styled.hr`
-  width: 600px;
+  width: 570px;
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 3px solid #C8D5FF;
   margin: 2rem 0;
 `;
 const MyInfoModifyKakaoPage = () => {
   const [nickname, setNickname] = useState('ari7717');
   const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
-  
+  const [originalNickname, setOriginalNickname] = useState('ari7717');
   useEffect(() => {
     axios.get('')
     .then(response => {
       setNickname(response.data.nickname);
+      setOriginalNickname(response.data.nickname);
     })
     .catch(error => [
       console.error('There was an error fetching the nickname!', error)
@@ -209,25 +221,50 @@ const MyInfoModifyKakaoPage = () => {
     axios.post('', {nickname})
       .then(response => {
         alert('닉네임이 수정되었습니다.');
+        setOriginalNickname(nickname);
       })
       .catch(error => {
         console.error('There was an error updating the nickname!', error);
         alert('아이디 수정에 실패했습니다.');
       });
   }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+    }
+  };
+
   return (
     <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine></HorizontalLine>
       <ProfileImageWrapper>
         <ProfileImage src={profileImage} alt='profile image'/>
-        <IconButton style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
+        <HiddenFileInput 
+            type='file'
+            accept='image/*'
+            id='profileImageInput'
+            onChange={handleImageChange}
+          />
+          <IconButton 
+            onClick={ () => document.getElementById('profileImageInput').click()}
+            style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
       </ProfileImageWrapper>
       <ProfileContainer> 
         <NicknameContainer>
           <InfoLabel>닉네임</InfoLabel>
-          <NicknameInput type="text" value={nickname} />
-          <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
+          <NicknameInput 
+            type="text" 
+            value={nickname} 
+            onChange={(e) => setNickname(e.target.value)}
+            />
+            {nickname !== originalNickname && (
+              <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
+              )
+            }
         </NicknameContainer>
       </ProfileContainer>
       <HorizontalSemiLine/>

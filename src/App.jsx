@@ -11,6 +11,9 @@ import AnswerStartPage from "./pages/AnswerStartPage";
 import FindPasswordPage from "./pages/FindPasswordPage";
 import FindIdPage from "./pages/FindIdPage";
 import SurveyModalPage from "./pages/SurveyModalPage";
+import MyInfoModifyPage from "./pages/mypage/MyInfoModifyPage";
+import MyInfoModifyKakaoPage from "./pages/mypage/MyInfoModifyKakaoPage";
+import KakaoAuthRedirectHandler from "./components/login/KakaoAuthRedirecteHandler";
 import MySurveyPage from "./pages/mysurveypage/MySurveyPage";
 import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
 import LandingPage from "./pages/LandingPage";
@@ -23,6 +26,7 @@ function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/oauth/kakao" element={<KakaoAuthRedirectHandler />} />
       <Route path="/answer" element={<AnswerPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
@@ -32,6 +36,10 @@ function App() {
       <Route path="/find-id" element={<FindIdPage />} />
       <Route path="/find-pswd" element={<FindPasswordPage />} />
       <Route path="/surveymodal" element={<SurveyModalPage />} />
+      <Route path="/find-id" element={<FindIdPage />} />
+      <Route path="/find-pswd" element={<FindPasswordPage />} />
+      <Route path="/myinfo" element={<MyInfoModifyPage />} />
+      <Route path="/myinfo-k" element={<MyInfoModifyKakaoPage />} />
       <Route path="/created-surveys" element={<MySurveyPage />} />
       <Route path="/answered-surveys" element={<MyAnsweredPage />} />
       <Route path="/landing" element={<LandingPage />} />
