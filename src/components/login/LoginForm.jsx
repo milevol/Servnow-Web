@@ -206,13 +206,14 @@ const LoginForm = () => {
 
         if (isRegistered) {
           alert('로그인에 성공하셨습니다.');
-          // Redux에 로그인 상태를 저장
-          dispatch(login({ accessToken: accessToken, refreshToken: refreshToken, userId: id })); 
+
           // 토큰을 로컬스토리지에 저장하기
           if (stayedLoggedIn) {
+            dispatch(login( { stayedLoggedIn: true } ));
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
           } else {
+            dispatch(login( { stayedLoggedIn: false } ));
             sessionStorage.setItem('accessToken', accessToken);
             sessionStorage.setItem('refreshToken', refreshToken);
           }
