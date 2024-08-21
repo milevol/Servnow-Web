@@ -4,9 +4,12 @@
 // 추가되어야 할 기능: api 연결, 링크 연결
 import React, { useState } from "react";
 import styled from "styled-components";
+import Navbar from "../components/Navbar";
 
 const Container = styled.div`
   width: 100%;
+  padding-top: 67px; // Navbar의 높이만큼 상단 패딩
+
   cursor: default;
   .blueColor {
     color: #3e77ff;
@@ -15,6 +18,10 @@ const Container = styled.div`
 
 const MyPageContainer = styled.div`
   width: 100%;
+
+  #pro {
+    padding-left: 10px;
+  }
 
   #darkblueColor {
     color: #011b6c;
@@ -47,9 +54,9 @@ const MyPageContainer = styled.div`
   #rating,
   #surveyContainer,
   #pointContainer {
-    height: 200px;
+    height: 180px;
     background-color: #f2f5ff;
-    border-radius: 15px;
+    border-radius: 14px;
     margin: 25px 0;
   }
 
@@ -85,15 +92,19 @@ const MyPageContainer = styled.div`
     width: 15%;
     height: 200px;
     padding: 30px 0px;
-    margin-top: -310px;
+    margin-top: -260px;
     font-size: 20px;
     border: solid 1px #e6e6e6;
-    border-radius: 5px;
+    border-radius: 14px;
     p {
       margin: 20px 20px;
     }
     hr {
       border: solid 1px #e6e6e6;
+    }
+    #arrow {
+      width: 10px;
+      height: 15px;
     }
   }
 
@@ -108,6 +119,9 @@ const MyPageContainer = styled.div`
         font-size: 30px;
         cursor: pointer;
       }
+    }
+    #arrow {
+      height: 20px;
     }
   }
 
@@ -170,9 +184,13 @@ const Paragraph = styled.p`
 
 const Img = styled.div`
   img {
-    width: 150px;
+    width: 120px;
     height: auto;
   }
+  /* #proImg {
+    width: 130px;
+    height: auto;
+  } */
 `;
 
 const PageBtnContainer = styled.div`
@@ -227,7 +245,7 @@ const Labels = styled.div`
 
 const MyPage = () => {
   const [activePage, setActivePage] = useState("mypage");
-  const userPoints = 5500; // 현재 사용자 포인트
+  const userPoints = 2500; // 현재 사용자 포인트
 
   const imageCount = 12;
   const pointsRequired = [
@@ -328,12 +346,17 @@ const MyPage = () => {
     if (activePage === "mypage") {
       return (
         <MyPageContainer>
+          <Navbar />
           <div id="container1">
             <div id="profile">
               <Img>
-                <img src="src\assets\roundLogo1.png" alt="Profile" />
+                <img
+                  id="proImg"
+                  src="src\assets\roundLogo1.png"
+                  alt="Profile"
+                />
               </Img>
-              <div>
+              <div id="pro">
                 <h1>아리 님</h1>
                 <p className="greyColor">안녕, 오늘도 좋은 하루 보내세요!</p>
               </div>
@@ -393,13 +416,13 @@ const MyPage = () => {
                 </span>
               </div>
               <p className="weight">
-                포인트 <span className="blueColor">{userPoints}p</span>{" "}
+                포인트 <span className="blueColor">{userPoints}p</span>
                 &nbsp;&nbsp;
                 <button
                   $active={activePage === "point"}
                   onClick={() => setActivePage("point")}
                 >
-                  &gt;
+                  <img src="src\assets\arrow.png" id="arrow"></img>
                 </button>
               </p>
               <div id="pointContainer">
@@ -423,6 +446,7 @@ const MyPage = () => {
     } else if (activePage === "point") {
       return (
         <PointContainer>
+          <Navbar />
           <Paragraph>
             <p>
               포인트 <span className="blueColor">{userPoints}p</span>
