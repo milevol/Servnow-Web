@@ -13,6 +13,7 @@ import FindIdPage from "./pages/FindIdPage";
 import SurveyModalPage from "./pages/SurveyModalPage";
 import MySurveyPage from "./pages/mysurveypage/MySurveyPage";
 import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
       <Route path="/surveymodal" element={<SurveyModalPage />} />
       <Route path="/created-surveys" element={<MySurveyPage />} />
       <Route path="/answered-surveys" element={<MyAnsweredPage />} />
+      <Route path="/landing" element={<LandingPage />} />
     </Routes>
   );
 }

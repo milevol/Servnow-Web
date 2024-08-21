@@ -40,7 +40,6 @@ const SideMascot = styled.div`
 `;
 
 // 검색 바 컨테이너 스타일
-// 검색 페이지에서는 검색 바의 위치와 크기가 달라짐
 const SearchBarContainer = styled.div`
   width: ${({ $isSearchPage }) => ($isSearchPage ? "60%" : "305px")};
   height: 41px;
@@ -180,10 +179,16 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  // 마스코트 클릭 핸들러
+  const handleMascotClick = () => {
+    navigate("/landing");
+  };
+
   return (
     <>
       <NavbarContainer>
-        <SideMascot onClick={() => navigate("/")} />
+        <SideMascot onClick={handleMascotClick} />{" "}
+        {/* 마스코트 클릭 시 /landing으로 이동 */}
         {!isSearchPage && (
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <SearchBarContainer $isSearchPage={isSearchPage}>
@@ -257,7 +262,11 @@ const Navbar = () => {
           </>
         )}
       </NavbarContainer>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        setIsLoggedIn={setIsLoggedIn}
+      />
     </>
   );
 };

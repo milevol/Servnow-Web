@@ -7,11 +7,11 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Select from "react-select";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
 import PlusButton from "../components/PlusButton";
 import mascotImage from "../assets/mascot.png";
-import mockData from "../data/mockData.json";
 
 // 메인 페이지 전체 컨테이너 스타일
 const HomePageContainer = styled.div`
@@ -21,7 +21,7 @@ const HomePageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 67px; // Navbar의 높이만큼 상단 패딩
+  padding-top: 67px;
 `;
 
 // 컨텐츠 래퍼 스타일
@@ -122,42 +122,47 @@ const customStyles = {
 };
 
 // HomePage 컴포넌트
-// 메인 페이지에서 설문 카드 리스트를 보여주고 정렬 기능을 제공
 function HomePage() {
-  const [sortOption, setSortOption] = useState("day"); // 현재 선택된 정렬 옵션 상태
+  const [sortOption, setSortOption] = useState("deadline"); // 현재 선택된 정렬 옵션 상태
   const [data, setData] = useState([]); // 설문 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 오류 상태 관리
 
-  // 데이터를 정렬하는 함수
-  // 선택된 옵션에 따라 데이터를 정렬하여 반환
-  const sortData = (option, dataToSort) => {
-    return [...dataToSort].sort((a, b) => {
-      if (option === "day") {
-        return a.day - b.day; // 기간 순으로 정렬
-      } else if (option === "people") {
-        return b.people - a.people; // 참여자 순으로 정렬
-      }
-      return 0;
-    });
+  // 데이터를 API로부터 가져오는 함수
+  const fetchSurveyData = async (sort) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token"); // "token" 키로 토큰 가져오기
+      const response = await axios.get(`/api/v1/survey/home?sort=${sort}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setData(response.data.data || []);
+    } catch (err) {
+      setError(err.response ? err.response.data.message : "Network error");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 정렬
+  // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 가져옴
   useEffect(() => {
-    const sortedData = sortData("day", mockData);
-    setData(sortedData);
+    fetchSurveyData("deadline");
   }, []);
 
   // 정렬 옵션이 변경될 때 호출되는 핸들러
-  // 새로운 정렬 옵션에 따라 데이터를 다시 정렬
   const handleSortChange = (selectedOption) => {
     const option = selectedOption.value;
     setSortOption(option);
-    const sortedData = sortData(option, mockData);
-    setData(sortedData);
+    fetchSurveyData(option);
   };
 
   const options = [
-    { value: "day", label: "기간 순" },
-    { value: "people", label: "참여자 순" },
+    { value: "deadline", label: "기간 순" },
+    { value: "participants", label: "참여자 순" },
   ];
 
   return (
@@ -174,11 +179,29 @@ function HomePage() {
             isSearchable={false}
           />
         </DropdownContainer>
-        <SurveyCardContainer>
-          {data.map((item, index) => (
-            <SurveyCard key={index} {...item} />
-          ))}
-        </SurveyCardContainer>
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div>Error: {error}</div>
+        ) : (
+          <SurveyCardContainer>
+            {data.length > 0 ? (
+              data.map((item) => (
+                <SurveyCard
+                  key={item.surveyId}
+                  title={item.title}
+                  day={item.dDay}
+                  createdAt={item.createdAt}
+                  expiredAt={item.expiredAt}
+                  people={item.participants}
+                  completed={item.status}
+                />
+              ))
+            ) : (
+              <div>설문이 존재하지 않아요 :(</div>
+            )}
+          </SurveyCardContainer>
+        )}
         <PlusButton />
       </ContentWrapper>
     </HomePageContainer>

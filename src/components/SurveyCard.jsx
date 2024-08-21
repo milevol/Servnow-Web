@@ -120,9 +120,23 @@ const ButtonText = styled.div`
   color: #ffffff;
 `;
 
+// 날짜 포맷 함수
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "오후" : "오전";
+  const adjustedHour = hours % 12 || 12; // 0시는 12시로 변환
+
+  return `${year}.${month}.${day} ${period} ${adjustedHour}:${minutes}`;
+};
+
 // SurveyCard 컴포넌트
 // 개별 설문 카드로 설문 정보와 참여 버튼을 표시
-function SurveyCard({ title, day, date, people, completed }) {
+function SurveyCard({ title, day, createdAt, expiredAt, people, completed }) {
   const navigate = useNavigate();
 
   // 참여 버튼 클릭 시 호출되는 핸들러
@@ -132,13 +146,17 @@ function SurveyCard({ title, day, date, people, completed }) {
     }
   };
 
+  const formattedDateRange = `${formatDate(createdAt)}~ ${formatDate(
+    expiredAt
+  )}`;
+
   return (
     <CardContainer>
       <LeftSection>
         <Title>{title}</Title>
         <InfoContainer>
           <DdayText>D-{day}</DdayText>
-          <DateInfo>{date}</DateInfo>
+          <DateInfo>{formattedDateRange}</DateInfo>
         </InfoContainer>
         <PercentageContainer>
           <PeopleIcon />

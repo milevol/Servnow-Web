@@ -4,9 +4,10 @@
 // 작성자: 임사랑
 // 작성일: 2024.07.24
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // 사이드바 전체 컨테이너 스타일
 const SidebarContainer = styled.div`
@@ -48,15 +49,76 @@ const SidebarItem = styled.div`
   }
 `;
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState(null); // 현재 활성화된 사이드바 항목 상태
+  const [points, setPoints] = useState(null); // 사용자 포인트 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 오류 상태 관리
+
+  useEffect(() => {
+    const fetchUserPoints = async () => {
+      const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+      if (!token) {
+        setError("토큰이 없습니다.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get("/api/v1/users/me/point", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPoints(response.data.data.point);
+        setLoading(false);
+      } catch (error) {
+        setError(
+          error.response ? error.response.data.message : "Network error"
+        );
+        setLoading(false);
+      }
+    };
+
+    fetchUserPoints();
+  }, []);
 
   // 네비게이션 핸들러 (사이드바 항목 클릭 시 페이지 이동)
   const handleNavigation = (path, item) => {
     setActiveItem(item);
     navigate(path);
     onClose(); // 사이드바 닫기
+  };
+
+  // 로그아웃 핸들러
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        "/api/v1/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Logout response:", response.data); // 서버 응답을 콘솔에 출력
+
+      // 로그아웃 성공 시 로컬 스토리지에서 토큰 제거
+      localStorage.removeItem("token");
+      setIsLoggedIn(false); // 로그아웃 성공 시 isLoggedIn을 false로 설정
+      onClose(); // 사이드바 닫기
+      // navigate("/login"); // 로그인 페이지로 리다이렉트
+    } catch (error) {
+      console.error("Logout failed: ", error);
+    }
   };
 
   return (
@@ -70,7 +132,11 @@ const Sidebar = ({ isOpen, onClose }) => {
           마이페이지
         </SidebarItem>
         <SidebarItem fontWeight={500} $active={false}>
-          1435 point
+          {loading
+            ? "Loading..."
+            : error
+            ? `Error: ${error}`
+            : `${points} point`}
         </SidebarItem>
         <SidebarItem
           fontWeight={600}
@@ -94,7 +160,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <SidebarItem
         fontWeight={500}
         $active={activeItem === "logout"}
-        onClick={() => handleNavigation("/logout", "logout")}
+        onClick={handleLogout} // 로그아웃 핸들러 호출
       >
         로그아웃
       </SidebarItem>
