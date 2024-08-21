@@ -4,8 +4,10 @@
 // 작성자: 임사랑
 // 작성일: 2024.08.07
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import Select from "react-select";
+import axios from "axios";
 import {
   PieChart,
   Pie,
@@ -20,12 +22,11 @@ import {
   ZAxis,
   ResponsiveContainer,
 } from "recharts";
-import Select from "react-select";
 import resultMascot from "../assets/resultMascot.png";
 
 // 페이지 전체를 감싸는 스타일링 컴포넌트
 const PageWrapper = styled.div`
-  width: 783.26px;
+  width: 810px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -34,7 +35,7 @@ const PageWrapper = styled.div`
 
 // 주요 컨테이너 스타일링 컴포넌트
 const MainContainer = styled.div`
-  width: 783.26px;
+  width: 810px;
   height: 204px;
   background: #4c76fe;
   border-radius: 8.56px;
@@ -150,9 +151,8 @@ const MascotImage = styled.img`
 `;
 
 // 추가 섹션 스타일링 컴포넌트
-const AdditionalSection = styled.div`
-  width: 783.26px;
-  height: 158.36px;
+const AdditionalSectionWrapper = styled.div`
+  width: 810px;
   background: #c6d3ff;
   border-radius: 8.56023px;
   position: relative;
@@ -161,17 +161,19 @@ const AdditionalSection = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 20px;
 `;
 
 const BlueRectangle = styled.div`
-  width: 300px;
+  display: flex;
   height: 55.64px;
   background: #4c76fe;
   border-radius: 10.2723px;
-  display: flex;
-  justify-content: flex-start;
   align-items: center;
   padding: 0 15px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  width: fit-content;
 `;
 
 const BlueRectangleText = styled.div`
@@ -181,10 +183,11 @@ const BlueRectangleText = styled.div`
   font-size: 20.5446px;
   line-height: 25px;
   color: #f0f0f0;
+  white-space: nowrap;
 `;
 
 const LongBlueRectangle = styled.div`
-  width: 712px;
+  width: 740px;
   height: 43.66px;
   background: #4c76fe;
   border-radius: 10.2723px;
@@ -192,6 +195,7 @@ const LongBlueRectangle = styled.div`
   justify-content: flex-start;
   align-items: center;
   padding: 0 15px;
+  margin-top: 15px;
 `;
 
 const LongBlueRectangleText = styled.div`
@@ -203,15 +207,27 @@ const LongBlueRectangleText = styled.div`
   color: #f0f0f0;
 `;
 
+// AdditionalSection 컴포넌트
+const AdditionalSection = ({ title, description }) => (
+  <AdditionalSectionWrapper>
+    <BlueRectangle>
+      <BlueRectangleText>{title}</BlueRectangleText>
+    </BlueRectangle>
+    <LongBlueRectangle>
+      <LongBlueRectangleText>{description}</LongBlueRectangleText>
+    </LongBlueRectangle>
+  </AdditionalSectionWrapper>
+);
+
 // 질문 카드 스타일링 컴포넌트
-const QuestionCard = styled.div`
-  width: 783.26px;
-  height: 332.99px;
+const QuestionCardWrapper = styled.div`
+  width: 810px;
   background: #ffffff;
   border-radius: 8.56023px;
   position: relative;
   padding: 35px 25px;
   box-sizing: border-box;
+  margin-bottom: 20px;
 `;
 
 // 질문 카드의 헤더 영역 스타일링
@@ -234,7 +250,7 @@ const QuestionNumber = styled.div`
   line-height: 33px;
   text-align: center;
   color: #4c76fe;
-  margin-right: 20px;
+  margin-right: 10px;
 `;
 
 const QuestionTitle = styled.div`
@@ -390,32 +406,15 @@ const ChartChangeDropdown = ({ value, onChange }) => {
   );
 };
 
-// 결과 페이지 메인 컴포넌트
-const ResultMain = () => {
-  // 응답 활성화 상태 관리
-  const [isActivated, setIsActivated] = useState(false);
-
-  // 첫 번째 질문의 차트 타입 상태 관리
-  const [chartType1, setChartType1] = useState("pie");
-
-  // 두 번째 질문의 차트 타입 상태 관리
-  const [chartType2, setChartType2] = useState("bar");
-
-  // 첫 번째 질문에 대한 데이터
-  const data1 = [
-    { name: "1번", value: 78.3, color: "#4C76FE", z: 400 },
-    { name: "2번", value: 15.4, color: "#8EA9FF", z: 200 },
-    { name: "3번", value: 6.3, color: "#E1E8FF", z: 100 },
-  ];
-
-  // 두 번째 질문에 대한 데이터
-  const data2 = [
-    { name: "A", value: 45.3, color: "#4C76FE", z: 300 },
-    { name: "B", value: 30.1, color: "#8EA9FF", z: 250 },
-    { name: "C", value: 24.6, color: "#E1E8FF", z: 150 },
-  ];
-
-  // 커스터마이즈된 라벨 렌더링 함수
+// QuestionCard 컴포넌트
+const QuestionCard = ({
+  questionNumber,
+  title,
+  description,
+  chartType,
+  setChartType,
+  data,
+}) => {
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -441,7 +440,6 @@ const ResultMain = () => {
     );
   };
 
-  // 선택된 차트 타입에 따라 적절한 차트를 렌더링하는 함수
   const renderChart = (chartType, data) => {
     switch (chartType) {
       case "pie":
@@ -464,13 +462,18 @@ const ResultMain = () => {
           </PieChart>
         );
       case "bar":
+        const totalValue = data.reduce((acc, curr) => acc + curr.value, 0); // 전체 값 계산
+        const percentageData = data.map((entry) => ({
+          ...entry,
+          value: ((entry.value / totalValue) * 100).toFixed(1), // 비율 계산하여 적용
+        }));
         return (
           <ChartContainer>
-            {/* 수평 막대 차트 */}
+            {/* 가로형 막대 차트 */}
             <BarChart
               width={300}
               height={200}
-              data={data}
+              data={percentageData}
               margin={{ top: 20, right: 60, left: 0, bottom: 30 }}
               layout="horizontal"
             >
@@ -485,15 +488,15 @@ const ResultMain = () => {
                     <text
                       x={x + width / 2}
                       y={y + height + 15}
-                      fill={data[index].color}
+                      fill={percentageData[index].color}
                       textAnchor="middle"
                     >
-                      {data[index].name}
+                      {percentageData[index].name}
                     </text>
                     <text
                       x={x + width / 2}
                       y={y - 10}
-                      fill={data[index].color}
+                      fill={percentageData[index].color}
                       textAnchor="middle"
                     >
                       {value}%
@@ -501,18 +504,18 @@ const ResultMain = () => {
                   </g>
                 )}
               >
-                {data.map((entry, index) => (
+                {percentageData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
 
-            {/* 수직 막대 차트 */}
+            {/* 세로형 막대 차트 */}
             <BarChart
               width={300}
               height={200}
-              data={data}
-              margin={{ top: 20, right: 50, left: 30, bottom: 30 }}
+              data={percentageData}
+              margin={{ top: 20, right: 50, left: 70, bottom: 30 }}
               layout="vertical"
             >
               <XAxis type="number" hide axisLine={false} tick={false} />
@@ -532,16 +535,16 @@ const ResultMain = () => {
                     <text
                       x={x - 5}
                       y={y + height / 2}
-                      fill={data[index].color}
+                      fill={percentageData[index].color}
                       textAnchor="end"
                       dominantBaseline="middle"
                     >
-                      {data[index].name}
+                      {percentageData[index].name}
                     </text>
                     <text
                       x={x + width + 5}
                       y={y + height / 2}
-                      fill={data[index].color}
+                      fill={percentageData[index].color}
                       textAnchor="start"
                       dominantBaseline="middle"
                     >
@@ -550,33 +553,26 @@ const ResultMain = () => {
                   </g>
                 )}
               >
-                {data.map((entry, index) => (
+                {percentageData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
           </ChartContainer>
         );
+
       case "bubble":
         return (
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-            <XAxis
-              type="number"
-              dataKey="value"
-              hide
-              axisLine={false}
-              tick={false}
-            />
-            <YAxis
-              type="number"
-              dataKey="z"
-              hide
-              axisLine={false}
-              tick={false}
-            />
-            <ZAxis type="number" range={[100, 500]} dataKey="z" />
+          <ScatterChart
+            width={400}
+            height={200}
+            margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+          >
+            <XAxis type="number" dataKey="x" name="X" hide />
+            <YAxis type="number" dataKey="y" name="Y" hide />
+            <ZAxis type="number" dataKey="z" range={[100, 1000]} name="Z" />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-            <Scatter name="Data" data={data}>
+            <Scatter name="Data" data={data} fill="#8884d8">
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
@@ -587,20 +583,127 @@ const ResultMain = () => {
         return null;
     }
   };
+  return (
+    <QuestionCardWrapper>
+      <QuestionHeader>
+        <QuestionInfo>
+          <QuestionNumber>{questionNumber}.</QuestionNumber>
+          <QuestionTitle>{title}</QuestionTitle>
+        </QuestionInfo>
+        <ChartChangeDropdown
+          value={chartType}
+          onChange={(e) => setChartType(e.target.value)}
+        />
+      </QuestionHeader>
+      <QuestionDescription>{description}</QuestionDescription>
+      <ChartContainer>
+        <ChartLegendGroup>
+          <ChartWrapper isBarChart={chartType === "bar"}>
+            <ResponsiveContainer width="100%" height="100%">
+              {renderChart(chartType, data)}
+            </ResponsiveContainer>
+          </ChartWrapper>
+          <LegendWrapper>
+            {data.map((entry, index) => (
+              <LegendItem key={index}>
+                <LegendColor color={entry.color} />
+                <LegendText>{entry.name}</LegendText>
+              </LegendItem>
+            ))}
+          </LegendWrapper>
+        </ChartLegendGroup>
+      </ChartContainer>
+    </QuestionCardWrapper>
+  );
+};
+
+// 결과 페이지 메인 컴포넌트
+const ResultMain = () => {
+  const [surveyData, setSurveyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [questionCards, setQuestionCards] = useState([]);
+  const [isActivated, setIsActivated] = useState(false); // 응답 활성화 상태
+
+  useEffect(() => {
+    const fetchSurveyData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+        const response = await axios.get("/api/v1/users/me/survey/1", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const fetchedSurveyData = response.data.data;
+        setSurveyData(fetchedSurveyData);
+
+        const initialQuestionCards = fetchedSurveyData.sections.map(
+          (section) => ({
+            sectionTitle: section.sectionTitle,
+            sectionContent: section.sectionContent,
+            questions: section.questions.map((question) => {
+              const chartData =
+                question.questionType === "MULTIPLE_CHOICE"
+                  ? question.choices.map((choice, index) => ({
+                      name: choice.multipleChoiceContent,
+                      value: choice.response,
+                      // 지정된 색상 배열을 순환하여 적용
+                      color: ["#4C76FE", "#8EA9FF", "#E1E8FF"][index % 3],
+                      x: index + 1, // 예시 데이터
+                      y: choice.response, // 예시 데이터
+                      z: choice.response * 10, // 예시 데이터
+                    }))
+                  : [];
+
+              return {
+                questionNumber: question.questionNumber,
+                title: question.questionContent,
+                description: "질문 설명이 들어갈 자리입니다. (선택)",
+                chartType: "pie", // 기본 차트 타입
+                data: chartData,
+              };
+            }),
+          })
+        );
+
+        setQuestionCards(initialQuestionCards);
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchSurveyData();
+  }, []);
+
+  const handleToggleChange = () => {
+    setIsActivated(!isActivated); // 상태를 토글
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
+
+  const responseCount = surveyData.response;
 
   return (
     <PageWrapper>
       {/* 상단 응답 활성화 섹션 */}
       <MainContainer>
         <div>
-          <ResponseCount>응답 108개</ResponseCount>
+          <ResponseCount>응답 {responseCount}개</ResponseCount>
           <ActivationContainer>
             <ActivationText>응답 활성화</ActivationText>
             <ToggleSwitch>
               <ToggleInput
                 type="checkbox"
-                checked={isActivated}
-                onChange={() => setIsActivated(!isActivated)}
+                checked={isActivated} // 상태에 따라 토글 상태 변경
+                onChange={handleToggleChange} // 상태 변경 함수 호출
               />
               <ToggleSlider />
             </ToggleSwitch>
@@ -609,85 +712,40 @@ const ResultMain = () => {
         <MascotImage src={resultMascot} alt="Result Mascot" />
       </MainContainer>
 
-      {/* 추가 설명 섹션 */}
-      <AdditionalSection>
-        <BlueRectangle>
-          <BlueRectangleText>섹션 내용을 입력해 주세요.</BlueRectangleText>
-        </BlueRectangle>
-        <LongBlueRectangle>
-          <LongBlueRectangleText>
-            섹션 내용을 입력해 주세요.
-          </LongBlueRectangleText>
-        </LongBlueRectangle>
-      </AdditionalSection>
+      {/* 섹션들 */}
+      {questionCards.map((section, sectionIndex) => (
+        <div key={sectionIndex}>
+          <AdditionalSectionWrapper>
+            <BlueRectangle>
+              <BlueRectangleText>{section.sectionTitle}</BlueRectangleText>
+            </BlueRectangle>
+            <LongBlueRectangle>
+              <LongBlueRectangleText>
+                {section.sectionContent}
+              </LongBlueRectangleText>
+            </LongBlueRectangle>
+          </AdditionalSectionWrapper>
 
-      {/* 질문 1 섹션 */}
-      <QuestionCard>
-        <QuestionHeader>
-          <QuestionInfo>
-            <QuestionNumber>1.</QuestionNumber>
-            <QuestionTitle>질문 1의 내용이 들어갈 자리입니다.</QuestionTitle>
-          </QuestionInfo>
-          <ChartChangeDropdown
-            value={chartType1}
-            onChange={(e) => setChartType1(e.target.value)}
-          />
-        </QuestionHeader>
-        <QuestionDescription>
-          질문 1의 설명이 들어갈 자리입니다. (선택)
-        </QuestionDescription>
-        <ChartContainer>
-          <ChartLegendGroup>
-            <ChartWrapper isBarChart={chartType1 === "bar"}>
-              <ResponsiveContainer width="100%" height="100%">
-                {renderChart(chartType1, data1)}
-              </ResponsiveContainer>
-            </ChartWrapper>
-            <LegendWrapper>
-              {data1.map((entry, index) => (
-                <LegendItem key={index}>
-                  <LegendColor color={entry.color} />
-                  <LegendText>{entry.name}</LegendText>
-                </LegendItem>
-              ))}
-            </LegendWrapper>
-          </ChartLegendGroup>
-        </ChartContainer>
-      </QuestionCard>
-
-      {/* 질문 2 섹션 */}
-      <QuestionCard>
-        <QuestionHeader>
-          <QuestionInfo>
-            <QuestionNumber>2.</QuestionNumber>
-            <QuestionTitle>질문 2의 내용이 들어갈 자리입니다.</QuestionTitle>
-          </QuestionInfo>
-          <ChartChangeDropdown
-            value={chartType2}
-            onChange={(e) => setChartType2(e.target.value)}
-          />
-        </QuestionHeader>
-        <QuestionDescription>
-          질문 2의 설명이 들어갈 자리입니다. (선택)
-        </QuestionDescription>
-        <ChartContainer>
-          <ChartLegendGroup>
-            <ChartWrapper isBarChart={chartType2 === "bar"}>
-              <ResponsiveContainer width="100%" height="100%">
-                {renderChart(chartType2, data2)}
-              </ResponsiveContainer>
-            </ChartWrapper>
-            <LegendWrapper>
-              {data2.map((entry, index) => (
-                <LegendItem key={index}>
-                  <LegendColor color={entry.color} />
-                  <LegendText>{entry.name}</LegendText>
-                </LegendItem>
-              ))}
-            </LegendWrapper>
-          </ChartLegendGroup>
-        </ChartContainer>
-      </QuestionCard>
+          {/* 각 섹션에 포함된 질문들 */}
+          {section.questions.map((question, questionIndex) => (
+            <QuestionCard
+              key={questionIndex}
+              questionNumber={question.questionNumber}
+              title={question.title}
+              description={question.description}
+              chartType={question.chartType}
+              setChartType={(newType) => {
+                const newQuestionCards = [...questionCards];
+                newQuestionCards[sectionIndex].questions[
+                  questionIndex
+                ].chartType = newType;
+                setQuestionCards(newQuestionCards);
+              }}
+              data={question.data}
+            />
+          ))}
+        </div>
+      ))}
     </PageWrapper>
   );
 };
