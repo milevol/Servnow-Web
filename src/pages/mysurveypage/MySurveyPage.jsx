@@ -33,7 +33,6 @@ export const SurveyOnerContainer = styled.div`
 export const TortalSurveyContainer = styled.div`
     display : flex;
     flex-wrap : wrap;
-    height : 100vh;
     padding-top : 44px;
     align-self : center;
     justify-content: flex-start;
