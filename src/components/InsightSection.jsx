@@ -249,7 +249,7 @@ const InsightSection = () => {
   useEffect(() => {
     const fetchMemos = async () => {
       try {
-        const storedToken = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+        const storedToken = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
         if (!storedToken) {
           throw new Error("토큰이 로컬 스토리지에 저장되어 있지 않습니다.");
         }
@@ -303,7 +303,7 @@ const InsightSection = () => {
 
   const saveMemos = async (updatedQuestions) => {
     try {
-      const storedToken = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+      const storedToken = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
       if (!storedToken) {
         throw new Error("토큰이 로컬 스토리지에 저장되어 있지 않습니다.");
       }

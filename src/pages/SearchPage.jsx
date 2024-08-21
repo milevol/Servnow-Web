@@ -10,7 +10,7 @@ import styled from "styled-components";
 import { SlPresent } from "react-icons/sl";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
-import mockData from "../data/mockData.json";
+import axios from "axios";
 
 // 검색 페이지 컨테이너 스타일
 const SearchPageContainer = styled.div`
@@ -105,13 +105,18 @@ const SurveyCardWrapper = styled.div`
 `;
 
 function SearchPage() {
-  // 검색 결과 상태
   const [searchResults, setSearchResults] = useState([]);
   const [queryKeywords, setQueryKeywords] = useState([]);
   const [excludeCompleted, setExcludeCompleted] = useState(false);
   const location = useLocation();
 
-  // URL 파라미터에서 검색어를 추출하고 결과를 필터링하는 효과
+  const getToken = () => {
+    return (
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken")
+    );
+  };
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const query = searchParams.get("q");
@@ -123,18 +128,75 @@ function SearchPage() {
         .map((keyword) => keyword.toLowerCase());
       setQueryKeywords(keywords);
 
-      // 검색어와 일치하는 항목 필터링
-      let filteredResults = mockData.filter((item) =>
-        keywords.some((keyword) => item.title.toLowerCase().includes(keyword))
-      );
+      const fetchSearchResults = async () => {
+        try {
+          const token = getToken();
+          const response = await axios.get(
+            `/api/v1/survey?keyword=${encodeURIComponent(
+              query
+            )}&filter=${excludeCompleted}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-      if (excludeCompleted) {
-        filteredResults = filteredResults.filter((item) => !item.completed);
-      }
+          // 응답 데이터를 상태에 설정
+          let results = response.data.data.survey || [];
 
-      setSearchResults(filteredResults);
+          // 클라이언트 측에서 추가로 필터링 (필요할 경우)
+          if (excludeCompleted) {
+            results = results.filter((item) => !item.status);
+          }
+
+          setSearchResults(results);
+        } catch (err) {
+          console.error("Search failed:", err);
+        }
+      };
+
+      fetchSearchResults();
     }
   }, [location.search, excludeCompleted]);
+
+  // Axios 인터셉터 설정
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          try {
+            const refreshToken =
+              localStorage.getItem("refreshToken") ||
+              sessionStorage.getItem("refreshToken");
+            const response = await axios.post("/api/v1/auth/refresh", {
+              refreshToken,
+            });
+            const { accessToken } = response.data.data;
+            if (localStorage.getItem("accessToken")) {
+              localStorage.setItem("accessToken", accessToken);
+            } else {
+              sessionStorage.setItem("accessToken", accessToken);
+            }
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(error.config);
+          } catch (err) {
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            window.location.href = "/login";
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
 
   return (
     <SearchPageContainer>
@@ -156,9 +218,13 @@ function SearchPage() {
           </ExcludeCompletedButton>
         </FilterContainer>
         <SurveyCardWrapper>
-          {searchResults.map((item, index) => (
-            <SurveyCard key={index} {...item} completed={item.completed} />
-          ))}
+          {searchResults.length > 0 ? (
+            searchResults.map((item, index) => (
+              <SurveyCard key={index} {...item} completed={item.status} />
+            ))
+          ) : (
+            <div>설문이 존재하지 않아요 :(</div>
+          )}
         </SurveyCardWrapper>
       </ContentWrapper>
     </SearchPageContainer>

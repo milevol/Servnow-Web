@@ -136,7 +136,15 @@ const formatDate = (dateString) => {
 
 // SurveyCard 컴포넌트
 // 개별 설문 카드로 설문 정보와 참여 버튼을 표시
-function SurveyCard({ title, day, createdAt, expiredAt, people, completed }) {
+// SurveyCard.jsx
+function SurveyCard({
+  title,
+  dDay,
+  createdAt,
+  expiredAt,
+  participants,
+  completed,
+}) {
   const navigate = useNavigate();
 
   // 참여 버튼 클릭 시 호출되는 핸들러
@@ -146,7 +154,7 @@ function SurveyCard({ title, day, createdAt, expiredAt, people, completed }) {
     }
   };
 
-  const formattedDateRange = `${formatDate(createdAt)}~ ${formatDate(
+  const formattedDateRange = `${formatDate(createdAt)} ~ ${formatDate(
     expiredAt
   )}`;
 
@@ -155,13 +163,13 @@ function SurveyCard({ title, day, createdAt, expiredAt, people, completed }) {
       <LeftSection>
         <Title>{title}</Title>
         <InfoContainer>
-          <DdayText>D-{day}</DdayText>
+          <DdayText>D-{dDay}</DdayText>
           <DateInfo>{formattedDateRange}</DateInfo>
         </InfoContainer>
         <PercentageContainer>
           <PeopleIcon />
           <Percentage>
-            <CurrentParticipants>{people}</CurrentParticipants>
+            <CurrentParticipants>{participants}</CurrentParticipants>
           </Percentage>
         </PercentageContainer>
       </LeftSection>
