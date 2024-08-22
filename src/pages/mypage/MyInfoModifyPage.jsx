@@ -8,9 +8,11 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import Navbar from '../../components/Navbar';
+import { useSelector } from 'react-redux';
 
 const PageContainer = styled.div`
-  margin-top: -40px;
+  margin-top: -10px;
   padding: 5rem;
   background-color: #fff;
   display: flex;
@@ -182,6 +184,7 @@ const ErrorMessage = styled.p`
 
 const MyInfoModifyPage = () => {
   const navigate = useNavigate();
+  const { stayedLoggedIn } = useSelector((state) => state.auth);
 
   const [profileImage, setProfileImage] = useState('/roundLogo1.png');
   const [nickname, setNickname] = useState('');
@@ -199,7 +202,9 @@ const MyInfoModifyPage = () => {
  
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const accessToken = sessionStorage.getItem('accessToken');
+      const accessToken = stayedLoggedIn
+      ? localStorage.getItem('accessToken')
+      : sessionStorage.getItem('accessToken');
 
       if (!accessToken) {
         console.log("Access token not found.");
@@ -287,7 +292,9 @@ const MyInfoModifyPage = () => {
 
 //이메일로 인증번호 전송 api
   const handleEmailVerification = async () => {
-    const accessToken = sessionStorage.getItem('accessToken');
+    const accessToken = stayedLoggedIn
+    ? localStorage.getItem('accessToken')
+    : sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
       console.log("Access token not found.");
@@ -325,7 +332,9 @@ const MyInfoModifyPage = () => {
 
   //이메일 인증번호 검증 api
   const handleEmailCertification = async () => {
-    const accessToken = sessionStorage.getItem('accessToken');
+    const accessToken = stayedLoggedIn
+    ? localStorage.getItem('accessToken')
+    : sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
       console.log("Access token not found.");
@@ -396,7 +405,9 @@ const MyInfoModifyPage = () => {
       alert("비밀번호를 올바르게 입력해주세요.");
       return;
     }
-    const accessToken = sessionStorage.getItem('accessToken');
+    const accessToken = stayedLoggedIn
+    ? localStorage.getItem('accessToken')
+    : sessionStorage.getItem('accessToken');
 
       if (!accessToken) {
         console.log("Access token not found.");
@@ -437,6 +448,8 @@ const MyInfoModifyPage = () => {
 
 
   return (
+  <>
+    <Navbar />
     <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine />
@@ -529,6 +542,7 @@ const MyInfoModifyPage = () => {
         <SaveButton onClick={handleSave}>저장하기</SaveButton>
       </ButtonContainer>
     </PageContainer>
+    </>
   );
 };
 
