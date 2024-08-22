@@ -8,7 +8,8 @@ const StructureContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 37px;
+  margin-bottom: 37px;
 `;
 
 const MainNode = styled.div`

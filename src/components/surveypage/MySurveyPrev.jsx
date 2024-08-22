@@ -101,17 +101,50 @@ const SurveyPrev = ({ survey }) => {
         }
       }, [survey.characterType]);
 
+      const [finished, setFinished] = useState("no");
+
+      useEffect(() => {
+          const checkIfFinished = () => {
+              const currentTime = new Date();
+              const expirationTime = new Date(survey.expiredAt);
+  
+              if (currentTime > expirationTime) {
+                  setFinished("yes");
+              } else {
+                  setFinished("no");
+              }
+          };
+  
+          checkIfFinished();
+      }, [survey.expiredAt]);
+
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+    
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+    
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+        const ampm = hours >= 12 ? '오후' : '오전';
+        const formattedHours = hours > 12 ? hours - 12 : hours;
+    
+        return `${year}년 ${month}월 ${day}일 ${ampm} ${formattedHours}:${minutes}`;
+    };
+
     return (
         <SurveyBox>
-            <SurveyContainer finished={survey.finished}>
-                <SurveyStatusButton finished={survey.finished}>
-                    {survey.finished === 'yes' ? '종료' : '진행 중'}
+            <SurveyContainer finished={finished}>
+                <SurveyStatusButton finished={finished}>
+                    {finished === 'yes' ? '종료' : '진행 중'}
                 </SurveyStatusButton>
                 <SurveyImageContainer>
                     <CharacterBox backgroundImage={`../../public/${characterURL}.png`}/>
                 </SurveyImageContainer>
-                <SurveyTitleBox finished={survey.finished}>{survey.title}</SurveyTitleBox>
-                <SurveyDateBox finished={survey.finished}>{survey.expiredAt}</SurveyDateBox>
+                <SurveyTitleBox finished={finished}>{survey.title}</SurveyTitleBox>
+                <SurveyDateBox finished={finished}>{formatDate(survey.expiredAt)}</SurveyDateBox>
             </SurveyContainer>
         </SurveyBox>
     );
