@@ -87,7 +87,7 @@ const TermsDetailsButton = styled.button`
 const SubmitButton = styled.button`
   width: 200px;
   height: 50px;
-  margin-top: 150px;
+  margin-top: 100px;
   background-color: #3e77ff;
   color: #fff;
   border: none;
