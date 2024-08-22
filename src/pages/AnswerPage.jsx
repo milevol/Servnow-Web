@@ -187,35 +187,29 @@ const ChoiceLabel = styled.label`
 const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnswer }) => {
   const handleChange = (e, nextSectionNo) => {
     const { value, checked } = e.target;
-    const index = answers.findIndex((answer) => answer.answerContent === value);
 
-    console.log(index);
-    let updatedAnswers;
-    if (type !== "text") {
-      updatedAnswers = [index];
-    } else {
-      updatedAnswers = savedAnswer;
+    let updatedAnswers = [...savedAnswer];
+    if (type === "radio") {
+      updatedAnswers = [value];
+    } else if (type === "checkbox") {
       if (checked) {
-        updatedAnswers = [...updatedAnswers, index];
+        if (!updatedAnswers.includes(value)) {
+          updatedAnswers.push(value);
+        }
       } else {
-        updatedAnswers = updatedAnswers.filter((i) => i !== index);
+        updatedAnswers = updatedAnswers.filter((i) => i !== value);
+        console.log("??" + updatedAnswers);
       }
+    } else {
+      updatedAnswers = [value];
     }
 
     setSavedAnswer(updatedAnswers);
     setNextSection(nextSectionNo);
   };
 
-  // TODO : 이미 저장된 값이 있을 경우 해당 값 찾아서 nextSection 지정
-  // useEffect(() => {
-  //   if (savedAnswer) {
-  //     setNextSection(answers.find((answer) => savedAnswer.includes(answer.answerContent)).nextSectionNo);
-  //   }
-  // }, []);
-
   switch (type) {
     case "radio":
-      // 객관식, 한 개 선택
       return (
         <AnswerContainer>
           {answers.map((a, index) => (
@@ -224,8 +218,8 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
                 type="radio"
                 name={name}
                 id={a.answerContent}
-                value={a.answerContent}
-                checked={savedAnswer.includes(index)}
+                value={index}
+                checked={savedAnswer.includes(index.toString())}
                 onChange={(e) => handleChange(e, a.nextSectionNo)}
               />
               <ChoiceLabel htmlFor={a.answerContent}>{a.answerContent}</ChoiceLabel>
@@ -285,6 +279,8 @@ const AnswerPage = () => {
   // TODO : essential 여부에 따라 막는 거
   // const [isNextDisabled, setIsNextDisabled] = useState(true);
   // const [isFilled, setIsFilled] = useState({});
+  // 답변 보낼 때 쓸 거
+  const [response, setResponse] = useState();
   const formRef = useRef(null);
   const [disabled, setDisabled] = useState(false);
   const [ref, inView] = useInView({
