@@ -325,11 +325,7 @@ const InsightCard = ({
   }
 
   return (
-    <InsightCardContainer
-      ref={ref}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-      isDirectlyOrdered={isDirectlyOrdered}
-    >
+    <InsightCardContainer ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }} isDirectlyOrdered={isDirectlyOrdered}>
       <QuestionContainer>
         <QuestionText>
           <QuestionNumber>{questionNumber}</QuestionNumber>
@@ -345,11 +341,7 @@ const InsightCard = ({
               placeholder="메모를 입력하세요"
               maxLength={300} // 최대 글자수 300자 제한
             />
-            <DeleteButton
-              onClick={() => onDeleteNote(index, noteIndex, note.id)}
-            >
-              x
-            </DeleteButton>
+            <DeleteButton onClick={() => onDeleteNote(index, noteIndex, note.id)}>x</DeleteButton>
           </NoteContainer>
         ))}
         {notes.length < 4 && ( // 메모장이 4개 미만일 때만 추가 버튼 표시
@@ -383,14 +375,11 @@ const InsightSection = ({ surveyId }) => {
         ? localStorage.getItem("accessToken")
         : sessionStorage.getItem("accessToken");
 
-      const response = await axios.get(
-        `/api/v1/users/me/survey/${surveyId}/memo/list`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`/api/v1/users/me/survey/${surveyId}/memo/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = response.data.data.questions.map((question) => ({
         questionId: question.questionId,
@@ -506,16 +495,12 @@ const InsightSection = ({ surveyId }) => {
       // 전송되는 데이터 확인용 로그
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await axios.post(
-        `/api/v1/users/me/survey/${surveyId}/memo`,
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post(`/api/v1/users/me/survey/${surveyId}/memo`, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("메모 저장 성공:", response.data);
 
@@ -553,9 +538,7 @@ const InsightSection = ({ surveyId }) => {
     } else {
       const savedOrder = JSON.parse(localStorage.getItem("questionOrder"));
       if (savedOrder) {
-        const orderedData = savedOrder.map((orderId) =>
-          questions.find((q) => q.questionId === orderId)
-        );
+        const orderedData = savedOrder.map((orderId) => questions.find((q) => q.questionId === orderId));
         setReorderedQuestions(orderedData);
       } else {
         setReorderedQuestions([...questions]);
@@ -563,8 +546,7 @@ const InsightSection = ({ surveyId }) => {
     }
   }, [activeButton, questions]);
 
-  const displayQuestions =
-    activeButton === "질문 순" ? questions : reorderedQuestions;
+  const displayQuestions = activeButton === "질문 순" ? questions : reorderedQuestions;
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -572,16 +554,10 @@ const InsightSection = ({ surveyId }) => {
         <InnerContainer>
           <SectionTitleContainer>
             <SectionTitleWrapper>
-              <SectionTitle
-                $active={activeTab === "insight"}
-                onClick={() => setActiveTab("insight")}
-              >
+              <SectionTitle $active={activeTab === "insight"} onClick={() => setActiveTab("insight")}>
                 인사이트
               </SectionTitle>
-              <SectionTitle
-                $active={activeTab === "structure"}
-                onClick={() => setActiveTab("structure")}
-              >
+              <SectionTitle $active={activeTab === "structure"} onClick={() => setActiveTab("structure")}>
                 설문 구조도
               </SectionTitle>
             </SectionTitleWrapper>
@@ -590,16 +566,10 @@ const InsightSection = ({ surveyId }) => {
           {activeTab === "insight" ? (
             <>
               <ButtonGroup>
-                <Button
-                  $active={activeButton === "질문 순"}
-                  onClick={() => setActiveButton("질문 순")}
-                >
+                <Button $active={activeButton === "질문 순"} onClick={() => setActiveButton("질문 순")}>
                   질문 순
                 </Button>
-                <Button
-                  $active={activeButton === "직접 나열"}
-                  onClick={() => setActiveButton("직접 나열")}
-                >
+                <Button $active={activeButton === "직접 나열"} onClick={() => setActiveButton("직접 나열")}>
                   직접 나열
                 </Button>
               </ButtonGroup>
@@ -613,11 +583,7 @@ const InsightSection = ({ surveyId }) => {
                   <InsightCard
                     key={question.questionId}
                     index={index}
-                    questionNumber={
-                      activeButton === "질문 순"
-                        ? question.questionOrder
-                        : index + 1
-                    }
+                    questionNumber={activeButton === "질문 순" ? question.questionOrder : index + 1}
                     questionText={question.title}
                     notes={question.notes}
                     onNoteChange={handleNoteChange}
@@ -631,7 +597,7 @@ const InsightSection = ({ surveyId }) => {
               )}
             </>
           ) : (
-          <ResultStructureDiagram />// **설문구조도 컴포넌트 자리**
+            <ResultStructureDiagram /> // **설문구조도 컴포넌트 자리**
           )}
         </InnerContainer>
       </InsightContainer>
