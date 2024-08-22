@@ -1,7 +1,7 @@
 // 목적: 설문 시작 화면
 // 기능: 설문 시작 전 설문지에 대한 정보 제공
-// 2024.08.21./엠마/신윤지
-// 추가되어야 할 기능: api url, id 및 이미지 변경 + 토큰 받아왔을 때 제대로 작동되는지 확인
+// 2024.08.23./엠마/신윤지
+// 추가되어야 할 기능: 이미지 변경
 import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
