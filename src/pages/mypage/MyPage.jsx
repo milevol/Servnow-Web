@@ -220,6 +220,12 @@ const Labels = styled.div`
   }
 `;
 
+const getToken = () => {
+  return (
+    sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken")
+  );
+};
+
 const MyPage = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // 유저 데이터 상태
@@ -229,7 +235,7 @@ const MyPage = () => {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const token = sessionStorage.getItem("accessToken"); // "token" 키로 토큰 가져오기
+      const token = getToken(); // "token" 키로 토큰 가져오기
       const response = await axios.get("/api/v1/users/me", {
         headers: {
           Authorization: `Bearer ${token}`,

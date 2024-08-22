@@ -406,6 +406,68 @@ const ChartChangeDropdown = ({ value, onChange }) => {
   );
 };
 
+// 주관식 응답을 감싸는 컨테이너 스타일링 컴포넌트
+const SubjectiveResponsesContainer = styled.div`
+  max-height: 210px; // 주관식 답변 영역의 최대 높이 설정
+  overflow-y: auto; // 세로 스크롤 허용
+  margin-top: 30px;
+
+  &::-webkit-scrollbar {
+    width: 6px; // 스크롤바의 너비
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; // 스크롤바 트랙의 배경
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); // 스크롤바 색상
+    border-radius: 10px; // 스크롤바 모서리 둥글게
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3); // 스크롤바 호버 시 색상
+  }
+`;
+
+// 주관식 응답 스타일링 컴포넌트
+const ResponseBox = styled.div`
+  position: relative;
+  width: 741.32px;
+  min-height: 43.66px;
+  margin-bottom: 20px;
+  background: #e1e8ff;
+  border-radius: 6.32px;
+  padding: 15px 20px;
+  box-sizing: border-box;
+  word-wrap: break-word; // 단어가 너무 길어서 박스를 넘칠 경우 줄바꿈
+  word-break: break-word; // 단어 단위로 줄바꿈
+  overflow-wrap: break-word; // 긴 단어나 URL이 박스를 넘치지 않게 줄바꿈
+`;
+
+const ResponseText = styled.div`
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13.6964px;
+  line-height: 16px;
+  color: #5d6670;
+  word-wrap: break-word;
+  padding: 5px 0;
+`;
+
+const SubjectiveResponses = ({ responses }) => {
+  return (
+    <SubjectiveResponsesContainer>
+      {responses.map((response, index) => (
+        <ResponseBox key={index}>
+          <ResponseText>{response.responseContent}</ResponseText>
+        </ResponseBox>
+      ))}
+    </SubjectiveResponsesContainer>
+  );
+};
+
 // QuestionCard 컴포넌트
 const QuestionCard = ({
   questionNumber,
@@ -414,6 +476,8 @@ const QuestionCard = ({
   chartType,
   setChartType,
   data,
+  questionType,
+  responses,
 }) => {
   const renderCustomizedLabel = ({
     cx,
@@ -462,14 +526,13 @@ const QuestionCard = ({
           </PieChart>
         );
       case "bar":
-        const totalValue = data.reduce((acc, curr) => acc + curr.value, 0); // 전체 값 계산
+        const totalValue = data.reduce((acc, curr) => acc + curr.value, 0);
         const percentageData = data.map((entry) => ({
           ...entry,
-          value: ((entry.value / totalValue) * 100).toFixed(1), // 비율 계산하여 적용
+          value: ((entry.value / totalValue) * 100).toFixed(1),
         }));
         return (
           <ChartContainer>
-            {/* 가로형 막대 차트 */}
             <BarChart
               width={300}
               height={200}
@@ -509,8 +572,6 @@ const QuestionCard = ({
                 ))}
               </Bar>
             </BarChart>
-
-            {/* 세로형 막대 차트 */}
             <BarChart
               width={300}
               height={200}
@@ -583,6 +644,7 @@ const QuestionCard = ({
         return null;
     }
   };
+
   return (
     <QuestionCardWrapper>
       <QuestionHeader>
@@ -590,35 +652,42 @@ const QuestionCard = ({
           <QuestionNumber>{questionNumber}.</QuestionNumber>
           <QuestionTitle>{title}</QuestionTitle>
         </QuestionInfo>
-        <ChartChangeDropdown
-          value={chartType}
-          onChange={(e) => setChartType(e.target.value)}
-        />
+        {questionType !== "SUBJECTIVE_SHORT" && (
+          <ChartChangeDropdown
+            value={chartType}
+            onChange={(e) => setChartType(e.target.value)}
+          />
+        )}
       </QuestionHeader>
       <QuestionDescription>{description}</QuestionDescription>
-      <ChartContainer>
-        <ChartLegendGroup>
-          <ChartWrapper isBarChart={chartType === "bar"}>
-            <ResponsiveContainer width="100%" height="100%">
-              {renderChart(chartType, data)}
-            </ResponsiveContainer>
-          </ChartWrapper>
-          <LegendWrapper>
-            {data.map((entry, index) => (
-              <LegendItem key={index}>
-                <LegendColor color={entry.color} />
-                <LegendText>{entry.name}</LegendText>
-              </LegendItem>
-            ))}
-          </LegendWrapper>
-        </ChartLegendGroup>
-      </ChartContainer>
+      {questionType === "SUBJECTIVE_SHORT" ? (
+        <SubjectiveResponses responses={responses} />
+      ) : (
+        <ChartContainer>
+          <ChartLegendGroup>
+            <ChartWrapper isBarChart={chartType === "bar"}>
+              <ResponsiveContainer width="100%" height="100%">
+                {renderChart(chartType, data)}
+              </ResponsiveContainer>
+            </ChartWrapper>
+            <LegendWrapper>
+              {data.map((entry, index) => (
+                <LegendItem key={index}>
+                  <LegendColor color={entry.color} />
+                  <LegendText>{entry.name}</LegendText>
+                </LegendItem>
+              ))}
+            </LegendWrapper>
+          </ChartLegendGroup>
+        </ChartContainer>
+      )}
     </QuestionCardWrapper>
   );
 };
 
 // 결과 페이지 메인 컴포넌트
-const ResultMain = () => {
+// surveyId를 받아서 API 요청에 사용
+const ResultMain = ({ surveyId }) => {
   const [surveyData, setSurveyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -628,12 +697,17 @@ const ResultMain = () => {
   useEffect(() => {
     const fetchSurveyData = async () => {
       try {
-        const token = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
-        const response = await axios.get("/api/v1/users/me/survey/1", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("accessToken")
+          ? localStorage.getItem("accessToken")
+          : sessionStorage.getItem("accessToken");
+        const response = await axios.get(
+          `/api/v1/users/me/survey/${surveyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const fetchedSurveyData = response.data.data;
         setSurveyData(fetchedSurveyData);
 
@@ -647,20 +721,21 @@ const ResultMain = () => {
                   ? question.choices.map((choice, index) => ({
                       name: choice.multipleChoiceContent,
                       value: choice.response,
-                      // 지정된 색상 배열을 순환하여 적용
                       color: ["#4C76FE", "#8EA9FF", "#E1E8FF"][index % 3],
-                      x: index + 1, // 예시 데이터
-                      y: choice.response, // 예시 데이터
-                      z: choice.response * 10, // 예시 데이터
+                      x: index + 1,
+                      y: choice.response,
+                      z: choice.response * 10,
                     }))
                   : [];
 
               return {
                 questionNumber: question.questionNumber,
-                title: question.questionContent,
-                description: "질문 설명이 들어갈 자리입니다. (선택)",
-                chartType: "pie", // 기본 차트 타입
+                title: question.questionTitle,
+                description: question.questionContent,
+                chartType: "pie",
                 data: chartData,
+                questionType: question.questionType,
+                responses: question.responses,
               };
             }),
           })
@@ -675,10 +750,10 @@ const ResultMain = () => {
     };
 
     fetchSurveyData();
-  }, []);
+  }, [surveyId]); // surveyId가 변경될 때마다 데이터를 다시 가져옴
 
   const handleToggleChange = () => {
-    setIsActivated(!isActivated); // 상태를 토글
+    setIsActivated(!isActivated);
   };
 
   if (loading) {
@@ -693,7 +768,6 @@ const ResultMain = () => {
 
   return (
     <PageWrapper>
-      {/* 상단 응답 활성화 섹션 */}
       <MainContainer>
         <div>
           <ResponseCount>응답 {responseCount}개</ResponseCount>
@@ -702,8 +776,8 @@ const ResultMain = () => {
             <ToggleSwitch>
               <ToggleInput
                 type="checkbox"
-                checked={isActivated} // 상태에 따라 토글 상태 변경
-                onChange={handleToggleChange} // 상태 변경 함수 호출
+                checked={isActivated}
+                onChange={handleToggleChange}
               />
               <ToggleSlider />
             </ToggleSwitch>
@@ -712,7 +786,6 @@ const ResultMain = () => {
         <MascotImage src={resultMascot} alt="Result Mascot" />
       </MainContainer>
 
-      {/* 섹션들 */}
       {questionCards.map((section, sectionIndex) => (
         <div key={sectionIndex}>
           <AdditionalSectionWrapper>
@@ -725,8 +798,6 @@ const ResultMain = () => {
               </LongBlueRectangleText>
             </LongBlueRectangle>
           </AdditionalSectionWrapper>
-
-          {/* 각 섹션에 포함된 질문들 */}
           {section.questions.map((question, questionIndex) => (
             <QuestionCard
               key={questionIndex}
@@ -742,6 +813,8 @@ const ResultMain = () => {
                 setQuestionCards(newQuestionCards);
               }}
               data={question.data}
+              questionType={question.questionType}
+              responses={question.responses}
             />
           ))}
         </div>

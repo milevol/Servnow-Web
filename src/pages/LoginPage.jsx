@@ -2,16 +2,21 @@
 //기능: 사용자 로그인 정보 입력
 //2024.07.21 데이-이연
 
-import React from 'react';
-import styled from 'styled-components';
-import LoginForm from '../components/login/LoginForm'; // 파일 경로와 default export 확인
+import React from "react";
+import styled from "styled-components";
+import LoginForm from "../components/login/LoginForm"; // 파일 경로와 default export 확인
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+<<<<<<< HEAD
   height: 100%;
   background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
+=======
+  height: 100vh;
+  background: linear-gradient(to bottom, #4c76fe 50%, #f0f2f5 50%);
+>>>>>>> c4e9222352d56aba8f4a62846e10bd26e83262ee
 `;
 
 const Content = styled.div`
@@ -21,6 +26,7 @@ const Content = styled.div`
   text-align: center;
   margin-top: 50px;
   margin-bottom: 50px;
+
 `;
 
 const Title = styled.h1`
@@ -30,7 +36,7 @@ const Title = styled.h1`
 `;
 
 const WelcomeText = styled.p`
-  margin-bottom: 3rem; 
+  margin-bottom: 3rem;
   color: white;
   font-size: 1.1rem;
 `;
@@ -46,6 +52,5 @@ const LoginPage = () => {
     </Container>
   );
 };
-
 
 export default LoginPage;

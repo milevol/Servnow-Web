@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SurveyPrev from '../../components/surveypage/MySurveyPrev';
 import styled, { css } from 'styled-components';
 import Navbar from '../../components/Navbar';
 import NewSurveyButton from '../../components/surveypage/NewSurveyButton';
+import Arrow from '../../components/surveypage/SurveyArrow';
+import axios from 'axios';
 
 export const MyPageContainer = styled.div`
     height : auto;
@@ -14,7 +16,7 @@ export const MyPageContainer = styled.div`
 `;
 
 export const MyPageTotalContainer = styled.div`
-    height : 100%;
+    height : 100vh;
     width : 100%;
     margin-left : 143px;
 `;
@@ -32,6 +34,7 @@ export const SurveyOnerContainer = styled.div`
 
 export const TortalSurveyContainer = styled.div`
     display : flex;
+    width: 1440px;
     flex-wrap : wrap;
     padding-top : 44px;
     align-self : center;
@@ -74,6 +77,7 @@ const DropdownContainer = styled.div`
 const DropdownButton = styled.button`
   background-color: #f8f9fa;
   border: 1px solid #ced4da;
+  font-family: 'PRETENDARD';
   width : 120px;
   height : 37px;
   border-radius: 8px;
@@ -92,7 +96,7 @@ const DropdownButton = styled.button`
 const DropdownMenu = styled.div`
   display: ${props => (props.isOpen ? 'block' : 'none')};
   position: absolute;
-  background-color: #fff;
+  background-color: #f8f9fa;
   min-width: 120px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -103,7 +107,6 @@ const DropdownItem = styled.div`
   color: #061522;
   padding: 12px 16px;
   font-size: 14px;
-  text-decoration: none;
   display: block;
   cursor: pointer;
   &:hover {
@@ -112,52 +115,89 @@ const DropdownItem = styled.div`
   }
 `;
 
-const Arrow = styled.span`
-  margin-left: 10px;
-  font-size : 12px;
-  transform: rotate(90deg);
-  ${props => props.isOpen && css`
-    transform: rotate(270deg);
-  `}
-  transition: transform 0.3s;
-`;
-
 const MySurveyPage = () => {
 
     const result = [
         {
-            id: 1,
+            surveyId: 1,
             title: '취업을 앞둔 대학생 인식 설문조사',
             description: 'Description for movie 1',
-            date: '2024.06.21. 오후 19:23',
-            finished: 'no'
+            expiredAt: '2024.06.21. 오후 19:23',
+            finished: 'no',
+            characterType: "TYPE_ONE"
         },
         {
-            id: 2,
+            surveyId: 2,
             title: '도서관에서의 가상현실(VR) 콘텐츠 이용자 및...',
             description: 'Description for movie 2',
-            date: '2024.06.19. 오후 16:53',
-            finished: 'no'
+            expiredAt: '2024.06.19. 오후 16:53',
+            finished: 'no',
+            characterType: "TYPE_TWO"
         },
         {
-            id: 3,
+            surveyId: 3,
             title: '대학생 설문 서비스 플랫폼 관련 인식조사',
             description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
+            expiredAt: '2024.06.02. 오후 12:00',
+            finished: 'yes',
+            characterType: "TYPE_THREE"
         }
     ];
 
-    const [sortOrder, setSortOrder] = useState('최신순');
+    const [sortOrder, setSortOrder] = useState('latest');
     const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState(null);
+    const [order, setOrder] = useState("최신 순");
 
     const toggleDropdown = () => setIsOpen(!isOpen);
 
     const handleSelect = (sortType) => {
         setSortOrder(sortType);
         setIsOpen(false);
+        setOrder(orders.find(order => order.value === sortType).label);
     };
 
+    const orders = [
+        {value: 'latest', label : "최신 순"},
+        {value: 'oldest', label : "오래된 순"},
+        {value: 'participants', label : "참여자 순"}
+    ]
+    
+    const getToken = () => {
+        return (
+          sessionStorage.getItem("accessToken") ||
+          localStorage.getItem("accessToken")
+        );
+      };
+
+    const [surveys, setSurveys] = useState([]);
+
+    const getSurveyData = async (sortOrder) => {
+        try {
+            const token = getToken();
+            const response = await axios.get(`/api/v1/users/me/survey?sort=${sortOrder}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            // response.data.survey가 배열인지 확인하고, 그렇지 않으면 빈 배열로 초기화
+            if (Array.isArray(response.data.data.survey)) {
+                setSurveys(response.data.data.survey);
+            } else {
+                console.error("Unexpected data format:", response.data);
+                setSurveys([]); // 잘못된 형식이 오면 빈 배열로 초기화
+            }
+        } catch (err) {
+            console.error("Error fetching survey data", err);
+            setSurveys([]);  // 오류가 발생하면 빈 배열로 초기화
+        }
+    };
+
+    useEffect(() => {
+        getSurveyData('newest');  // 초기 로딩 시 최신 순으로 데이터를 가져옴
+    }, []);
+    
     return (
         <MyPageContainer>
             <Navbar />
@@ -166,19 +206,19 @@ const MySurveyPage = () => {
                     MY
                     <DropdownContainer>
                         <DropdownButton onClick={toggleDropdown}>
-                            {sortOrder}
-                            <Arrow isOpen={isOpen}>&gt;</Arrow>
+                            {order}
+                            <Arrow isOpen={isOpen} />
                         </DropdownButton>
                         <DropdownMenu isOpen={isOpen}>
-                            <DropdownItem onClick={() => handleSelect('참여자순')}>참여자 순</DropdownItem>
-                            <DropdownItem onClick={() => handleSelect('오래된순')}>오래된 순</DropdownItem>
-                            <DropdownItem onClick={() => handleSelect('최신순')}>최신 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('participants')}>참여자 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('oldest')}>오래된 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('newest')}>최신 순</DropdownItem>
                         </DropdownMenu>
                     </DropdownContainer>
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
-                    {result.map((survey) => (
-                        <SurveyPrev key={survey.id} survey={survey} />
+                    {surveys.map((survey) => (
+                        <SurveyPrev key={survey.surveId} survey={survey} />
                     ))}
                     <SurveyBox>
                         <NewSurveyBox>
