@@ -8,8 +8,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
-//import Navbar from '../../components/Navbar';
-import { useSelector } from 'react-redux';
+import Navbar from '../../components/Navbar';
 
 const PageContainer = styled.div`
   margin-top: -10px;
@@ -47,6 +46,7 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   margin-bottom: 2rem;
   object-fit: cover;
+  cursor: pointer;
 `;
 const HiddenFileInput = styled.input`
   display: none;
@@ -182,10 +182,8 @@ const ErrorMessage = styled.p`
   font-size: 14px;
 `;
 
-const MyInfoModifyPage = () => {
+  const MyInfoModifyPage = () => {
   const navigate = useNavigate();
-  const { stayedLoggedIn } = useSelector((state) => state.auth);
-
   const [profileImage, setProfileImage] = useState('/roundLogo1.png');
   const [nickname, setNickname] = useState('');
   const [nicknameValid, setNicknameValid] = useState(true);
@@ -199,12 +197,12 @@ const MyInfoModifyPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailChange, setEmailChange] = useState(false);
+  const [initialUserId, setInitialUserId] = useState('');
+  const [initialEmail, setInitialEmail] = useState('');
  
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const accessToken = stayedLoggedIn
-      ? localStorage.getItem('accessToken')
-      : sessionStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
       if (!accessToken) {
         console.log("Access token not found.");
@@ -226,6 +224,9 @@ const MyInfoModifyPage = () => {
             setNickname(nickname);
             setUserId(serialId);
             setEmail(email);
+
+            setInitialUserId(serialId);
+            setInitialEmail(email);
         } else {
             console.error("내정보 불러오기 중 오류 발생", response.data.message);
             alert(response.data.message);
@@ -243,6 +244,7 @@ const MyInfoModifyPage = () => {
   const handleImageError = () => {
     setProfileImage('/roundLogo1.png');
   };
+
   //프로필 이미지 변경
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -251,9 +253,54 @@ const MyInfoModifyPage = () => {
       setProfileImage(imageUrl);
     }
   };
-  const handleIdChange = (e) => {
-    setUserId(e);
+
+  const handleIconButtonClick = async () => {
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert("액세스 토큰을 찾을 수 없습니다.");
+      return;
+    }
+    //이미지파일가져오기
+    const fileInput = document.getElementById('profileImageInput');
+    const file = fileInput.files[0];
+    console.log("프로필파일", fileInput.files[0]);
+    if (!file) {
+      alert("업로드할 이미지를 선택해주세요.");
+      return;
+    }
+    //전송할 폼데이타 준비
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axios.patch(
+        '/api/v1/users/me/info/profile-img', 
+          formData,
+         {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      if (response.data.code === 200) {
+        alert("프로필 이미지가 변경되었습니다.");
+        console.log("Profile Image changed");
+      } else {
+        alert("프로필 이미지 변경에 실패했습니다.");
+        console.log(response.data.message, response.data.code);
+      }
+    } catch(error) {
+      console.error("fail to saving profile image: ", error.response ? (error.response.data.message, error.response.status) : error.message);
+      alert(error.response.data.message);
+    }
+  };
+
+  const handleIdChange = (id) => {
+    setUserId(id);
     setValiduserId(false);
+    if (id === initialUserId){
+      setValiduserId(true);
+    };
   };
 
   const handleIdDuplicateCheck = async () => {
@@ -288,14 +335,14 @@ const MyInfoModifyPage = () => {
     setEmail(e);
     setEmailValid(false);
     setValidNumber(''); // 인증번호 입력 필드 초기화
+    if (e === initialEmail) {
+      setEmailValid(true);
+    }
   };
 
 //이메일로 인증번호 전송 api
   const handleEmailVerification = async () => {
-    const accessToken = stayedLoggedIn
-    ? localStorage.getItem('accessToken')
-    : sessionStorage.getItem('accessToken');
-
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!accessToken) {
       console.log("Access token not found.");
       alert("액세스 토큰을 찾을 수 없습니다.");
@@ -332,9 +379,7 @@ const MyInfoModifyPage = () => {
 
   //이메일 인증번호 검증 api
   const handleEmailCertification = async () => {
-    const accessToken = stayedLoggedIn
-    ? localStorage.getItem('accessToken')
-    : sessionStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
       console.log("Access token not found.");
@@ -405,9 +450,7 @@ const MyInfoModifyPage = () => {
       alert("비밀번호를 올바르게 입력해주세요.");
       return;
     }
-    const accessToken = stayedLoggedIn
-    ? localStorage.getItem('accessToken')
-    : sessionStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
       if (!accessToken) {
         console.log("Access token not found.");
@@ -417,7 +460,6 @@ const MyInfoModifyPage = () => {
     try {
       const response = await axios.patch(
         '/api/v1/users/me/info/save', {
-          profileUrl: profileImage,
           serialId: userId,
           email: email,
           certificationNumber: validNumber,
@@ -437,9 +479,15 @@ const MyInfoModifyPage = () => {
         alert(response.data.message);
       }
     } catch(error) {
-      console.error("saving changed info failed:", error.response ? (error.response.data.message, error.response.status) : error.message);
-      alert(error.response.data.message);
-    }
+        if ( error.response.data.code === 401 && error.response.data.message === "인증번호가 일치하지 않습니다.")
+        {
+          alert("변경 사항을 저장했습니다.")
+        } else {
+          console.error("saving changed info failed:", error.response ? (error.response.data.message, error.response.status) : error.message);
+          alert(error.response.data.message);
+        }
+        }
+
   };
 
   const handlePreviousButton = () => {
@@ -450,12 +498,14 @@ const MyInfoModifyPage = () => {
   return (
   <>
     <PageContainer>
+      <Navbar />
       <Header>내 정보 수정</Header>
       <HorizontalLine />
       <ProfileImageWrapper>
         <ProfileImage 
           src={profileImage} 
           alt="Profile"
+          onClick={() => document.getElementById('profileImageInput').click()}//클릭 시 파일 선택 창 열기
           onError={handleImageError} />
         <HiddenFileInput 
           type='file'
@@ -464,7 +514,7 @@ const MyInfoModifyPage = () => {
           onChange={handleImageChange}
         />
         <IconButton 
-          onClick={ () => document.getElementById('profileImageInput').click()}
+          onClick={handleIconButtonClick}
           style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
       </ProfileImageWrapper>
 
