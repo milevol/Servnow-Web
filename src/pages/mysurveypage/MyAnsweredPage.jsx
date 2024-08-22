@@ -16,8 +16,9 @@ export const MyPageContainer = styled.div`
 
 export const MyPageTotalContainer = styled.div`
     height : 100%;
-    width : 100%;
-    padding-left: 8%;
+    min-height: 100vh;
+    width : 85%;
+    padding-left: 15%;
 `;
 
 export const SurveyOnerContainer = styled.div`
