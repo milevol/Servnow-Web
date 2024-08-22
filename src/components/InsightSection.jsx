@@ -9,7 +9,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-// **설문 구조도 임포트 자리**
+import ResultStructureDiagram from "./CustomSidebar/ResultStructureDiagram"; // **설문 구조도 임포트 자리**
 
 const InsightContainer = styled.div`
   width: 559px;
@@ -631,8 +631,7 @@ const InsightSection = ({ surveyId }) => {
               )}
             </>
           ) : (
-            <></>
-            // **설문구조도 컴포넌트 자리**
+          <ResultStructureDiagram />// **설문구조도 컴포넌트 자리**
           )}
         </InnerContainer>
       </InsightContainer>
