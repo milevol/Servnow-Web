@@ -108,7 +108,7 @@ const SurveyPrev = ({ survey }) => {
                     {survey.finished === 'yes' ? '종료' : '진행 중'}
                 </SurveyStatusButton>
                 <SurveyImageContainer>
-                    <CharacterBox backgroundImage={`../../src/assets/servnow_character/${characterURL}.png`}/>
+                    <CharacterBox backgroundImage={`../../public/${characterURL}.png`}/>
                 </SurveyImageContainer>
                 <SurveyTitleBox finished={survey.finished}>{survey.title}</SurveyTitleBox>
                 <SurveyDateBox finished={survey.finished}>{survey.expiredAt}</SurveyDateBox>
