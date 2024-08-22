@@ -363,33 +363,32 @@ const InsightCard = ({
   );
 };
 
-const InsightSection = ({ isActivated }) => {
+const InsightSection = ({ surveyId }) => {
   const [activeTab, setActiveTab] = useState("insight");
   const [activeButton, setActiveButton] = useState("질문 순");
   const [questions, setQuestions] = useState([]);
   const [reorderedQuestions, setReorderedQuestions] = useState([]);
-  const [loading, setLoading] = useState(false); // 초기 로딩 상태를 false로 설정
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchMemos();
-  }, [isActivated]);
+  }, [surveyId]); // surveyId가 변경될 때마다 데이터를 다시 가져옴
 
   const fetchMemos = async () => {
     try {
-      const token = isActivated
+      const token = localStorage.getItem("accessToken")
         ? localStorage.getItem("accessToken")
         : sessionStorage.getItem("accessToken");
 
-      if (!token) {
-        throw new Error("토큰이 저장되어 있지 않습니다.");
-      }
-
-      const response = await axios.get("/api/v1/users/me/survey/1/memo/list", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `/api/v1/users/me/survey/${surveyId}/memo/list`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = response.data.data.questions.map((question) => ({
         questionId: question.questionId,
@@ -402,21 +401,7 @@ const InsightSection = ({ isActivated }) => {
       }));
 
       setQuestions(data);
-
-      if (activeButton === "직접 나열") {
-        const savedOrder = JSON.parse(localStorage.getItem("questionOrder"));
-        if (savedOrder) {
-          const orderedData = savedOrder.map((orderId) =>
-            data.find((q) => q.questionId === orderId)
-          );
-          setReorderedQuestions(orderedData);
-        } else {
-          setReorderedQuestions(data);
-        }
-      } else {
-        setReorderedQuestions(data);
-      }
-
+      setReorderedQuestions(data);
       setLoading(false);
     } catch (error) {
       setError(error.response ? error.response.data.message : "Network error");
@@ -455,7 +440,7 @@ const InsightSection = ({ isActivated }) => {
     }
 
     try {
-      const token = isActivated
+      const token = localStorage.getItem("accessToken")
         ? localStorage.getItem("accessToken")
         : sessionStorage.getItem("accessToken");
 
@@ -484,7 +469,7 @@ const InsightSection = ({ isActivated }) => {
   const saveMemos = async (questionIndex) => {
     setLoading(true); // 저장 버튼 클릭 시 로딩 상태로 변경
     try {
-      const token = isActivated
+      const token = localStorage.getItem("accessToken")
         ? localStorage.getItem("accessToken")
         : sessionStorage.getItem("accessToken");
 
@@ -520,7 +505,7 @@ const InsightSection = ({ isActivated }) => {
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
 
       const response = await axios.post(
-        "/api/v1/users/me/survey/1/memo",
+        `/api/v1/users/me/survey/${surveyId}/memo`,
         requestBody,
         {
           headers: {

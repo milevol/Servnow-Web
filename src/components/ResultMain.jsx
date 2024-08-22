@@ -686,7 +686,8 @@ const QuestionCard = ({
 };
 
 // 결과 페이지 메인 컴포넌트
-const ResultMain = () => {
+// surveyId를 받아서 API 요청에 사용
+const ResultMain = ({ surveyId }) => {
   const [surveyData, setSurveyData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -699,11 +700,14 @@ const ResultMain = () => {
         const token = localStorage.getItem("accessToken")
           ? localStorage.getItem("accessToken")
           : sessionStorage.getItem("accessToken");
-        const response = await axios.get("/api/v1/users/me/survey/1", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `/api/v1/users/me/survey/${surveyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const fetchedSurveyData = response.data.data;
         setSurveyData(fetchedSurveyData);
 
@@ -746,7 +750,7 @@ const ResultMain = () => {
     };
 
     fetchSurveyData();
-  }, []);
+  }, [surveyId]); // surveyId가 변경될 때마다 데이터를 다시 가져옴
 
   const handleToggleChange = () => {
     setIsActivated(!isActivated);

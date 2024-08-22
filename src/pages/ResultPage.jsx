@@ -6,6 +6,7 @@
 
 import React from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 import ResultMain from "../components/ResultMain";
 import InsightSection from "../components/InsightSection";
 
@@ -19,7 +20,7 @@ const ResultPageContainer = styled.div`
   padding-top: 125px;
   padding-bottom: 50px;
   box-sizing: border-box;
-  align-items: flex-start; /* 자식 요소들을 위에서부터 쌓이게 설정 */
+  align-items: flex-start;
 `;
 
 // ResultMain 컴포넌트를 감싸는 컨테이너 스타일링 컴포넌트
@@ -37,16 +38,18 @@ const ResultMainWrapper = styled.div`
 
 // 결과 페이지 컴포넌트 정의
 const ResultPage = () => {
+  const { id } = useParams(); // URL 파라미터에서 id가져오기
+
   return (
     <ResultPageContainer>
       {/* ResultMain 컴포넌트를 가운데 정렬 */}
       <ResultMainContainer>
         <ResultMainWrapper>
-          <ResultMain />
+          <ResultMain surveyId={id} />
         </ResultMainWrapper>
       </ResultMainContainer>
       {/* InsightSection 컴포넌트를 오른쪽에 위치 */}
-      <InsightSection />
+      <InsightSection surveyId={id} />
     </ResultPageContainer>
   );
 };
