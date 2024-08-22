@@ -16,6 +16,7 @@ import MyInfoModifyKakaoPage from "./pages/mypage/MyInfoModifyKakaoPage";
 import KakaoAuthRedirectHandler from "./components/login/KakaoAuthRedirecteHandler";
 import MySurveyPage from "./pages/mysurveypage/MySurveyPage";
 import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
+import CreatePage from "./pages/CreatePage";
 import LandingPage from "./pages/LandingPage";
 import MyPagePoint from "./pages/mypage/MyPagePoint";
 
@@ -40,6 +41,8 @@ function App() {
       <Route path="/myinfo-k" element={<MyInfoModifyKakaoPage />} />
       <Route path="/created-surveys" element={<MySurveyPage />} />
       <Route path="/answered-surveys" element={<MyAnsweredPage />} />
+      <Route path="/create" element={<CreatePage />} />
+      <Route path="/answerstart" element={<AnswerStartPage />} />
       <Route path="/landing" element={<LandingPage />} />
     </Routes>
   );
