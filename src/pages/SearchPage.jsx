@@ -131,26 +131,29 @@ function SearchPage() {
       const fetchSearchResults = async () => {
         try {
           const token = getToken();
-          const response = await axios.get(
-            `/api/v1/survey?keyword=${encodeURIComponent(
-              query
-            )}&filter=${excludeCompleted}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const results = [];
 
-          // 응답 데이터를 상태에 설정
-          let results = response.data.data.survey || [];
+          for (const keyword of keywords) {
+            const response = await axios.get(
+              `/api/v1/survey?keyword=${encodeURIComponent(
+                keyword
+              )}&filter=${excludeCompleted}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
 
-          // 클라이언트 측에서 추가로 필터링 (필요할 경우)
-          if (excludeCompleted) {
-            results = results.filter((item) => !item.status);
+            results.push(...response.data.data.survey);
           }
 
-          setSearchResults(results);
+          // 중복 제거
+          const uniqueResults = Array.from(
+            new Set(results.map((result) => result.surveyId))
+          ).map((id) => results.find((result) => result.surveyId === id));
+
+          setSearchResults(uniqueResults);
         } catch (err) {
           console.error("Search failed:", err);
         }

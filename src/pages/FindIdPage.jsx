@@ -2,16 +2,16 @@
 //기능: 사용자 성명 전화번호 검증 및 아이디 찾기 기능
 //2024.07.25 데이-이연
 
-import React from 'react';
-import styled from 'styled-components';
-import FindIdForm from '../components/login/FindIdForm';
+import React from "react";
+import styled from "styled-components";
+import FindIdForm from "../components/login/FindIdForm";
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
+  background: linear-gradient(to bottom, #4c76fe 50%, #f0f2f5 50%);
 `;
 
 const Content = styled.div`
@@ -19,7 +19,6 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  
 `;
 
 const Title = styled.h1`
@@ -29,7 +28,7 @@ const Title = styled.h1`
 `;
 
 const WelcomeText = styled.p`
-  margin-bottom: 3rem; 
+  margin-bottom: 3rem;
   color: white;
   font-size: 1.1rem;
 `;
@@ -45,6 +44,5 @@ const FindIdPage = () => {
     </Container>
   );
 };
-
 
 export default FindIdPage;
