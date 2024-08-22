@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 export const SurveyBox = styled.div`
@@ -42,8 +43,19 @@ export const SurveyImageContainer = styled.div`
     align-content:center;
     font-weight : bolder;
     font-size : 20px;
-    justify-content:center;
+    justify-content: start;
 `;
+
+
+export const CharacterBox = styled.div`
+    height : 160px;
+    width : 91px;
+    margin-top : 17px;
+    margin-left : 232px;
+    background-image: url(${props => props.backgroundImage});
+    background-size: cover;
+    background-position: center;
+`
 
 export const SurveyTitleBox = styled.div`
     width : 552px;
@@ -71,13 +83,37 @@ export const SurveyDateBox = styled.div`
 `;
 
 const SurveyPrev = ({ survey }) => {
+    const characters = [
+        {value: "TYPE_ONE", label: "character1"},
+        {value: "TYPE_TWO", label: "character2"},
+        {value: "TYPE_THREE", label: "character3"},
+        {value: "TYPE_FOUR", label: "character4"},
+        {value: "TYPE_FIVE", label: "character5"},
+        {value: "TYPE_SIX", label: "character6"},
+        {value: "TYPE_SEVEN", label: "character7"},
+        {value: "TYPE_EIGHT", label: "character8"},
+        {value: "TYPE_NINE", label: "character9"},
+        {value: "TYPE_TEN", label: "character10"},
+        {value: "TYPE_ELEVEN", label: "character11"},
+    ]
+
+    const [characterURL, setCharacterURL] = useState("")
+    useEffect(() => {
+        const character = characters.find(character => character.value === survey.characterType);
+        if (character) {
+          setCharacterURL(character.label);
+        }
+      }, [survey.characterType]);
+
     return (
         <SurveyBox>
             <SurveyContainer finished={survey.finished}>
                 <SurveyStatusButton finished={survey.finished}>
                     {survey.finished === 'yes' ? '종료' : '진행 중'}
                 </SurveyStatusButton>
-                <SurveyImageContainer>나와라 캐릭터~</SurveyImageContainer>
+                <SurveyImageContainer>
+                    <CharacterBox backgroundImage={`../../src/assets/servnow_character/${characterURL}.png`}/>
+                </SurveyImageContainer>
                 <SurveyTitleBox finished={survey.finished}>{survey.title}</SurveyTitleBox>
                 <SurveyDateBox finished={survey.finished}>{survey.date}</SurveyDateBox>
             </SurveyContainer>

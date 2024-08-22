@@ -183,7 +183,7 @@ const ErrorMessage = styled.p`
 const MyInfoModifyPage = () => {
   const navigate = useNavigate();
 
-  const [profileImage, setProfileImage] = useState('/roundLogo.png');
+  const [profileImage, setProfileImage] = useState('/roundLogo1.png');
   const [nickname, setNickname] = useState('');
   const [nicknameValid, setNicknameValid] = useState(true);
   const [userId, setUserId] = useState('');
@@ -216,20 +216,12 @@ const MyInfoModifyPage = () => {
           });
           if (response.data.code === 200) {
             console.log(response.data.data);
-            if(response.data.data.profile_url === '/roundLogo1.png') {
-              const { nickname, serialId, email } = response.data.data;
-              setProfileImage('/roundLogo.png');
-              setNickname(nickname);
-              setUserId(serialId);
-              setEmail(email);
-            } else {
-              const { profile_url, nickname, serialId, email } = response.data.data;
-              setProfileImage(profile_url);
-              setNickname(nickname);
-              setUserId(serialId);
-              setEmail(email);
-            }
-          } else {
+            const { profile_url, nickname, serialId, email } = response.data.data;
+            setProfileImage(profile_url);
+            setNickname(nickname);
+            setUserId(serialId);
+            setEmail(email);
+        } else {
             console.error("내정보 불러오기 중 오류 발생", response.data.message);
             alert(response.data.message);
           }
@@ -242,7 +234,10 @@ const MyInfoModifyPage = () => {
     
     fetchUserInfo();
   },[]);
-  
+  //이미지 오류 시 핸들러
+  const handleImageError = () => {
+    setProfileImage('/roundLogo1.png');
+  };
   //프로필 이미지 변경
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -446,7 +441,10 @@ const MyInfoModifyPage = () => {
       <Header>내 정보 수정</Header>
       <HorizontalLine />
       <ProfileImageWrapper>
-        <ProfileImage src={profileImage} alt="Profile" />
+        <ProfileImage 
+          src={profileImage} 
+          alt="Profile"
+          onError={handleImageError} />
         <HiddenFileInput 
           type='file'
           accept='image/*'

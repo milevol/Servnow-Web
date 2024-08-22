@@ -207,7 +207,7 @@ const HorizontalSemiLine = styled.hr`
 const MyInfoModifyKakaoPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
-  const [profileImage, setProfileImage] = useState('/roundLogo.png')
+  const [profileImage, setProfileImage] = useState('/roundLogo1.png')
   const [originalNickname, setOriginalNickname] = useState('');
   const [userName, setUserName] = useState('우*진');
   const [phoneNumber, setPhoneNumber] = useState('010-****-7637');

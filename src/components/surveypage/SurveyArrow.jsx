@@ -21,7 +21,6 @@ const Arrow = styled.button`
     margin-top : 0px;
     margin-bottom : 5px;
   `}
-  
   transition: transform 0.3s;
 `;
 

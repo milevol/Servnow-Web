@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 // 스타일링된 컴포넌트들 정의
 const InsightContainer = styled.div`
@@ -51,7 +52,7 @@ const SectionTitle = styled.div`
   font-size: 24px;
   line-height: 29px;
   text-align: center;
-  color: ${(props) => (props.active ? "#4C76FE" : "#B6B6B6")};
+  color: ${(props) => (props.$active ? "#4C76FE" : "#B6B6B6")};
   padding-bottom: 15px;
   cursor: pointer;
   position: relative;
@@ -65,7 +66,7 @@ const SectionTitle = styled.div`
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: ${(props) => (props.active ? "#4C76FE" : "transparent")};
+    background-color: ${(props) => (props.$active ? "#4C76FE" : "transparent")};
     transition: background-color 0.3s;
     z-index: 2;
   }
@@ -78,10 +79,12 @@ const ButtonGroup = styled.div`
   margin-top: 30px;
 `;
 
-const Button = styled.div`
+const Button = styled.div.attrs((props) => ({
+  active: undefined,
+}))`
   width: 76px;
   height: 33px;
-  background: ${(props) => (props.active ? "#8EA9FF" : "transparent")};
+  background: ${(props) => (props.$active ? "#8EA9FF" : "transparent")};
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -90,12 +93,81 @@ const Button = styled.div`
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
-  color: ${(props) => (props.active ? "#011B6C" : "#B6B6B6")};
+  color: ${(props) => (props.$active ? "#011B6C" : "#B6B6B6")};
   cursor: pointer;
   margin: 0 60px;
 `;
 
-const InsightCard = styled.div`
+const NoteRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin-top: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const NoteContainer = styled.div`
+  width: 141px;
+  height: 141px;
+  background: #e1e8ff;
+  display: inline-block;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10px;
+  margin-right: 10px;
+  flex-shrink: 0;
+`;
+
+const NoteContent = styled.textarea`
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  color: #061522;
+  resize: none;
+  outline: none;
+`;
+
+const AddNoteContainer = styled.div`
+  width: 141px;
+  height: 141px;
+  background: none;
+  border: 1px dashed #b6b6b6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 10px;
+  flex-shrink: 0;
+  padding: 9px;
+`;
+
+const AddNoteIcon = styled.div`
+  font-size: 24px;
+  color: #b6b6b6;
+`;
+
+const InsightCardContainer = styled.div`
   width: 100%;
   margin: 20px 0;
 `;
@@ -133,59 +205,144 @@ const QuestionContent = styled.span`
   color: #061522;
 `;
 
-const NoteContainer = styled.div`
-  width: 141px;
-  height: 141px;
-  background: #e1e8ff;
-  border-radius: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 10px;
-  margin-bottom: 46px;
-`;
+const InsightCard = ({
+  questionNumber,
+  questionText,
+  notes,
+  onNoteChange,
+  onAddNote,
+}) => (
+  <InsightCardContainer>
+    <QuestionContainer>
+      <QuestionText>
+        <QuestionNumber>{questionNumber}</QuestionNumber>
+        <QuestionContent>{questionText}</QuestionContent>
+      </QuestionText>
+    </QuestionContainer>
+    <NoteRow>
+      {notes.map((note, index) => (
+        <NoteContainer key={index}>
+          <NoteContent
+            value={note}
+            onChange={(e) => onNoteChange(index, e.target.value)}
+            placeholder="메모를 입력하세요"
+            maxLength={300} // 최대 글자수 300자 제한
+          />
+        </NoteContainer>
+      ))}
+      {notes.length < 4 && ( // 메모장이 4개 미만일 때만 추가 버튼 표시
+        <AddNoteContainer onClick={onAddNote}>
+          <AddNoteIcon>+</AddNoteIcon>
+        </AddNoteContainer>
+      )}
+    </NoteRow>
+  </InsightCardContainer>
+);
 
-const NoteContent = styled.textarea`
-  width: 100%;
-  height: 100%;
-  background: none;
-  border: none;
-  font-family: "Pretendard", sans-serif;
-  font-size: 14px;
-  color: #061522;
-  resize: none;
-  outline: none;
-`;
-
-// InsightSection 컴포넌트 정의
 const InsightSection = () => {
-  // 활성화된 탭 (인사이트/설문 구조도) 상태 관리
   const [activeTab, setActiveTab] = useState("insight");
-
-  // 활성화된 버튼 (질문 순/직접 나열) 상태 관리
   const [activeButton, setActiveButton] = useState("질문 순");
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 오류 상태 관리
 
-  // 메모 내용 상태 관리 (로컬 스토리지에서 초기값을 가져옴)
-  const [notes, setNotes] = useState(() => {
-    const savedNotes = {
-      note1: localStorage.getItem("note1") || "",
-      note2: localStorage.getItem("note2") || "",
-      note3: localStorage.getItem("note3") || "",
-    };
-    return savedNotes;
-  });
-
-  // notes 상태가 변경될 때마다 로컬 스토리지에 자동 저장
   useEffect(() => {
-    localStorage.setItem("note1", notes.note1);
-    localStorage.setItem("note2", notes.note2);
-    localStorage.setItem("note3", notes.note3);
-  }, [notes]);
+    const fetchMemos = async () => {
+      try {
+        const storedToken = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
+        if (!storedToken) {
+          throw new Error("토큰이 로컬 스토리지에 저장되어 있지 않습니다.");
+        }
 
-  // 메모 내용 변경 시 호출되는 함수
-  const handleNoteChange = (e, noteKey) => {
-    setNotes({ ...notes, [noteKey]: e.target.value });
+        const response = await axios.get(
+          "/api/v1/users/me/survey/1/memo/list",
+          {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          }
+        );
+        const data = response.data.data.questions.map((question) => ({
+          questionId: question.questionId,
+          questionOrder: question.questionOrder,
+          title: question.title,
+          notes: question.memos,
+        }));
+        setQuestions(data);
+        setLoading(false);
+      } catch (error) {
+        setError(
+          error.response ? error.response.data.message : "Network error"
+        );
+        setLoading(false);
+      }
+    };
+
+    fetchMemos();
+  }, []);
+
+  const handleNoteChange = (questionIndex, noteIndex, value) => {
+    const newQuestions = [...questions];
+    newQuestions[questionIndex].notes[noteIndex] = value;
+    setQuestions(newQuestions);
+
+    // 자동 저장
+    saveMemos(newQuestions);
+  };
+
+  const handleAddNote = (questionIndex) => {
+    const newQuestions = [...questions];
+    if (newQuestions[questionIndex].notes.length < 4) {
+      newQuestions[questionIndex].notes.push("");
+      setQuestions(newQuestions);
+      saveMemos(newQuestions);
+    } else {
+      alert("각 질문당 최대 4개의 메모만 추가할 수 있습니다.");
+    }
+  };
+
+  const saveMemos = async (updatedQuestions) => {
+    try {
+      const storedToken = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰 가져오기
+      if (!storedToken) {
+        throw new Error("토큰이 로컬 스토리지에 저장되어 있지 않습니다.");
+      }
+
+      const requestBody = {
+        questions: updatedQuestions
+          .map((q) => ({
+            questionId: q.questionId,
+            questionOrder: q.questionOrder,
+            memos: q.notes
+              .filter((note) => note.trim() !== "") // 빈 메모 필터링
+              .slice(0, 4), // 메모 개수를 최대 4개로 제한
+          }))
+          .filter((q) => q.memos.length > 0), // memos가 비어있지 않은 질문만 포함
+      };
+
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+
+      const response = await axios.post(
+        "/api/v1/users/me/survey/1/memo",
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("메모 저장 성공:", response.data);
+    } catch (error) {
+      if (error.response) {
+        console.error("메모 저장 실패:", error.response.data);
+        console.error("상태 코드:", error.response.status);
+        console.error("헤더:", error.response.headers);
+      } else {
+        console.error("메모 저장 실패:", error.message);
+      }
+    }
   };
 
   return (
@@ -193,13 +350,13 @@ const InsightSection = () => {
       <SectionTitleContainer>
         <SectionTitleWrapper>
           <SectionTitle
-            active={activeTab === "insight"}
+            $active={activeTab === "insight"}
             onClick={() => setActiveTab("insight")}
           >
             인사이트
           </SectionTitle>
           <SectionTitle
-            active={activeTab === "structure"}
+            $active={activeTab === "structure"}
             onClick={() => setActiveTab("structure")}
           >
             설문 구조도
@@ -209,66 +366,37 @@ const InsightSection = () => {
 
       <ButtonGroup>
         <Button
-          active={activeButton === "질문 순"}
+          $active={activeButton === "질문 순"}
           onClick={() => setActiveButton("질문 순")}
         >
           질문 순
         </Button>
         <Button
-          active={activeButton === "직접 나열"}
+          $active={activeButton === "직접 나열"}
           onClick={() => setActiveButton("직접 나열")}
         >
           직접 나열
         </Button>
       </ButtonGroup>
 
-      <InsightCard>
-        <QuestionContainer>
-          <QuestionText>
-            <QuestionNumber>01</QuestionNumber>
-            <QuestionContent>질문을 적어주세요</QuestionContent>
-          </QuestionText>
-        </QuestionContainer>
-        <NoteContainer>
-          <NoteContent
-            value={notes.note1}
-            onChange={(e) => handleNoteChange(e, "note1")}
-            placeholder="메모를 입력하세요"
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
+        questions.map((question, questionIndex) => (
+          <InsightCard
+            key={question.questionId}
+            questionNumber={question.questionOrder}
+            questionText={question.title}
+            notes={question.notes}
+            onNoteChange={(noteIndex, value) =>
+              handleNoteChange(questionIndex, noteIndex, value)
+            }
+            onAddNote={() => handleAddNote(questionIndex)}
           />
-        </NoteContainer>
-      </InsightCard>
-
-      <InsightCard>
-        <QuestionContainer>
-          <QuestionText>
-            <QuestionNumber>02</QuestionNumber>
-            <QuestionContent>질문을 적어주세요</QuestionContent>
-          </QuestionText>
-        </QuestionContainer>
-        <NoteContainer>
-          <NoteContent
-            value={notes.note2}
-            onChange={(e) => handleNoteChange(e, "note2")}
-            placeholder="메모를 입력하세요"
-          />
-        </NoteContainer>
-      </InsightCard>
-
-      <InsightCard>
-        <QuestionContainer>
-          <QuestionText>
-            <QuestionNumber>03</QuestionNumber>
-            <QuestionContent>질문을 적어주세요</QuestionContent>
-          </QuestionText>
-        </QuestionContainer>
-        <NoteContainer>
-          <NoteContent
-            value={notes.note3}
-            onChange={(e) => handleNoteChange(e, "note3")}
-            placeholder="메모를 입력하세요"
-          />
-        </NoteContainer>
-      </InsightCard>
+        ))
+      )}
     </InsightContainer>
   );
 };
