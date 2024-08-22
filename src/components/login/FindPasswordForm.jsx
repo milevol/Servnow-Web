@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const FormContainer = styled.div`
   width: 800px;
@@ -98,6 +99,7 @@ const Line = styled.hr`
 `
 
 const FindPasswordForm = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -211,6 +213,7 @@ const FindPasswordForm = () => {
         if (response.data.code === 200) {
           alert('비밀번호 변경이 완료되었습니다.');
           setError('');
+          navigate('/login');
         } else {
           alert('비밀번호 변경에 실패했습니다.');
         } 
@@ -219,13 +222,13 @@ const FindPasswordForm = () => {
         const { status, data } = error.response;
         if (status === 500) {
           console.error("서버 내부 오류:", data.message);
-          alert(data.message || "서버 내부 오류가 발생했습니다.");
+          alert(data.message);
         } else if (status === 404){
           console.error("비밀번호 변경 중 오류 발생:", data.message);
-          alert(data.message || "사용자를 찾을 수 없습니다.");
+          alert(data.message);
         } else {
           console.error("비밀번호 변경 중 오류 발생:", data.message);
-          alert("본인증번호 확인 중 오류가 발생했습니다.");
+          alert(data.message);
         }
       } else {
         console.error("비밀번호 변경 중 네트워크 오류 발생:", error.message);

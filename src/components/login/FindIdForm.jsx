@@ -270,7 +270,7 @@ const FindIdForm = () => {
     navigate('/find-pswd');
   };
   const handleOkClick = () => {
-    navigate('login');
+    navigate('/login');
   };
 
   return (
