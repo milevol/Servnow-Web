@@ -7,18 +7,17 @@ import Arrow from '../../components/surveypage/SurveyArrow';
 import axios from 'axios';
 
 export const MyPageContainer = styled.div`
-    height : auto;
-    width : 100vw;
-    margin-top : 60px;
+    height : 100%;
+    width : 100%;
     background-color : #F2F5FF;
     display : grid;
     contents-align : center;
 `;
 
 export const MyPageTotalContainer = styled.div`
-    height : 100vh;
+    height : 100%;
     width : 100%;
-    margin-left : 143px;
+    padding-left: 8%;
 `;
 
 export const SurveyOnerContainer = styled.div`
@@ -34,22 +33,21 @@ export const SurveyOnerContainer = styled.div`
 
 export const TortalSurveyContainer = styled.div`
     display : flex;
-    width: 1440px;
     flex-wrap : wrap;
-    padding-top : 44px;
+    padding-top : 5%;
     align-self : center;
-    justify-content: flex-start;
-    align-content: flex-start;
+    gap: 50px;
 `;
 
 export const SurveyBox = styled.div`
-    width : 552px;
-    height : 272px;
+    width : 40%;
+    position: relative;
+    aspect-ratio: 552/272;
 `;
 
 export const NewSurveyBox = styled.div`
-    width : 552px;
-    height : 272px;
+    width : 100%;
+    height : 100%;
     background-color : white;
     display : grid;
     flex-direction: row;
@@ -217,6 +215,9 @@ const MySurveyPage = () => {
                     </DropdownContainer>
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
+                    {result.map((survey) => (
+                        <SurveyPrev key={survey.id} survey={survey} />
+                    ))}
                     {surveys.map((survey) => (
                         <SurveyPrev key={survey.surveId} survey={survey} />
                     ))}
