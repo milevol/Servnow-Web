@@ -209,13 +209,15 @@ const LoginForm = () => {
 
           // 토큰을 로컬스토리지에 저장하기
           if (stayedLoggedIn) {
-            dispatch(login( { stayedLoggedIn: true } ));
+            dispatch(login({ stayedLoggedIn: true }));
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            console.log('Access Token (localStorage):', localStorage.getItem('accessToken'));
           } else {
-            dispatch(login( { stayedLoggedIn: false } ));
+            dispatch(login({ stayedLoggedIn: false }));
             sessionStorage.setItem('accessToken', accessToken);
             sessionStorage.setItem('refreshToken', refreshToken);
+            console.log('Access Token (sessionStorage):', sessionStorage.getItem('accessToken'));
           }
      
           navigate('/');

@@ -7,18 +7,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ChromePicker } from 'react-color';
 import StructureDiagram from './StructureDiagram';
-
-import character1 from '../../assets/servnow_character/character1.png';
-import character2 from '../../assets/servnow_character/character2.png';
-import character3 from '../../assets/servnow_character/character3.png';
-import character4 from '../../assets/servnow_character/character4.png';
-import character5 from '../../assets/servnow_character/character5.png';
-import character6 from '../../assets/servnow_character/character6.png';
-import character7 from '../../assets/servnow_character/character7.png';
-import character8 from '../../assets/servnow_character/character8.png';
-import character9 from '../../assets/servnow_character/character9.png';
-import character10 from '../../assets/servnow_character/character10.png';
-import character11 from '../../assets/servnow_character/character11.png';
+import { useSelector, useDispatch } from 'react-redux';
+import { setMainColor, setSubColor, setFont, setMainCharacter } from '../../redux/customizationSlice';
 
 const CustomizationPanel = styled.div`
   display: flex;
@@ -220,42 +210,53 @@ const FontSelection = styled.div`
 `;
 
 const CustomizationSidebar = () => {
-  const [mainColor, setMainColor] = useState('#BAC5ED');
-  const [subColor, setSubColor] = useState('#4C76FE');
-  const [mainCharacter, setMainCharacter] = useState('');
-  const [font, setFont] = useState('Pretendard');
+
+  const dispatch = useDispatch();
+  const { mainColor, subColor, font, mainCharacter } = useSelector(state => state.customization);
+  // const [mainColor, setMainColor] = useState('#BAC5ED');
+  // const [subColor, setSubColor] = useState('#4C76FE');
+  // const [mainCharacter, setMainCharacter] = useState('/character1.png');
+  // const [font, setFont] = useState('Pretendard');
   const [colorChoice, setColorChoice] = useState('main');
   const [selectedTab, setSelectedTab] = useState('customization');
+  
   const characterImages = [
-    character1,
-    character2,
-    character3,
-    character4,
-    character5,
-    character6,
-    character7,
-    character8,
-    character9,
-    character10,
-    character11,
+    '/character1.png',
+    '/character2.png',
+    '/character3.png',
+    '/character4.png',
+    '/character5.png',
+    '/character6.png',
+    '/character7.png',
+    '/character8.png',
+    '/character9.png',
+    '/character10.png',
+    '/character11.png',
   ]
+
   //메인색상 혹은 서브색상 필드를 눌렀을때 colorChoice state 확인해서 색상변경
   const handleColorChange = (color) => {
     if (colorChoice === 'main') {
-      setMainColor(color.hex);
+      dispatch(setMainColor(color.hex));
     } else if (colorChoice === 'sub') {
-      setSubColor(color.hex);
+      dispatch(setSubColor(color.hex));
     }
   };
   // 메인색상 혹은 서브색상 필드를 클릭했을때 colorChice의 상태를 변경
   const handleColorInputClick = (choice) => {
     setColorChoice(choice);
   };
+  const handleFontChange = (font) => {
+    dispatch(setFont(font));
+  }
   //메인 캐릭터가 변경됐을 때 mainCharacter의 상태를 변경
   const handleMainCharacterChange = (character) => {
-    setMainCharacter(character);
+    dispatch(setMainCharacter(character));
   };
-
+  const handleSave = () => {
+    // 필요한 경우 저장 동작 구현
+    console.log('Settings saved:', { mainColor, subColor, font, mainCharacter });
+  };
   return (
     <CustomizationPanel>
       <TitleSection>
@@ -318,7 +319,7 @@ const CustomizationSidebar = () => {
       </ColorInputs>
       <FontSelection>
         <FontLabel htmlFor="font-select">글꼴 선택</FontLabel>
-        <FontInput type="text" id="font-select" value={font} onChange={(e) => setFont(e.target.value)} />
+        <FontInput type="text" id="font-select" value={font} onChange={(e) => handleFontChange(e.target.value)} />
       </FontSelection>
       <MainCharacterSelection>
         <CharacterLabel htmlFor="main-character">설문 커버 캐릭터 변경</CharacterLabel>
@@ -334,7 +335,7 @@ const CustomizationSidebar = () => {
         </CharacterSelectionContainer>
       </MainCharacterSelection>
       <ButtonContainer>
-        <SubmitButton>저장</SubmitButton>
+        <SubmitButton onClick={handleSave}>저장</SubmitButton>
       </ButtonContainer>
       </>
       ) :
