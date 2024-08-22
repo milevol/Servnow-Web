@@ -10,7 +10,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
   background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
 `;
 
@@ -19,7 +19,8 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  
+  margin-top: 50px;
+  margin-bottom: 50px;
 `;
 
 const Title = styled.h1`

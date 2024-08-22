@@ -9,16 +9,18 @@ import styled from 'styled-components';
 import kakaoLogo from '../../../src/assets/kakao_logo.png'
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import Navbar from '../../components/Navbar';
 
 const PageContainer = styled.div`
-  margin-top: -40px;
-  padding: 5rem;
+  margin-top: -10px;
+  padding-top: 5rem;
   background-color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 10px;
   white-space: nowrap;
+  overflow-x:hidden;
 `;
 
 const Header = styled.h2`
@@ -28,7 +30,7 @@ const Header = styled.h2`
 `;
 
 const HorizontalLine = styled.hr`
-  margin-left: -97px;
+  margin-left: 0;
   width: 100vw;
   border: none;
   border-top: 3px solid #4C76FE;
@@ -66,7 +68,8 @@ const IconButton = styled.button`
 const NicknameContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 110px;
+  margin-left: -1rem;
+  position: relative;
 `;
 
 const NicknameInput = styled.input`
@@ -77,7 +80,10 @@ const NicknameInput = styled.input`
   font-size: 1rem;
   margin-right: 3rem;
 `;
-
+const UpdateButtonPlaceholder = styled.div`
+  width: 139px; /* 버튼과 동일한 폭 */
+  height: 47px; /* 버튼과 동일한 높이 */
+`;
 const UpdateButton = styled.button`
   width: 139px;
   height: 47px;    
@@ -87,6 +93,9 @@ const UpdateButton = styled.button`
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  position: absolute;
+  right: -150px; /* 오른쪽에 고정 */
+  visibility: ${props => (props.visible ? 'visible' : 'hidden')};
 `;
 
 const Section = styled.div`
@@ -112,12 +121,11 @@ const KakaoButton = styled.button`
   width: 411px;
   height: 66px;
   padding: 0.8rem;
-  background-color: #f9e000;
-  margin-bottom: 1rem;
+  background-color: #ffe617;
+  margin-bottom: 0.6rem;
   color: #3a3a3a;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 10px;
   font-size: 20px;
   font-weight: bold;
   display: flex;
@@ -168,8 +176,10 @@ const InfoInput = styled.input`
 
 const ButtonContainer = styled.div`
   display: flex;
-  margin-top: 2rem;
-  margin-bottom: -40px;
+  justify-content: center;
+  position: relative;
+  margin-top: 11rem;
+  margin-bottom: 40px;  // 페이지 하단에서 40px 위에 위치
 `;
 
 const PrevButton = styled.button`
@@ -202,15 +212,13 @@ const HorizontalSemiLine = styled.hr`
   width: 570px;
   border: none;
   border-top: 3px solid #C8D5FF;
-  margin: 2rem 0;
+  margin-top: 2rem;
 `;
 const MyInfoModifyKakaoPage = () => {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState('');
   const [profileImage, setProfileImage] = useState('/roundLogo1.png')
   const [originalNickname, setOriginalNickname] = useState('');
-  const [userName, setUserName] = useState('우*진');
-  const [phoneNumber, setPhoneNumber] = useState('010-****-7637');
 
   useEffect(() => {
 
@@ -275,6 +283,8 @@ const MyInfoModifyKakaoPage = () => {
   }
 
   return (
+    <>
+    <Navbar />
     <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine></HorizontalLine>
@@ -299,7 +309,11 @@ const MyInfoModifyKakaoPage = () => {
             onChange={(e) => setNickname(e.target.value)}
             />
             {nickname !== originalNickname && (
-              <UpdateButton type='button' onClick={handleUpdateNickname}>수정하기</UpdateButton>
+              <UpdateButton 
+                type='button' 
+                onClick={handleUpdateNickname}
+                visible={nickname !== originalNickname}
+                >수정하기</UpdateButton>
               )
             }
         </NicknameContainer>
@@ -307,13 +321,13 @@ const MyInfoModifyKakaoPage = () => {
       <HorizontalSemiLine/>
       <Section>
         <SectionTitle>SNS 연결</SectionTitle>
-        <SectionSubTitle>연결된 SNS 계정으로 로그인할 수 있습니다.</SectionSubTitle>
+        <SectionSubTitle>연결된 SNS 계정으로 로그인 되었습니다.</SectionSubTitle>
         <KakaoButton>
           <KakaoIcon src={kakaoLogo} alt="Kakao Logo"/> 카카오로 연결
         </KakaoButton>
       </Section>
       <HorizontalSemiLine/>
-      <Section>
+      {/* <Section>
         <SecondSectionTitle>본인 인증된 회원 정보</SecondSectionTitle>
         <InfoContainer>
           <InfoItem>
@@ -325,12 +339,13 @@ const MyInfoModifyKakaoPage = () => {
             <InfoInput type="text" value={phoneNumber} readOnly />
           </InfoItem>
         </InfoContainer>
-      </Section>
+      </Section> */}
       <ButtonContainer>
         <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
-        <ReAuthButton>본인 인증 다시하기</ReAuthButton>
+        <ReAuthButton>저장하기</ReAuthButton>
       </ButtonContainer>
     </PageContainer>
+    </>
   );
 };
 

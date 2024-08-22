@@ -311,8 +311,7 @@ const FindIdForm = () => {
         </InputWrapper>
         <FindButton type="submit">아이디 찾기</FindButton>
       </form>
-    )};
-      
+    )}
     </FormContainer>
   
   );
