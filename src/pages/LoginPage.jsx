@@ -6,13 +6,13 @@ import React from "react";
 import styled from "styled-components";
 import LoginForm from "../components/login/LoginForm"; // 파일 경로와 default export 확인
 import Navbar from "../components/Navbar";
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
-
+  background: linear-gradient(to bottom, #4c76fe 50%, #f0f2f5 50%);
 `;
 
 const Content = styled.div`
@@ -22,7 +22,6 @@ const Content = styled.div`
   text-align: center;
   margin-top: 60px;
   margin-bottom: 50px;
-
 `;
 
 const Title = styled.h1`

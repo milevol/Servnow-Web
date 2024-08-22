@@ -1,13 +1,15 @@
 // 목적: 설문 시작 화면
 // 기능: 설문 시작 전 설문지에 대한 정보 제공
-// 2024.08.21./엠마/신윤지
-// 추가되어야 할 기능: api url, id 및 이미지 변경 + 토큰 받아왔을 때 제대로 작동되는지 확인
+// 2024.08.23./엠마/신윤지
+// 추가되어야 할 기능: 이미지 변경
 import React, { useState } from "react";
 import styled from "styled-components";
-import character from "../assets/logo1.png";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import character from "../assets/logo1.png";
 
 const Container = styled.div`
+  height: auto;
   padding: 48px;
   background-color: #f2f5ff;
 `;
@@ -15,6 +17,7 @@ const Container = styled.div`
 const SurveyContainer = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 48px 0;
 
   div:nth-child(2) {
     display: flex;
@@ -144,47 +147,52 @@ const Description = styled.div`
   word-break: keep-all;
 `;
 
+const ButtonContainer = styled.div`
+  width: 100%;
+  text-align: right;
+`;
+
+const NextButton = styled.button`
+  padding: 18px 48px;
+  background-color: #3e77ff;
+  border: 0px;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const AnswerStartPage = () => {
-  const loginStatus = localStorage.getItem("token");
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const loginStatus = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
+  const [email, setEmail] = useState("");
 
-  const fetchLoginedData = async () => {
-    await axios
-      .get("/api/v1/survey/2/intro", {
-        headers: {
-          Authorization: "Bearer " + loginStatus,
-        },
-      })
-      .then((res) => {
-        setLoading(false);
-        setData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("질문지 답변 전 화면에서 에러 발생 :" + err);
-        alert("오류가 발생했습니다.");
-      });
-  };
+  const getData = async () => {
+    try {
+      const res = await (loginStatus
+        ? axios.get(`/api/v1/survey/${id}/intro`, {
+            headers: {
+              Authorization: `Bearer ${loginStatus}`,
+            },
+          })
+        : axios.get(`/api/v1/survey/guest/${id}/intro`));
 
-  const fetchUnloginedData = async () => {
-    await axios
-      .get("/api/v1/survey/guest/1/intro")
-      .then((res) => {
-        setLoading(false);
-        setData(res.data.data);
-      })
-      .catch((err) => {
-        console.log("질문지 답변 전 화면에서 에러 발생 :" + err);
-        alert("오류가 발생했습니다.");
-      });
+      setData(res.data.data);
+      setLoading(false);
+    } catch (err) {
+      console.log("질문지 답변 전 화면에서 에러 발생 :" + err);
+      alert("오류가 발생했습니다.");
+    }
   };
 
   useState(() => {
-    if (loginStatus) {
-      fetchLoginedData();
-    } else {
-      fetchUnloginedData();
-    }
+    getData();
   }, []);
 
   const changeTime = (localDateTime) => {
@@ -199,6 +207,19 @@ const AnswerStartPage = () => {
       return year + "." + month + "." + day + ". 오후 " + hour - 12 + ":" + min;
     } else {
       return year + "." + month + "." + day + ". 오전 " + hour + ":" + min;
+    }
+  };
+
+  const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const onNextClick = () => {
+    if (!loginStatus && emailValidation.test(email)) {
+      navigate(`/answer/${id}`, {
+        state: {
+          email: `${email}`,
+        },
+      });
+    } else {
+      navigate(`/answer/${id}`);
     }
   };
 
@@ -227,7 +248,14 @@ const AnswerStartPage = () => {
                   <div>
                     이메일&nbsp;
                     <span>*</span>
-                    <Text type="text" placeholder="응답을 받기 위해 필수적으로 입력해주세요." />
+                    <Text
+                      type="text"
+                      placeholder="응답을 받기 위해 필수적으로 입력해주세요."
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                      }}
+                    />
                   </div>
                 </Email>
               )}
@@ -243,6 +271,10 @@ const AnswerStartPage = () => {
           </DescriptionContainer>
         </>
       )}
+
+      <ButtonContainer>
+        <NextButton onClick={onNextClick}>다음</NextButton>
+      </ButtonContainer>
     </Container>
   );
 };

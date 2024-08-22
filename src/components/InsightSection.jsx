@@ -1,8 +1,15 @@
+// InsightSection.jsx
+// 목적: 결과페이지의 인사이트 부분 구현
+// 기능: 인사이트&설문 구조도 토글, 질문 순 직접 나열, 메모장 자동저장
+// 작성자: 임사랑
+// 작성일: 2024.08.07
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import ResultStructureDiagram from "./CustomSidebar/ResultStructureDiagram"; // **설문 구조도 임포트 자리**
 
 const InsightContainer = styled.div`
   width: 559px;
@@ -11,16 +18,16 @@ const InsightContainer = styled.div`
   border-radius: 10px 0px 0px 10px;
   padding: 20px;
   position: relative;
-  display: block; /* block 요소로 설정하여 내부 크기에 맞게 늘어남 */
-  flex-shrink: 0; /* 스크롤바에 딱 붙도록 설정 */
-  align-self: flex-start; /* 상단에 붙도록 설정 */
+  display: block;
+  flex-shrink: 0;
+  align-self: flex-start;
 `;
 
 const InnerContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: auto; /* 높이가 내부 콘텐츠에 따라 자동으로 조정되도록 설정 */
+  height: auto;
 `;
 
 const SectionTitleContainer = styled.div`
@@ -138,12 +145,12 @@ const DeleteButton = styled.button`
   color: #4c76fe;
   font-size: 14px;
   cursor: pointer;
-  opacity: 0; /* 초기 상태에서 보이지 않게 설정 */
-  transition: opacity 0.3s ease; /* 부드러운 전환 효과 추가 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
 
   &:hover {
     color: #4c76fe;
-    transform: scale(1.2); /* hover 시 크기 약간 확대 */
+    transform: scale(1.2);
   }
 `;
 
@@ -158,11 +165,11 @@ const NoteContainer = styled.div`
   padding: 10px;
   margin-right: 10px;
   flex-shrink: 0;
-  position: relative; /* 삭제 버튼을 오른쪽 위에 배치하기 위해 추가 */
-  overflow: hidden; /* 내부 요소가 넘치지 않도록 설정 */
+  position: relative;
+  overflow: hidden;
 
   &:hover ${DeleteButton} {
-    opacity: 1; /* NoteContainer에 hover될 때 DeleteButton을 보이게 함 */
+    opacity: 1;
   }
 `;
 
@@ -176,28 +183,23 @@ const NoteContent = styled.textarea`
   color: #061522;
   resize: none;
   outline: none;
-  overflow-y: auto; /* 스크롤바 표시를 위한 설정 */
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
-    width: 6px; /* 스크롤바 너비 */
+    width: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent; /* 스크롤바 트랙의 배경 */
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2); /* 스크롤바 색상 */
-    border-radius: 10px; /* 스크롤바의 둥근 모서리 */
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(
-      0,
-      0,
-      0,
-      0.3
-    ); /* 스크롤바에 마우스를 올렸을 때 색상 */
+    background-color: rgba(0, 0, 0, 0.3);
   }
 `;
 
@@ -481,8 +483,8 @@ const InsightSection = ({ surveyId }) => {
 
       // id가 없는 새 메모만 필터링하여 전송
       const newMemos = updatedQuestion.notes
-        .filter((note) => !note.id && note.content.trim() !== "")
-        .map((note) => note.content);
+        .filter((음표) => !note.id && note.content.trim() !== "")
+        .map((음표) => note.content);
 
       // 새로운 메모가 없으면 저장 요청을 보내지 않음
       if (newMemos.length === 0) {
@@ -585,45 +587,51 @@ const InsightSection = ({ surveyId }) => {
             </SectionTitleWrapper>
           </SectionTitleContainer>
 
-          <ButtonGroup>
-            <Button
-              $active={activeButton === "질문 순"}
-              onClick={() => setActiveButton("질문 순")}
-            >
-              질문 순
-            </Button>
-            <Button
-              $active={activeButton === "직접 나열"}
-              onClick={() => setActiveButton("직접 나열")}
-            >
-              직접 나열
-            </Button>
-          </ButtonGroup>
+          {activeTab === "insight" ? (
+            <>
+              <ButtonGroup>
+                <Button
+                  $active={activeButton === "질문 순"}
+                  onClick={() => setActiveButton("질문 순")}
+                >
+                  질문 순
+                </Button>
+                <Button
+                  $active={activeButton === "직접 나열"}
+                  onClick={() => setActiveButton("직접 나열")}
+                >
+                  직접 나열
+                </Button>
+              </ButtonGroup>
 
-          {loading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>Error: {error}</p>
+              {loading ? (
+                <p>Loading...</p>
+              ) : error ? (
+                <p>Error: {error}</p>
+              ) : (
+                displayQuestions.map((question, index) => (
+                  <InsightCard
+                    key={question.questionId}
+                    index={index}
+                    questionNumber={
+                      activeButton === "질문 순"
+                        ? question.questionOrder
+                        : index + 1
+                    }
+                    questionText={question.title}
+                    notes={question.notes}
+                    onNoteChange={handleNoteChange}
+                    onAddNote={handleAddNote}
+                    onDeleteNote={handleDeleteNote}
+                    onSave={saveMemos}
+                    moveCard={moveCard}
+                    isDirectlyOrdered={activeButton === "직접 나열"}
+                  />
+                ))
+              )}
+            </>
           ) : (
-            displayQuestions.map((question, index) => (
-              <InsightCard
-                key={question.questionId}
-                index={index}
-                questionNumber={
-                  activeButton === "질문 순"
-                    ? question.questionOrder
-                    : index + 1
-                }
-                questionText={question.title}
-                notes={question.notes}
-                onNoteChange={handleNoteChange}
-                onAddNote={handleAddNote}
-                onDeleteNote={handleDeleteNote} // 삭제 핸들러 추가
-                onSave={saveMemos}
-                moveCard={moveCard}
-                isDirectlyOrdered={activeButton === "직접 나열"} // 직접 나열일 때만 드래그 가능
-              />
-            ))
+          <ResultStructureDiagram />// **설문구조도 컴포넌트 자리**
           )}
         </InnerContainer>
       </InsightContainer>

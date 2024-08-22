@@ -2,17 +2,15 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 
 export const SurveyBox = styled.div`
-    width : 552px;
-    height : 272px;
-    margin-bottom : 53px;
-    margin-right : 57px;
+    width : 40%;
+    position: relative;
+    aspect-ratio: 552/272;
 `;
 
 export const SurveyContainer = styled.div`
     position: relative;
-    height : 272px;
-    width : 552px;
-    align-content : grid;
+    height : 100%;
+    width : 100%;
     background-color : white;
     border-radius : 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -22,11 +20,12 @@ export const SurveyStatusButton = styled.div`
     position: absolute;
     margin-top: 9px;
     margin-left: 8px;
-    height : 25px;
-    width : 60px;
+    height : 9%;
+    width : 11%;
     padding : 15px 27px 14.8px;
     background-color: white;
-    color: ${props => props.finished === 'yes' ? '#5D6670' : '#4C76FE'};
+    font-family: "PRETENDARD";
+    color: ${props => props.finished === 'yes' ? '#5D6670' : '#4C76FE'};100%
     font-weight: bold;
     font-size : 21px;
     border-radius: 12px;
@@ -37,29 +36,26 @@ export const SurveyStatusButton = styled.div`
 `;
 
 export const SurveyImageContainer = styled.div`
-    width : 552px;
-    height : 182px;
+    width : 100%;
+    height : 67%;
     display: grid;
-    align-content:center;
     font-weight : bolder;
     font-size : 20px;
-    justify-content: start;
 `;
 
-
 export const CharacterBox = styled.div`
-    height : 160px;
-    width : 91px;
-    margin-top : 17px;
-    margin-left : 232px;
+    height : 88%;
+    width : 16.5%;
+    margin-top : 1%;
+    margin-left : 42%;
     background-image: url(${props => props.backgroundImage});
     background-size: cover;
     background-position: center;
 `
 
 export const SurveyTitleBox = styled.div`
-    width : 552px;
-    height : 51px;
+    width : 100%;
+    height : 19%;
     background-color : ${props => props.finished === 'yes' ? '#C5CCD5' : '#C6D3FF'};
     display: grid;
     align-content:center;
@@ -70,8 +66,8 @@ export const SurveyTitleBox = styled.div`
 `;
 
 export const SurveyDateBox = styled.div`
-    width : 552px;
-    height : 38px;
+    width : 100%;
+    height : 14%;
     color: #5d6670;
     font-size : 20px;
     display: grid;
@@ -105,17 +101,50 @@ const SurveyPrev = ({ survey }) => {
         }
       }, [survey.characterType]);
 
+      const [finished, setFinished] = useState("no");
+
+      useEffect(() => {
+          const checkIfFinished = () => {
+              const currentTime = new Date();
+              const expirationTime = new Date(survey.expiredAt);
+  
+              if (currentTime > expirationTime) {
+                  setFinished("yes");
+              } else {
+                  setFinished("no");
+              }
+          };
+  
+          checkIfFinished();
+      }, [survey.expiredAt]);
+
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+    
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+    
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+        const ampm = hours >= 12 ? '오후' : '오전';
+        const formattedHours = hours > 12 ? hours - 12 : hours;
+    
+        return `${year}년 ${month}월 ${day}일 ${ampm} ${formattedHours}:${minutes}`;
+    };
+
     return (
         <SurveyBox>
-            <SurveyContainer finished={survey.finished}>
-                <SurveyStatusButton finished={survey.finished}>
-                    {survey.finished === 'yes' ? '종료' : '진행 중'}
+            <SurveyContainer finished={finished}>
+                <SurveyStatusButton finished={finished}>
+                    {finished === 'yes' ? '종료' : '진행 중'}
                 </SurveyStatusButton>
                 <SurveyImageContainer>
-                    <CharacterBox backgroundImage={`../../src/assets/servnow_character/${characterURL}.png`}/>
+                    <CharacterBox backgroundImage={`../../public/${characterURL}.png`}/>
                 </SurveyImageContainer>
-                <SurveyTitleBox finished={survey.finished}>{survey.title}</SurveyTitleBox>
-                <SurveyDateBox finished={survey.finished}>{survey.expiredAt}</SurveyDateBox>
+                <SurveyTitleBox finished={finished}>{survey.title}</SurveyTitleBox>
+                <SurveyDateBox finished={finished}>{formatDate(survey.expiredAt)}</SurveyDateBox>
             </SurveyContainer>
         </SurveyBox>
     );
