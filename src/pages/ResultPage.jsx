@@ -19,6 +19,7 @@ const ResultPageContainer = styled.div`
   padding-top: 125px;
   padding-bottom: 50px;
   box-sizing: border-box;
+  align-items: flex-start; /* 자식 요소들을 위에서부터 쌓이게 설정 */
 `;
 
 // ResultMain 컴포넌트를 감싸는 컨테이너 스타일링 컴포넌트
