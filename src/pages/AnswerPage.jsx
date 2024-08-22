@@ -5,6 +5,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useInView } from "react-intersection-observer";
 import TextAreaAutoSize from "react-textarea-autosize";
@@ -65,7 +66,7 @@ const NextButton = styled.button`
   color: white;
 `;
 
-const SubmitButton = styled.input`
+const SubmitButton = styled.button`
   display: block;
   text-align: center;
   padding: 24px 12px;
@@ -193,12 +194,18 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
       updatedAnswers = [value];
     } else if (type === "checkbox") {
       if (checked) {
-        if (!updatedAnswers.includes(value)) {
-          updatedAnswers.push(value);
+        if (Array.isArray(updatedAnswers[0])) {
+          if (!updatedAnswers[0].includes(value)) {
+            updatedAnswers[0].push(value);
+          }
+          // TODO local Storage 저장된 후 되돌아왔을 때 제거
+        } else {
+          if (!updatedAnswers.includes(value)) {
+            updatedAnswers.push(value);
+          } else {
+            updatedAnswers = updatedAnswers.filter((item) => item !== value);
+          }
         }
-      } else {
-        updatedAnswers = updatedAnswers.filter((i) => i !== value);
-        console.log("??" + updatedAnswers);
       }
     } else {
       updatedAnswers = [value];
@@ -232,7 +239,12 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
       return (
         <AnswerContainer>
           {answers.map((a, index) => {
-            const tempA = savedAnswer.length > 0 ? savedAnswer[0] : [];
+            let tempA;
+            if (savedAnswer.length > 0) {
+              tempA = Array.isArray(savedAnswer[0]) ? savedAnswer[0] : savedAnswer;
+            } else {
+              tempA = [];
+            }
 
             return (
               <ChoiceContainer key={index}>
@@ -252,7 +264,6 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
       );
 
     case "text":
-      console.log(savedAnswer);
       return (
         <AnswerContainer>
           <TextAreaAutoSize cacheMeasurements name={name} value={savedAnswer} onChange={(e) => handleChange(e, null)} />
@@ -265,6 +276,9 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
 };
 
 const AnswerPage = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isLoading, setIsLoading] = useState(true);
   // 현재 섹션 페이지
@@ -296,12 +310,12 @@ const AnswerPage = () => {
         : sessionStorage.getItem("accessToken");
 
       const res = await (isLoggedIn
-        ? axios.get(`/api/v1/survey/1/sections/${sectionPage}`, {
+        ? axios.get(`/api/v1/survey/${id}/sections/${sectionPage}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           })
-        : axios.get(`/api/v1/survey/guest/1/sections/${sectionPage}`, {}));
+        : axios.get(`/api/v1/survey/guest/${id}/sections/${sectionPage}`, {}));
       setData(res.data.data);
       setIsLoading(false);
     } catch (err) {
@@ -311,6 +325,7 @@ const AnswerPage = () => {
 
   const postAnswer = async () => {
     try {
+      const email = location.state.email;
       const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
       const allAnswers = [];
@@ -319,7 +334,6 @@ const AnswerPage = () => {
         const savedData = JSON.parse(localStorage.getItem(sectionList[i] || {}) || {});
 
         for (const [questionId, answer] of Object.entries(savedData)) {
-          // console.log(answer);
           // value === object, 즉 checkbox
           if (answer !== null) {
             if (typeof answer === "object") {
@@ -356,26 +370,24 @@ const AnswerPage = () => {
         };
       } else {
         requestBody = {
-          email: "email@a.com",
+          email: email,
           answers: allAnswers,
         };
       }
-      console.log(JSON.stringify(requestBody, null, 2));
 
-      const res = await (isLoggedIn
+      await (isLoggedIn
         ? axios.post(`/api/v1/result/${id}`, requestBody, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           })
-        : axios.post(`/api/v1/result/guest/1`, requestBody, {
+        : axios.post(`/api/v1/result/guest/${id}`, requestBody, {
             headers: {
               "Content-Type": "application/json",
             },
           }));
-      // setData(res.data);
-      // setIsLoading(false);
+      navigate(`/answerend`);
     } catch (err) {
       console.error(err);
     }
@@ -509,7 +521,7 @@ const AnswerPage = () => {
             {sectionPage === data.sectionTotalCount ? (
               <>
                 <PrevButton onClick={onPrevClick}>이전</PrevButton>
-                <SubmitButton value={"제출 하기"} onClick={onSubmit} />
+                <SubmitButton onClick={onSubmit}>제출 하기</SubmitButton>
               </>
             ) : (
               <>
