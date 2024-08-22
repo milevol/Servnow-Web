@@ -115,7 +115,7 @@ const SurveyPrev = ({ survey }) => {
                     <CharacterBox backgroundImage={`../../src/assets/servnow_character/${characterURL}.png`}/>
                 </SurveyImageContainer>
                 <SurveyTitleBox finished={survey.finished}>{survey.title}</SurveyTitleBox>
-                <SurveyDateBox finished={survey.finished}>{survey.date}</SurveyDateBox>
+                <SurveyDateBox finished={survey.finished}>{survey.expiredAt}</SurveyDateBox>
             </SurveyContainer>
         </SurveyBox>
     );
