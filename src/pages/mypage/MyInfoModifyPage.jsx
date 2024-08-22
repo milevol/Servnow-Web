@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
-import Navbar from '../../components/Navbar';
+//import Navbar from '../../components/Navbar';
 import { useSelector } from 'react-redux';
 
 const PageContainer = styled.div`
@@ -449,7 +449,6 @@ const MyInfoModifyPage = () => {
 
   return (
   <>
-    <Navbar />
     <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine />

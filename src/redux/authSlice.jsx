@@ -13,10 +13,6 @@ const authSlice = createSlice({
             state.isLoggedIn = true;
             state.stayedLoggedIn = action.payload.stayedLoggedIn || false; // stayedLoggedIn 상태 설정
         },
-        logout: (state) => {
-            state.isLoggedIn = false;
-            state.stayedLoggedIn = false; // 로그아웃 시 상태 초기화
-        },
         kakaoLogin: (state) => {
             state.isLoggedIn = true;
             state.stayedLoggedIn = false; // 카카오 로그인은 자동으로 상태 유지
@@ -24,5 +20,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { login, logout, kakaoLogin } = authSlice.actions;
+export const { login, kakaoLogin } = authSlice.actions;
 export default authSlice.reducer;
