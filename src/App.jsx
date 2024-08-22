@@ -24,15 +24,15 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/search" element={<SearchPage />} />
-      <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/oauth/kakao" element={<KakaoAuthRedirectHandler />} />
-      <Route path="/answer" element={<AnswerPage />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/mypage/point" element={<MyPagePoint />} />
+      <Route path="/answerstart/:id" element={<AnswerStartPage />} />
+      <Route path="/answer/:id" element={<AnswerPage />} />
+      <Route path="/answerend" element={<AnswerEndPage />} />
       <Route path="/result/:id" element={<ResultPage />} />
-      <Route path="/answerstart" element={<AnswerStartPage />} />
       <Route path="/find-id" element={<FindIdPage />} />
       <Route path="/find-pswd" element={<FindPasswordPage />} />
       <Route path="/surveymodal" element={<SurveyModalPage />} />
