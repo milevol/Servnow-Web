@@ -69,8 +69,16 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
     const fetchUserPoints = async () => {
       setLoading(true);
 
+      const token = getToken();
+
+      // 토큰이 없으면 API 호출을 중단하고, 사용자에게 로그인하도록 안내
+      if (!token) {
+        setLoading(false);
+        setError("로그인이 필요합니다.");
+        return;
+      }
+
       try {
-        const token = getToken();
         const response = await axios.get("/api/v1/users/me/point", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,31 +142,51 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
+        const originalRequest = error.config;
         if (error.response && error.response.status === 401) {
+          // 이미 시도한 요청인지 확인
+          if (originalRequest._retry) {
+            return Promise.reject(error);
+          }
+          originalRequest._retry = true;
+
           try {
             const refreshToken =
               localStorage.getItem("refreshToken") ||
               sessionStorage.getItem("refreshToken");
+
+            if (!refreshToken) {
+              throw new Error("No refresh token available");
+            }
+
             const response = await axios.post("/api/v1/auth/refresh", {
               refreshToken,
             });
+
             const { accessToken } = response.data.data;
+
             if (localStorage.getItem("accessToken")) {
               localStorage.setItem("accessToken", accessToken);
             } else {
               sessionStorage.setItem("accessToken", accessToken);
             }
-            error.config.headers.Authorization = `Bearer ${accessToken}`;
-            return axios(error.config);
+
+            // 원래 요청을 다시 시도
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(originalRequest);
           } catch (err) {
+            console.error("Token refresh failed: ", err);
+            // 토큰 갱신 실패 시 로그아웃 처리
             sessionStorage.removeItem("accessToken");
             sessionStorage.removeItem("refreshToken");
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
             setIsLoggedIn(false);
             navigate("/login");
+            return Promise.reject(err);
           }
         }
+
         return Promise.reject(error);
       }
     );
