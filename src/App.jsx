@@ -31,7 +31,7 @@ function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/mypage/point" element={<MyPagePoint />} />
-      <Route path="/result" element={<ResultPage />} />
+      <Route path="/result/:id" element={<ResultPage />} />
       <Route path="/answerstart" element={<AnswerStartPage />} />
       <Route path="/find-id" element={<FindIdPage />} />
       <Route path="/find-pswd" element={<FindPasswordPage />} />
