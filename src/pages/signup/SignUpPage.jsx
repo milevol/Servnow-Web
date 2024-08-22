@@ -1,14 +1,18 @@
 // 목적: 회원가입 화면 구현
 // 기능: 토글 버튼
-// 2024.07.21/곤/장고은
+// 2024.08.22/곤/장고은
 
 import React, { useState } from "react";
 import styled from "styled-components";
 import SignUp from "./SignUpInputInfo";
 import SignUpComplete from "./SignUpComplete";
 import SignUpTermsAgreement from "./SignUpTermsAgreement";
+import Navbar from "../../components/Navbar";
 
 const Container = styled.div`
+  p {
+    margin-top: 60px;
+  }
   .pageName {
     padding: 20px 0px 0px 0px;
     text-align: center;
@@ -62,6 +66,7 @@ const SignUpPage = () => {
 
   return (
     <Container>
+      <Navbar />
       <p className="pageName">회원가입</p>
       <StateContainer>
         {steps.map((step, index) => (

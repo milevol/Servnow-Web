@@ -136,7 +136,6 @@ const formatDate = (dateString) => {
 
 // SurveyCard 컴포넌트
 // 개별 설문 카드로 설문 정보와 참여 버튼을 표시
-// SurveyCard.jsx
 function SurveyCard({
   title,
   dDay,
@@ -144,13 +143,14 @@ function SurveyCard({
   expiredAt,
   participants,
   completed,
+  surveyId, // surveyId를 props로 받음
 }) {
   const navigate = useNavigate();
 
   // 참여 버튼 클릭 시 호출되는 핸들러
   const handleParticipation = () => {
     if (!completed) {
-      navigate("/participation");
+      navigate(`/answerstart/${surveyId}`); // surveyId를 포함한 경로로 이동
     }
   };
 
