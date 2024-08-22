@@ -9,7 +9,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import character from "../assets/logo1.png";
 
 const Container = styled.div`
-  height: auto;
+  height: 100vh;
   padding: 48px;
   background-color: #f2f5ff;
 `;

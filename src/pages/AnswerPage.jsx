@@ -14,7 +14,7 @@ import SectionCard from "../components/answer/SectionCard";
 
 const Container = styled.div`
   display: inline-block;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   padding-bottom: 50px;
   background-color: #f2f5ff;
@@ -279,7 +279,7 @@ const AnswerPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
   const [isLoading, setIsLoading] = useState(true);
   // 현재 섹션 페이지
   const [sectionPage, setSectionPage] = useState(1);
@@ -305,11 +305,7 @@ const AnswerPage = () => {
 
   const getSectionData = useCallback(async () => {
     try {
-      const token = localStorage.getItem("accessToken")
-        ? localStorage.getItem("accessToken")
-        : sessionStorage.getItem("accessToken");
-
-      const res = await (isLoggedIn
+      const res = await (token
         ? axios.get(`/api/v1/survey/${id}/sections/${sectionPage}`, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -321,11 +317,10 @@ const AnswerPage = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [sectionPage, isLoggedIn]);
+  }, [sectionPage, token]);
 
   const postAnswer = async () => {
     try {
-      const email = location.state.email;
       const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
       const allAnswers = [];
@@ -364,18 +359,20 @@ const AnswerPage = () => {
       }
 
       let requestBody = {};
-      if (isLoggedIn) {
+      if (token) {
         requestBody = {
           answers: allAnswers,
         };
       } else {
+        const email = location.state.email;
+
         requestBody = {
           email: email,
           answers: allAnswers,
         };
       }
 
-      await (isLoggedIn
+      await (token
         ? axios.post(`/api/v1/result/${id}`, requestBody, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -401,7 +398,7 @@ const AnswerPage = () => {
   useEffect(() => {
     // 로그인 여부에 따라 fetch url 등 변경
     getSectionData();
-  }, [sectionPage, isLoggedIn]);
+  }, [sectionPage, token]);
 
   useEffect(() => {
     if (sectionIndex >= sectionList.length) {
