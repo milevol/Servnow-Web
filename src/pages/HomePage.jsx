@@ -6,13 +6,14 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import Select from "react-select";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
 import PlusButton from "../components/PlusButton";
 import mascotImage from "../assets/mascot.png";
-import mockData from "../data/mockData.json";
 
-// 메인 컨테이너 스타일
+// 메인 페이지 전체 컨테이너 스타일
 const HomePageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -20,7 +21,7 @@ const HomePageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 67px; // Navbar의 높이만큼 상단 패딩
+  padding-top: 67px;
 `;
 
 // 컨텐츠 래퍼 스타일
@@ -34,7 +35,7 @@ const ContentWrapper = styled.div`
   position: relative;
 `;
 
-// 마스코트 이미지 스타일
+// 마스코트 아이콘 스타일
 const MascotIcon = styled.div`
   width: 300px;
   height: 350px;
@@ -64,56 +65,152 @@ const DropdownContainer = styled.div`
   margin-top: 300px;
 `;
 
-// 드롭다운 스타일
-const Dropdown = styled.select`
-  width: 120px;
-  height: 37px;
-  background: #ffffff;
-  box-shadow: 0px 1px 5px rgba(95, 108, 126, 0.25);
-  border-radius: 8px;
-  font-family: "Pretendard", sans-serif;
-  font-size: 16px;
-  color: #061522;
-  border: none;
-  padding: 0 10px;
-  cursor: pointer;
-`;
+// 커스텀 Select 스타일 설정
+const customStyles = {
+  control: (provided) => ({
+    ...provided,
+    width: 120,
+    height: 37,
+    backgroundColor: "#FFF",
+    borderRadius: "8px",
+    border: "none",
+    boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)",
+    fontFamily: "Pretendard",
+    fontWeight: 500,
+    fontSize: "15.408px",
+    lineHeight: "normal",
+    color: "#21293A",
+    cursor: "pointer",
+    "&:hover": {
+      boxShadow: "0px 1px 5px 0px rgba(95, 108, 126, 0.25)",
+    },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    marginTop: 0,
+    borderRadius: "0 0 8px 8px",
+    border: "1px solid #4C76FE",
+    overflow: "hidden",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    fontFamily: "Pretendard",
+    fontWeight: 600,
+    fontSize: "14px",
+    color: state.isSelected ? "#3E77FF" : "#061522",
+    backgroundColor: state.isSelected
+      ? "rgba(47, 53, 61, 0.1)"
+      : state.isFocused
+      ? "rgba(47, 53, 61, 0.05)"
+      : "#FFFFFF",
+    "&:hover": {
+      backgroundColor: "rgba(47, 53, 61, 0.05)",
+    },
+    cursor: "pointer",
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "#21293A",
+  }),
+  dropdownIndicator: (provided) => ({
+    ...provided,
+    color: "#21293A",
+  }),
+  indicatorSeparator: () => ({
+    display: "none",
+  }),
+};
 
-// HomePage 컴포넌트 함수
-// 메인 페이지의 렌더링과 상태 관리를 담당
+// HomePage 컴포넌트
 function HomePage() {
-  // 정렬 옵션 상태
-  const [sortOption, setSortOption] = useState("day");
-  // 설문 데이터 상태
-  const [data, setData] = useState([]);
+  const [sortOption, setSortOption] = useState("deadline"); // 현재 선택된 정렬 옵션 상태
+  const [data, setData] = useState([]); // 설문 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태 관리
+  const [error, setError] = useState(null); // 오류 상태 관리
 
-  // 데이터를 정렬하는 함수
-  const sortData = (option, dataToSort) => {
-    return [...dataToSort].sort((a, b) => {
-      if (option === "day") {
-        return a.day - b.day;
-      } else if (option === "title") {
-        return a.title.localeCompare(b.title);
-      } else if (option === "people") {
-        return b.people - a.people;
-      }
-      return 0;
-    });
+  const getToken = () => {
+    return (
+      sessionStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken")
+    );
   };
 
-  // 컴포넌트가 마운트될 때 데이터 정렬
+  // 데이터를 API로부터 가져오는 함수
+  const fetchSurveyData = async (sort) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = getToken();
+      const response = await axios.get(`/api/v1/survey/home?sort=${sort}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 설문 데이터 배열 접근 방식 수정
+      setData(response.data.data.survey || []);
+    } catch (err) {
+      setError(err.response ? err.response.data.message : "Network error");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 가져옴
   useEffect(() => {
-    const sortedData = sortData("day", mockData);
-    setData(sortedData);
+    fetchSurveyData("deadline");
   }, []);
 
-  // 정렬 옵션 변경 핸들러
-  const handleSortChange = (e) => {
-    const option = e.target.value;
+  // Axios 인터셉터 설정
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          try {
+            const refreshToken =
+              localStorage.getItem("refreshToken") ||
+              sessionStorage.getItem("refreshToken");
+            const response = await axios.post("/api/v1/auth/refresh", {
+              refreshToken,
+            });
+            const { accessToken } = response.data.data;
+            if (localStorage.getItem("accessToken")) {
+              localStorage.setItem("accessToken", accessToken);
+            } else {
+              sessionStorage.setItem("accessToken", accessToken);
+            }
+            error.config.headers.Authorization = `Bearer ${accessToken}`;
+            return axios(error.config);
+          } catch (err) {
+            sessionStorage.removeItem("accessToken");
+            sessionStorage.removeItem("refreshToken");
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            window.location.href = "/login";
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
+
+  // 정렬 옵션이 변경될 때 호출되는 핸들러
+  const handleSortChange = (selectedOption) => {
+    const option = selectedOption.value;
     setSortOption(option);
-    const sortedData = sortData(option, mockData);
-    setData(sortedData);
+    fetchSurveyData(option);
   };
+
+  const options = [
+    { value: "deadline", label: "기간 순" },
+    { value: "participants", label: "참여자 순" },
+  ];
 
   return (
     <HomePageContainer>
@@ -121,17 +218,37 @@ function HomePage() {
       <ContentWrapper>
         <MascotIcon />
         <DropdownContainer>
-          <Dropdown value={sortOption} onChange={handleSortChange}>
-            <option value="day">기간순</option>
-            <option value="title">이름순</option>
-            <option value="people">참여자수순</option>
-          </Dropdown>
+          <Select
+            styles={customStyles}
+            value={options.find((option) => option.value === sortOption)}
+            onChange={handleSortChange}
+            options={options}
+            isSearchable={false}
+          />
         </DropdownContainer>
-        <SurveyCardContainer>
-          {data.map((item, index) => (
-            <SurveyCard key={index} {...item} />
-          ))}
-        </SurveyCardContainer>
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div>Error: {error}</div>
+        ) : (
+          <SurveyCardContainer>
+            {data.length > 0 ? (
+              data.map((item) => (
+                <SurveyCard
+                  key={item.surveyId}
+                  title={item.title}
+                  dDay={item.dDay}
+                  createdAt={item.createdAt}
+                  expiredAt={item.expiredAt}
+                  participants={item.participants}
+                  completed={item.status}
+                />
+              ))
+            ) : (
+              <div>설문이 존재하지 않아요 :(</div>
+            )}
+          </SurveyCardContainer>
+        )}
         <PlusButton />
       </ContentWrapper>
     </HomePageContainer>

@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import peopleImage from "../assets/people.png";
 
-// 카드 컨테이너 스타일 정의
+// 카드 전체 컨테이너 스타일
 const CardContainer = styled.div`
   width: 100%;
   max-width: 1235px;
@@ -25,14 +25,14 @@ const CardContainer = styled.div`
   height: 180px;
 `;
 
-// 좌측 섹션 스타일
+// 카드 좌측 섹션 스타일
 const LeftSection = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
 `;
 
-// 우측 섹션 스타일
+// 카드 우측 섹션 스타일
 const RightSection = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -57,7 +57,7 @@ const InfoContainer = styled.div`
   margin-bottom: 13px;
 `;
 
-// 날짜 스타일
+// 날짜 정보 스타일
 const DateInfo = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
@@ -92,12 +92,6 @@ const CurrentParticipants = styled.span`
   font-weight: 600;
 `;
 
-// 총 참여자 수 스타일
-const TotalParticipants = styled.span`
-  color: #000000;
-  font-weight: 400;
-`;
-
 // 참여자 아이콘 스타일
 const PeopleIcon = styled.div`
   width: 26px;
@@ -110,12 +104,12 @@ const PeopleIcon = styled.div`
 const Button = styled.div`
   width: 150px;
   height: 70px;
-  background: ${({ completed }) => (completed ? "#BFBFBF" : "#4c76fe")};
+  background: ${({ $completed }) => ($completed ? "#BFBFBF" : "#4c76fe")};
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: ${({ completed }) => (completed ? "default" : "pointer")};
+  cursor: ${({ $completed }) => ($completed ? "default" : "pointer")};
 `;
 
 // 버튼 텍스트 스타일
@@ -126,34 +120,61 @@ const ButtonText = styled.div`
   color: #ffffff;
 `;
 
-// SurveyCard 컴포넌트 함수
-function SurveyCard({ title, day, date, people, completed }) {
+// 날짜 포맷 함수
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours >= 12 ? "오후" : "오전";
+  const adjustedHour = hours % 12 || 12; // 0시는 12시로 변환
+
+  return `${year}.${month}.${day} ${period} ${adjustedHour}:${minutes}`;
+};
+
+// SurveyCard 컴포넌트
+// 개별 설문 카드로 설문 정보와 참여 버튼을 표시
+// SurveyCard.jsx
+function SurveyCard({
+  title,
+  dDay,
+  createdAt,
+  expiredAt,
+  participants,
+  completed,
+}) {
   const navigate = useNavigate();
 
+  // 참여 버튼 클릭 시 호출되는 핸들러
   const handleParticipation = () => {
     if (!completed) {
       navigate("/participation");
     }
   };
 
+  const formattedDateRange = `${formatDate(createdAt)} ~ ${formatDate(
+    expiredAt
+  )}`;
+
   return (
     <CardContainer>
       <LeftSection>
         <Title>{title}</Title>
         <InfoContainer>
-          <DdayText>D-{day}</DdayText>
-          <DateInfo>{date}</DateInfo>
+          <DdayText>D-{dDay}</DdayText>
+          <DateInfo>{formattedDateRange}</DateInfo>
         </InfoContainer>
         <PercentageContainer>
           <PeopleIcon />
           <Percentage>
-            <CurrentParticipants>{people}</CurrentParticipants>
-            {/* <TotalParticipants>/100</TotalParticipants> */}
+            <CurrentParticipants>{participants}</CurrentParticipants>
           </Percentage>
         </PercentageContainer>
       </LeftSection>
       <RightSection>
-        <Button completed={completed} onClick={handleParticipation}>
+        <Button $completed={completed} onClick={handleParticipation}>
           <ButtonText>{completed ? "참여 완료" : "참여 하기"}</ButtonText>
         </Button>
       </RightSection>

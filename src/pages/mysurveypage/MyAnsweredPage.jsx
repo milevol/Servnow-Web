@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SurveyPrev from '../../components/surveypage/MySurveyPrev';
 import styled, { css } from 'styled-components';
 import Navbar from '../../components/Navbar';
+import Arrow from '../../components/surveypage/SurveyArrow';
+import axios from 'axios';
 
 export const MyPageContainer = styled.div`
     height : auto;
@@ -14,29 +16,29 @@ export const MyPageContainer = styled.div`
 
 export const MyPageTotalContainer = styled.div`
     height : 100%;
-    width : 80%;
-    margin-left : 10%;
-    margin-right : 10%;
+    width : 100%;
+    margin-left : 143px;
 `;
 
 export const SurveyOnerContainer = styled.div`
-    height : 80px;
-    margin-top : 100px;
-    padding-top : 10px;
-    padding-bottom : 10px;
+    height : 57px;
+    width : 78px;
+    margin-top : 116px;
     text-align : left;
-    font-size : 55px;
-    font-weight : bolder;
+    font-size : 48px;
+    font-weight : 800;
     display: flex;
     align-items: center;
 `;
 
 export const TortalSurveyContainer = styled.div`
     display : flex;
+    width : 1440px;
+    min-height : 100vh;
     flex-wrap : wrap;
-    height : auto;
+    padding-top : 44px;
     align-self : center;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-content: flex-start;
 `;
 
@@ -59,21 +61,6 @@ export const NewSurveyBox = styled.div`
     border-radius : 10px;
 `;
 
-export const NewSurveyButton = styled.button`
-    width : 80px;
-    height : 80px;
-    padding-top : 0px;
-    padding-bottom : 0px;
-    padding-left : 0px;
-    padding-right : 0px;
-    text-align : center;
-    border-radius : 40px;
-    background-color : #4C76FE;
-    color : white;
-    font-size : 50px;
-    font-weight : bolder;
-`;
-
 export const CreateNewSurvey = styled.div`
     padding-top : 10px;
     color : black;
@@ -84,16 +71,19 @@ export const CreateNewSurvey = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
-  margin-top : 10px;
-  margin-left: 70px;
+  margin-left: 44px;
+  padding-top: 11px;
+  padding-bottom: 9px;
 `;
 
 const DropdownButton = styled.button`
-  background-color: white;
+  background-color: #f8f9fa;
   border: 1px solid #ced4da;
-  width : 150px;
-  height : 50px;
-  padding: 10px 16px;
+  font-family: 'PRETENDARD';
+  width : 120px;
+  height : 37px;
+  border-radius: 8px;
+  padding: 10px 12px 10px 15px;
   font-size: 14px;
   font-weight : 600;
   color: #212529;
@@ -102,14 +92,14 @@ const DropdownButton = styled.button`
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  ${props => (props.isOpen ? 'border-radius' : '10px 10px 0px 0px')};
 `;
 
 const DropdownMenu = styled.div`
   display: ${props => (props.isOpen ? 'block' : 'none')};
   position: absolute;
-  background-color: #fff;
-  min-width: 150px;
+  background-color: #f8f9fa;
+  min-width: 120px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   border-radius: 0px 0px 10px 10px;
@@ -119,7 +109,6 @@ const DropdownItem = styled.div`
   color: #061522;
   padding: 12px 16px;
   font-size: 14px;
-  text-decoration: none;
   display: block;
   cursor: pointer;
   &:hover {
@@ -128,92 +117,111 @@ const DropdownItem = styled.div`
   }
 `;
 
-const Arrow = styled.span`
-  margin-left: 10px;
-  font-size : 24px;
-  transform: rotate(90deg);
-  ${props => props.isOpen && css`
-    transform: rotate(270deg);
-  `}
-  transition: transform 0.3s;
-`;
-
 const MyAnsweredPage = () => {
     const result = [
         {
-            id: 1,
+            surveyId: 1,
             title: '취업을 앞둔 대학생 인식 설문조사',
             description: 'Description for movie 1',
-            date: '2024.06.21. 오후 19:23',
-            finished: 'no'
+            expiredAt: '2024.06.21. 오후 19:23',
+            finished: 'no',
+            characterType: "TYPE_FOUR"
         },
         {
-            id: 2,
+            surveyId: 2,
             title: '도서관에서의 가상현실(VR) 콘텐츠 이용자 및...',
             description: 'Description for movie 2',
-            date: '2024.06.19. 오후 16:53',
-            finished: 'no'
+            expiredAt: '2024.06.19. 오후 16:53',
+            finished: 'no',
+            characterType: "TYPE_FIVE"
         },
         {
-            id: 3,
+            surveyId: 3,
             title: '대학생 설문 서비스 플랫폼 관련 인식조사',
             description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
+            expiredAt: '2024.06.02. 오후 12:00',
+            finished: 'yes',
+            characterType: "TYPE_SIX"
         },
         {
-            id: 4,
+            surveyId: 4,
             title: '취업을 앞둔 대학생 인식 설문조사',
             description: 'Description for movie 1',
-            date: '2024.06.21. 오후 19:23',
-            finished: 'no'
+            expiredAt: '2024.06.21. 오후 19:23',
+            finished: 'no',
+            characterType: "TYPE_SEVEN"
         },
         {
-            id: 5,
+            surveyId: 5,
             title: '대학생 설문 서비스 플랫폼 관련 인식조사',
             description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
+            expiredAt: '2024.06.02. 오후 12:00',
+            finished: 'yes',
+            characterType: "TYPE_EIGHT"
         },
         {
-            id: 6,
+            surveyId: 6,
             title: '대학생 설문 서비스 플랫폼 관련 인식조사',
             description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
-        },
-        {
-            id: 7,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
-            description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
-        },
-        {
-            id: 8,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
-            description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
-        },
-        {
-            id: 9,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
-            description: 'Description for movie 3',
-            date: '2024.06.02. 오후 12:00',
-            finished: 'yes'
+            expiredAt: '2024.06.02. 오후 12:00',
+            finished: 'yes',
+            characterType: "TYPE_NINE"
         }
     ];
 
-    const [sortOrder, setSortOrder] = useState('최신 순');
+    const [sortOrder, setSortOrder] = useState('latest');
     const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState(null);
+    const [order, setOrder] = useState("최신 순");
 
     const toggleDropdown = () => setIsOpen(!isOpen);
 
     const handleSelect = (sortType) => {
         setSortOrder(sortType);
         setIsOpen(false);
+        setOrder(orders.find(order => order.value === sortType).label);
     };
+
+    const orders = [
+        {value: 'latest', label : "최신 순"},
+        {value: 'oldest', label : "오래된 순"},
+        {value: 'participants', label : "참여자 순"}
+    ]
+    
+    const getToken = () => {
+        return (
+          sessionStorage.getItem("accessToken") ||
+          localStorage.getItem("accessToken")
+        );
+      };
+
+    const [surveys, setSurveys] = useState([]);
+
+    const getSurveyData = async (sortOrder) => {
+        try {
+            const token = getToken();
+            const response = await axios.get(`/api/v1/users/me/survey?sort=${sortOrder}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            // response.data.survey가 배열인지 확인하고, 그렇지 않으면 빈 배열로 초기화
+            if (Array.isArray(response.data.data.survey)) {
+                setSurveys(response.data.data.survey);
+            } else {
+                console.error("Unexpected data format:", response.data);
+                setSurveys([]); // 잘못된 형식이 오면 빈 배열로 초기화
+            }
+        } catch (err) {
+            console.error("Error fetching survey data", err);
+            setSurveys([]);  // 오류가 발생하면 빈 배열로 초기화
+        }
+    };
+
+    useEffect(() => {
+        getSurveyData('newest');  // 초기 로딩 시 최신 순으로 데이터를 가져옴
+    }, []);
 
     return (
         <MyPageContainer>
@@ -223,18 +231,18 @@ const MyAnsweredPage = () => {
                     MY
                     <DropdownContainer>
                         <DropdownButton onClick={toggleDropdown}>
-                            {sortOrder}
-                            <Arrow isOpen={isOpen}>&gt;</Arrow>
+                            {order}
+                            <Arrow isOpen={isOpen} />
                         </DropdownButton>
                         <DropdownMenu isOpen={isOpen}>
-                            <DropdownItem onClick={() => handleSelect('참여자 순')}>참여자 순</DropdownItem>
-                            <DropdownItem onClick={() => handleSelect('오래된 순')}>오래된 순</DropdownItem>
-                            <DropdownItem onClick={() => handleSelect('최신 순')}>최신 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('participants')}>참여자 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('oldest')}>오래된 순</DropdownItem>
+                            <DropdownItem onClick={() => handleSelect('latest')}>최신 순</DropdownItem>
                         </DropdownMenu>
                     </DropdownContainer>
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
-                    {result.map((survey) => (
+                    {surveys.map((survey) => (
                         <SurveyPrev key={survey.id} survey={survey} />
                     ))}
                 </TortalSurveyContainer>

@@ -24,7 +24,7 @@ const Content = styled.div`
 
 const Title = styled.h1`
   color: white;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 35px;
 `;
 
