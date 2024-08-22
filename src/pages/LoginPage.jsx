@@ -6,6 +6,7 @@ import React from "react";
 import styled from "styled-components";
 import LoginForm from "../components/login/LoginForm"; // 파일 경로와 default export 확인
 import Navbar from "../components/Navbar";
+
 const Container = styled.div`
   display: flex;
   justify-content: center;

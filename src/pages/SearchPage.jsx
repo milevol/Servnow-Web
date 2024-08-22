@@ -5,7 +5,7 @@
 // 작성일: 2024.07.24
 
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { SlPresent } from "react-icons/sl";
 import Navbar from "../components/Navbar";
@@ -109,6 +109,7 @@ function SearchPage() {
   const [queryKeywords, setQueryKeywords] = useState([]);
   const [excludeCompleted, setExcludeCompleted] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getToken = () => {
     return (
@@ -120,40 +121,38 @@ function SearchPage() {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const query = searchParams.get("q");
+    const filter = searchParams.get("filter") || "false";
 
     if (query) {
+      // 해시태그로 구분된 검색어를 배열로 변환
       const keywords = query
         .split("#")
         .filter(Boolean)
-        .map((keyword) => keyword.toLowerCase());
+        .map((keyword) => keyword.trim());
+
       setQueryKeywords(keywords);
 
       const fetchSearchResults = async () => {
         try {
           const token = getToken();
-          const results = [];
 
-          for (const keyword of keywords) {
-            const response = await axios.get(
-              `/api/v1/survey?keyword=${encodeURIComponent(
-                keyword
-              )}&filter=${excludeCompleted}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
+          // keyword 파라미터를 여러 번 추가하기 위해 URLSearchParams 사용
+          const params = new URLSearchParams();
+          keywords.forEach((keyword) => {
+            params.append("keyword", keyword);
+          });
+          params.append("filter", filter);
 
-            results.push(...response.data.data.survey);
-          }
+          const response = await axios.get(
+            `/api/v1/survey?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-          // 중복 제거
-          const uniqueResults = Array.from(
-            new Set(results.map((result) => result.surveyId))
-          ).map((id) => results.find((result) => result.surveyId === id));
-
-          setSearchResults(uniqueResults);
+          setSearchResults(response.data.data.survey || []);
         } catch (err) {
           console.error("Search failed:", err);
         }
@@ -161,7 +160,51 @@ function SearchPage() {
 
       fetchSearchResults();
     }
-  }, [location.search, excludeCompleted]);
+  }, [location.search]);
+
+  // 필터 상태 변경 시 URL 업데이트 및 재검색
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("filter", excludeCompleted.toString());
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+
+    // 필터 상태 변경 시 검색 결과를 다시 가져옴
+    const keywords = searchParams.get("q")
+      ? searchParams
+          .get("q")
+          .split("#")
+          .filter(Boolean)
+          .map((keyword) => keyword.trim())
+      : [];
+
+    if (keywords.length > 0) {
+      const fetchSearchResults = async () => {
+        try {
+          const token = getToken();
+          const params = new URLSearchParams();
+          keywords.forEach((keyword) => {
+            params.append("keyword", keyword);
+          });
+          params.append("filter", excludeCompleted.toString());
+
+          const response = await axios.get(
+            `/api/v1/survey?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          setSearchResults(response.data.data.survey || []);
+        } catch (err) {
+          console.error("Search failed:", err);
+        }
+      };
+
+      fetchSearchResults();
+    }
+  }, [excludeCompleted, navigate, location.pathname]);
 
   // Axios 인터셉터 설정
   useEffect(() => {
