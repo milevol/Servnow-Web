@@ -187,35 +187,29 @@ const ChoiceLabel = styled.label`
 const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnswer }) => {
   const handleChange = (e, nextSectionNo) => {
     const { value, checked } = e.target;
-    const index = answers.findIndex((answer) => answer.answerContent === value);
 
-    console.log(index);
-    let updatedAnswers;
-    if (type !== "text") {
-      updatedAnswers = [index];
-    } else {
-      updatedAnswers = savedAnswer;
+    let updatedAnswers = [...savedAnswer];
+    if (type === "radio") {
+      updatedAnswers = [value];
+    } else if (type === "checkbox") {
       if (checked) {
-        updatedAnswers = [...updatedAnswers, index];
+        if (!updatedAnswers.includes(value)) {
+          updatedAnswers.push(value);
+        }
       } else {
-        updatedAnswers = updatedAnswers.filter((i) => i !== index);
+        updatedAnswers = updatedAnswers.filter((i) => i !== value);
+        console.log("??" + updatedAnswers);
       }
+    } else {
+      updatedAnswers = [value];
     }
 
     setSavedAnswer(updatedAnswers);
     setNextSection(nextSectionNo);
   };
 
-  // TODO : 이미 저장된 값이 있을 경우 해당 값 찾아서 nextSection 지정
-  // useEffect(() => {
-  //   if (savedAnswer) {
-  //     setNextSection(answers.find((answer) => savedAnswer.includes(answer.answerContent)).nextSectionNo);
-  //   }
-  // }, []);
-
   switch (type) {
     case "radio":
-      // 객관식, 한 개 선택
       return (
         <AnswerContainer>
           {answers.map((a, index) => (
@@ -224,8 +218,8 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
                 type="radio"
                 name={name}
                 id={a.answerContent}
-                value={a.answerContent}
-                checked={savedAnswer.includes(index)}
+                value={index}
+                checked={savedAnswer.includes(index.toString())}
                 onChange={(e) => handleChange(e, a.nextSectionNo)}
               />
               <ChoiceLabel htmlFor={a.answerContent}>{a.answerContent}</ChoiceLabel>
@@ -235,35 +229,33 @@ const Answer = ({ type, answers, name, setNextSection, setSavedAnswer, savedAnsw
       );
 
     case "checkbox":
-      // 객관식, 여러 개 선택
       return (
         <AnswerContainer>
-          {answers.map((a, index) => (
-            <ChoiceContainer key={index}>
-              <ChoiceInput
-                type="checkbox"
-                name={name}
-                id={a.answerContent}
-                value={a.answerContent}
-                checked={savedAnswer.includes(index)}
-                onChange={(e) => handleChange(e, a.nextSectionNo)}
-              />
-              <ChoiceLabel htmlFor={a.answerContent}>{a.answerContent}</ChoiceLabel>
-            </ChoiceContainer>
-          ))}
+          {answers.map((a, index) => {
+            const tempA = savedAnswer.length > 0 ? savedAnswer[0] : [];
+
+            return (
+              <ChoiceContainer key={index}>
+                <ChoiceInput
+                  type="checkbox"
+                  name={name}
+                  id={a.answerContent}
+                  value={index}
+                  checked={tempA.includes(index.toString())}
+                  onChange={(e) => handleChange(e, a.nextSectionNo)}
+                />
+                <ChoiceLabel htmlFor={a.answerContent}>{a.answerContent}</ChoiceLabel>
+              </ChoiceContainer>
+            );
+          })}
         </AnswerContainer>
       );
 
     case "text":
-      // 주관식
+      console.log(savedAnswer);
       return (
         <AnswerContainer>
-          <TextAreaAutoSize
-            cacheMeasurements
-            name={name}
-            defaultValue={savedAnswer[0] || ""}
-            onChange={(e) => handleChange(e, null)}
-          />
+          <TextAreaAutoSize cacheMeasurements name={name} value={savedAnswer} onChange={(e) => handleChange(e, null)} />
         </AnswerContainer>
       );
 
@@ -319,63 +311,71 @@ const AnswerPage = () => {
 
   const postAnswer = async () => {
     try {
-      const token = localStorage.getItem("accessToken")
-        ? localStorage.getItem("accessToken")
-        : sessionStorage.getItem("accessToken");
+      const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
       const allAnswers = [];
-      for (let i = 0; i <= sectionList.length; i++) {
-        const savedData = JSON.parse(localStorage.getItem(sectionList[i] || {}));
+
+      for (let i = 0; i < sectionList.length; i++) {
+        const savedData = JSON.parse(localStorage.getItem(sectionList[i] || {}) || {});
 
         for (const [questionId, answer] of Object.entries(savedData)) {
-          console.log(questionId + " " + answer);
+          // console.log(answer);
+          // value === object, 즉 checkbox
+          if (answer !== null) {
+            if (typeof answer === "object") {
+              for (let i = 0; i < answer.length; i++) {
+                allAnswers.push({
+                  question_id: parseInt(questionId),
+                  multipleChoiceId: parseInt(answer[i]),
+                  subjective_result_content: null,
+                });
+              }
+            } // parseInt 했을 때 NaN이 아니다, 즉 choice
+            else if (!isNaN(parseInt(answer))) {
+              allAnswers.push({
+                question_id: parseInt(questionId),
+                multipleChoiceId: parseInt(answer),
+                subjective_result_content: null,
+              });
+            } // parseInt 했을 때 NaN이다, 즉 text
+            else {
+              allAnswers.push({
+                question_id: parseInt(questionId),
+                multipleChoiceId: null,
+                subjective_result_content: answer,
+              });
+            }
+          }
         }
       }
 
+      let requestBody = {};
       if (isLoggedIn) {
-        const requestBody = {
-          survey_id: 1,
-          answers: [
-            {
-              //
-            },
-          ],
+        requestBody = {
+          answers: allAnswers,
         };
       } else {
-        const requestBody = {
-          survey_id: 1,
+        requestBody = {
           email: "email@a.com",
-          answers: [
-            {
-              //
-            },
-          ],
+          answers: allAnswers,
         };
       }
-
-      // "survey_id": 1,
-      // "email": "umc@gmail.com",
-      // "answers": [
-      //     {
-      //         "question_id": 1
-      //         "answer_result_id": 1
-      //         "mutiple_choice_id": 2,
-      //      },
-      //      {
-      //         "question_id": 2,
-      //         "answer_result_id": 1,
-      //         "subjective_result_content": "주관식 답변 내용"
-      //     }
+      console.log(JSON.stringify(requestBody, null, 2));
 
       const res = await (isLoggedIn
-        ? axios.post(`/api/v1/result/${id}`, {
+        ? axios.post(`/api/v1/result/${id}`, requestBody, {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           })
-        : axios.post(`/api/v1/result/guest/{id}`, {}));
-      setData(res.data.data);
-      setIsLoading(false);
+        : axios.post(`/api/v1/result/guest/1`, requestBody, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }));
+      // setData(res.data);
+      // setIsLoading(false);
     } catch (err) {
       console.error(err);
     }
@@ -414,11 +414,22 @@ const AnswerPage = () => {
 
   const saveTemporary = () => {
     if (formRef.current) {
-      const formData = new FormData(formRef.current);
+      const formElements = formRef.current.elements;
       const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
+
+      for (const element of formElements) {
+        if (element.type === "checkbox") {
+          if (!data[element.name]) {
+            data[element.name] = [];
+          }
+          if (element.checked) {
+            data[element.name].push(element.value);
+          }
+        } else {
+          data[element.name] = element.value;
+        }
+      }
+
       localStorage.setItem(sectionPage, JSON.stringify(data));
     }
   };
@@ -454,24 +465,11 @@ const AnswerPage = () => {
       setSectionPage(newSection);
       setSectionIndex((prevIndex) => prevIndex + 1);
     }
-
-    const allAnswers = [];
-    for (let i = 0; i <= sectionList.length; i++) {
-      const savedData = JSON.parse(localStorage.getItem(sectionList[i] || {}));
-
-      for (const [questionId, answer] of Object.entries(savedData)) {
-        console.log(questionId + " " + answer);
-
-        allAnswers.push({
-          question_id: questionId,
-        });
-      }
-    }
   };
 
   const onSubmit = () => {
     saveTemporary();
-    // 제출 로직 추가 필요
+    postAnswer();
   };
 
   return (
