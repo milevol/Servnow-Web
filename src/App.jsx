@@ -36,8 +36,6 @@ function App() {
       <Route path="/find-id" element={<FindIdPage />} />
       <Route path="/find-pswd" element={<FindPasswordPage />} />
       <Route path="/surveymodal" element={<SurveyModalPage />} />
-      <Route path="/find-id" element={<FindIdPage />} />
-      <Route path="/find-pswd" element={<FindPasswordPage />} />
       <Route path="/myinfo" element={<MyInfoModifyPage />} />
       <Route path="/myinfo-k" element={<MyInfoModifyKakaoPage />} />
       <Route path="/created-surveys" element={<MySurveyPage />} />
