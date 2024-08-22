@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
@@ -7,6 +7,8 @@ import { kakaoLogin } from '../../redux/authSlice';
 const KakaoRedirectHandler = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch(); 
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const getKakaoToken = async (authorizationCode) => {
         try {
            
@@ -49,23 +51,20 @@ const KakaoRedirectHandler = () => {
 
 
             // 성공적인 로그인 후에 메인 페이지 또는 회원 가입 페이지로 리다이렉트
-            if (isRegistered) {
-                
-                 // JWT 토큰을 로컬 스토리지에 저장
-                localStorage.setItem('accessToken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
+            if (response.data.code === 200 && isRegistered) {
                 //로그인 상태 디스패치
-                dispatch(kakaoLogin({
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
-                    userId: '',
+                dispatch(kakaoLogin({ }));
+                 // JWT 토큰을 로컬 스토리지에 저장
+                sessionStorage.setItem('accessToken', accessToken);
+                sessionStorage.setItem('refreshToken', refreshToken);
 
-                }))
                 alert('로그인이 완료되었습니다.');
+                console.log(response.data.message);
                 navigate('/');
-            } else {
-                alert('회원가입을 진행해주세요.');
-                navigate('/signup');
+            } else if(response.data.code === 200 && !isRegistered) {
+                alert('회원가입 되었습니다. 다시 로그인해주세요.');
+                console.log(response.data.message);
+                navigate('/login');
             }
         } catch (error) {
             
@@ -95,7 +94,8 @@ const KakaoRedirectHandler = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const authorizationCode = urlParams.get('code');
 
-        if (authorizationCode) {
+        if (authorizationCode && !isProcessing) {
+            setIsProcessing(true);
             getKakaoToken(authorizationCode);
         } else {  
             alert('카카오 토큰 불러오기 실패');

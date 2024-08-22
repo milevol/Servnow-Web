@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import kakaoLogo from '../../../src/assets/kakao_logo.png'
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const PageContainer = styled.div`
   margin-top: -40px;
@@ -17,6 +18,7 @@ const PageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   border-radius: 10px;
+  white-space: nowrap;
 `;
 
 const Header = styled.h2`
@@ -26,7 +28,7 @@ const Header = styled.h2`
 `;
 
 const HorizontalLine = styled.hr`
-  margin-left: -100px;
+  margin-left: -97px;
   width: 100vw;
   border: none;
   border-top: 3px solid #4C76FE;
@@ -203,19 +205,50 @@ const HorizontalSemiLine = styled.hr`
   margin: 2rem 0;
 `;
 const MyInfoModifyKakaoPage = () => {
-  const [nickname, setNickname] = useState('ari7717');
-  const [profileImage, setProfileImage] = useState('../../../src/assets/logo1.png')
-  const [originalNickname, setOriginalNickname] = useState('ari7717');
+  const navigate = useNavigate();
+  const [nickname, setNickname] = useState('');
+  const [profileImage, setProfileImage] = useState('/roundLogo1.png')
+  const [originalNickname, setOriginalNickname] = useState('');
+  const [userName, setUserName] = useState('우*진');
+  const [phoneNumber, setPhoneNumber] = useState('010-****-7637');
+
   useEffect(() => {
-    axios.get('')
-    .then(response => {
-      setNickname(response.data.nickname);
-      setOriginalNickname(response.data.nickname);
-    })
-    .catch(error => [
-      console.error('There was an error fetching the nickname!', error)
-    ]);
-  }, []);
+
+    const fetchUserInfoKakao = async () => {
+      const accessToken = sessionStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        console.log("Access token not found.");
+        alert("액세스 토큰을 찾을 수 없습니다.");
+        return;
+      }
+      try {
+        const response = await axios.get(
+          '/api/v1/users/me/info', {
+            headers:{
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          if (response.data.code === 200) {
+            console.log(response.data.data);
+            const { nickname, profile_url } = response.data.data;
+            setProfileImage(nickname);
+            setOriginalNickname(profile_url);
+            setNickname(profile_url);
+          }
+          else {
+              console.error("내정보 불러오기 중 오류 발생", response.data.message);
+              alert(response.data.message);
+          }
+        
+      } catch (error) {
+        console.error("내정보 불러오기 중 오류 발생", error.response ? (error.response.data.message, error.response.status) : error.message);
+        alert(error.response.data.message);
+      } 
+  };
+
+    fetchUserInfoKakao();
+}, []);
 
   const handleUpdateNickname = () => {
     axios.post('', {nickname})
@@ -225,7 +258,7 @@ const MyInfoModifyKakaoPage = () => {
       })
       .catch(error => {
         console.error('There was an error updating the nickname!', error);
-        alert('아이디 수정에 실패했습니다.');
+        alert('닉네임 수정에 실패했습니다.');
       });
   }
 
@@ -236,6 +269,10 @@ const MyInfoModifyKakaoPage = () => {
       setProfileImage(imageUrl);
     }
   };
+
+  const handlePreviousButton = () => {
+    navigate('/mypage')
+  }
 
   return (
     <PageContainer>
@@ -281,16 +318,16 @@ const MyInfoModifyKakaoPage = () => {
         <InfoContainer>
           <InfoItem>
             <InfoLabel>성명</InfoLabel>
-            <InfoInput type="text" value="우*진" readOnly />
+            <InfoInput type="text" value={userName} readOnly />
           </InfoItem>
           <InfoItem>
             <InfoLabel>연락처</InfoLabel>
-            <InfoInput type="text" value="010-****-7637" readOnly />
+            <InfoInput type="text" value={phoneNumber} readOnly />
           </InfoItem>
         </InfoContainer>
       </Section>
       <ButtonContainer>
-        <PrevButton>이전</PrevButton>
+        <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
         <ReAuthButton>본인 인증 다시하기</ReAuthButton>
       </ButtonContainer>
     </PageContainer>
