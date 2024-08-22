@@ -269,6 +269,9 @@ const FindIdForm = () => {
   const handleFindPasswordClick = () => {
     navigate('/find-pswd');
   };
+  const handleOkClick = () => {
+    navigate('login');
+  };
 
   return (
     <FormContainer>
@@ -280,7 +283,7 @@ const FindIdForm = () => {
                 </SuccessContainer>
 
                 <ButtonContainer>
-                    <ConfirmButton>확인</ConfirmButton>
+                    <ConfirmButton onClick={handleOkClick}>확인</ConfirmButton>
                     <FindPswdButton onClick={handleFindPasswordClick}>비밀번호 찾기</FindPswdButton>
                 </ButtonContainer>
             </FindWrapper>
