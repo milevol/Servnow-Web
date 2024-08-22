@@ -5,12 +5,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import FindPasswordForm from '../components/login/FindPasswordForm';
+import Navbar from '../components/Navbar';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
   background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
 `;
 
@@ -19,7 +20,8 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  
+  margin-top: 80px;
+  margin-bottom: 80px;
 `;
 
 const Title = styled.h1`
@@ -36,13 +38,16 @@ const WelcomeText = styled.p`
 
 const FindPasswordPage = () => {
   return (
-    <Container>
-      <Content>
-        <Title>비밀번호 찾기</Title>
-        <WelcomeText>비밀번호를 잊으셨나요?</WelcomeText>
-        <FindPasswordForm />
-      </Content>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <Content>
+          <Title>비밀번호 찾기</Title>
+          <WelcomeText>비밀번호를 잊으셨나요?</WelcomeText>
+          <FindPasswordForm />
+        </Content>
+      </Container>
+    </>
   );
 };
 

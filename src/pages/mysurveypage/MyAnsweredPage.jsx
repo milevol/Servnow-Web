@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import SurveyPrev from '../../components/surveypage/MySurveyPrev';
 import styled, { css } from 'styled-components';
 import Navbar from '../../components/Navbar';
+import NewSurveyButton from '../../components/surveypage/NewSurveyButton';
 import Arrow from '../../components/surveypage/SurveyArrow';
 import axios from 'axios';
 
 export const MyPageContainer = styled.div`
-    height : auto;
-    width : 100vw;
-    margin-top : 60px;
+    height : 100%;
+    width : 100%;
     background-color : #F2F5FF;
     display : grid;
     contents-align : center;
@@ -16,8 +16,10 @@ export const MyPageContainer = styled.div`
 
 export const MyPageTotalContainer = styled.div`
     height : 100%;
-    width : 100%;
-    margin-left : 143px;
+    min-height: 100vh;
+    width : 85%;
+    padding-left: 15%;
+    margin-bottom: 60px;
 `;
 
 export const SurveyOnerContainer = styled.div`
@@ -33,25 +35,21 @@ export const SurveyOnerContainer = styled.div`
 
 export const TortalSurveyContainer = styled.div`
     display : flex;
-    width : 1440px;
-    min-height : 100vh;
     flex-wrap : wrap;
-    padding-top : 44px;
+    padding-top : 5%;
     align-self : center;
-    justify-content: flex-start;
-    align-content: flex-start;
+    gap: 50px;
 `;
 
 export const SurveyBox = styled.div`
-    width : 50%;
-    height : 300px;
-    margin-top : 20px;
-    margin-bottom : 20px;
+    width : 40%;
+    position: relative;
+    aspect-ratio: 552/272;
 `;
 
 export const NewSurveyBox = styled.div`
-    width : 600px;
-    height : 300px;
+    width : 100%;
+    height : 100%;
     background-color : white;
     display : grid;
     flex-direction: row;
@@ -62,10 +60,10 @@ export const NewSurveyBox = styled.div`
 `;
 
 export const CreateNewSurvey = styled.div`
-    padding-top : 10px;
-    color : black;
-    font-size : 20px;
-    font-weight : bolder;
+    padding-top : 30px;
+    color : #061522;
+    font-size : 22px;
+    font-weight : 600;
 `;
 
 const DropdownContainer = styled.div`
@@ -123,49 +121,25 @@ const MyAnsweredPage = () => {
             surveyId: 1,
             title: '취업을 앞둔 대학생 인식 설문조사',
             description: 'Description for movie 1',
-            expiredAt: '2024.06.21. 오후 19:23',
+            expiredAt: '2024-06-21T19:23:10.111Z',
             finished: 'no',
-            characterType: "TYPE_FOUR"
+            characterType: "TYPE_ONE"
         },
         {
             surveyId: 2,
             title: '도서관에서의 가상현실(VR) 콘텐츠 이용자 및...',
             description: 'Description for movie 2',
-            expiredAt: '2024.06.19. 오후 16:53',
+            expiredAt: '2024-06-19T16:53:10.111Z',
             finished: 'no',
-            characterType: "TYPE_FIVE"
+            characterType: "TYPE_TWO"
         },
         {
             surveyId: 3,
             title: '대학생 설문 서비스 플랫폼 관련 인식조사',
             description: 'Description for movie 3',
-            expiredAt: '2024.06.02. 오후 12:00',
+            expiredAt: '2024-06-02T12:00:00.000Z',
             finished: 'yes',
-            characterType: "TYPE_SIX"
-        },
-        {
-            surveyId: 4,
-            title: '취업을 앞둔 대학생 인식 설문조사',
-            description: 'Description for movie 1',
-            expiredAt: '2024.06.21. 오후 19:23',
-            finished: 'no',
-            characterType: "TYPE_SEVEN"
-        },
-        {
-            surveyId: 5,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
-            description: 'Description for movie 3',
-            expiredAt: '2024.06.02. 오후 12:00',
-            finished: 'yes',
-            characterType: "TYPE_EIGHT"
-        },
-        {
-            surveyId: 6,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
-            description: 'Description for movie 3',
-            expiredAt: '2024.06.02. 오후 12:00',
-            finished: 'yes',
-            characterType: "TYPE_NINE"
+            characterType: "TYPE_THREE"
         }
     ];
 
@@ -207,8 +181,8 @@ const MyAnsweredPage = () => {
             });
     
             // response.data.survey가 배열인지 확인하고, 그렇지 않으면 빈 배열로 초기화
-            if (Array.isArray(response.data.data.survey)) {
-                setSurveys(response.data.data.survey);
+            if (Array.isArray(response.data.data)) {
+                setSurveys(response.data.data);
             } else {
                 console.error("Unexpected data format:", response.data);
                 setSurveys([]); // 잘못된 형식이 오면 빈 배열로 초기화
@@ -242,6 +216,9 @@ const MyAnsweredPage = () => {
                     </DropdownContainer>
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
+                    {result.map((survey) => (
+                        <SurveyPrev key={survey.id} survey={survey} />
+                    ))}
                     {surveys.map((survey) => (
                         <SurveyPrev key={survey.id} survey={survey} />
                     ))}
