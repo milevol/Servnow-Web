@@ -5,6 +5,7 @@
 import React from "react";
 import styled from "styled-components";
 import FindIdForm from "../components/login/FindIdForm";
+import Navbar from "../components/Navbar";
 
 const Container = styled.div`
   display: flex;
@@ -19,7 +20,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: 50px;
+
 `;
 
 const Title = styled.h1`
@@ -36,13 +37,16 @@ const WelcomeText = styled.p`
 
 const FindIdPage = () => {
   return (
-    <Container>
-      <Content>
-        <Title>아이디 찾기</Title>
-        <WelcomeText>아이디를 잊으셨나요?</WelcomeText>
-        <FindIdForm />
-      </Content>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <Content>
+          <Title>아이디 찾기</Title>
+          <WelcomeText>아이디를 잊으셨나요?</WelcomeText>
+          <FindIdForm />
+        </Content>
+      </Container>
+      </>
   );
 };
 

@@ -5,18 +5,14 @@
 import React from "react";
 import styled from "styled-components";
 import LoginForm from "../components/login/LoginForm"; // 파일 경로와 default export 확인
-
+import Navbar from "../components/Navbar";
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-<<<<<<< HEAD
   height: 100%;
   background: linear-gradient(to bottom, #4C76FE 50%, #f0f2f5 50%);
-=======
-  height: 100vh;
-  background: linear-gradient(to bottom, #4c76fe 50%, #f0f2f5 50%);
->>>>>>> c4e9222352d56aba8f4a62846e10bd26e83262ee
+
 `;
 
 const Content = styled.div`
@@ -24,7 +20,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: 50px;
+  margin-top: 60px;
   margin-bottom: 50px;
 
 `;
@@ -43,13 +39,16 @@ const WelcomeText = styled.p`
 
 const LoginPage = () => {
   return (
-    <Container>
-      <Content>
-        <Title>로그인</Title>
-        <WelcomeText>서브나우에 오신 것을 환영합니다.</WelcomeText>
-        <LoginForm />
-      </Content>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <Content>
+          <Title>로그인</Title>
+          <WelcomeText>서브나우에 오신 것을 환영합니다.</WelcomeText>
+          <LoginForm />
+        </Content>
+      </Container>
+    </>
   );
 };
 
