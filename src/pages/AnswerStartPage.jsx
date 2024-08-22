@@ -145,7 +145,9 @@ const Description = styled.div`
 `;
 
 const AnswerStartPage = () => {
-  const loginStatus = localStorage.getItem("token");
+  const loginStatus = localStorage.getItem("accessToken")
+    ? localStorage.getItem("accessToken")
+    : sessionStorage.getItem("accessToken");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
 

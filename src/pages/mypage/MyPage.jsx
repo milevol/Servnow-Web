@@ -249,9 +249,7 @@ const MyPage = () => {
   }, []);
 
   const userPoints = data.point; // 현재 사용자 포인트
-  const pointsRequired = [
-    0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500,
-  ];
+  const pointsRequired = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500];
 
   // 캐릭터 이미지 배열
   const characterImages = [
@@ -269,17 +267,12 @@ const MyPage = () => {
   ];
 
   // 등급 이미지 인덱스를 계산
-  const imageIndex = characterImages.findIndex(
-    (_, index) => userPoints < (index + 1) * 500
-  );
-  const selectedImage =
-    characterImages[imageIndex >= 0 ? imageIndex : characterImages.length - 1];
+  const imageIndex = characterImages.findIndex((_, index) => userPoints < (index + 1) * 500);
+  const selectedImage = characterImages[imageIndex >= 0 ? imageIndex : characterImages.length - 1];
 
   //마이페이지에서 포인트 이미지 불러오기 함수
   const getImageSrc = (index) => {
-    return userPoints >= pointsRequired[index]
-      ? characterImages[index]
-      : "/lock.png";
+    return userPoints >= pointsRequired[index] ? characterImages[index] : "/lock.png";
   };
 
   // 포인트 바 함수
@@ -290,22 +283,11 @@ const MyPage = () => {
     if (userPoints <= thresholds[0]) {
       return 0; // 평민 구간
     } else if (userPoints <= thresholds[1]) {
-      return (
-        ((userPoints - thresholds[0]) / (thresholds[1] - thresholds[0])) *
-        progressPerLevel
-      ); // 기사 구간
+      return ((userPoints - thresholds[0]) / (thresholds[1] - thresholds[0])) * progressPerLevel; // 기사 구간
     } else if (userPoints <= thresholds[2]) {
-      return (
-        progressPerLevel +
-        ((userPoints - thresholds[1]) / (thresholds[2] - thresholds[1])) *
-          progressPerLevel
-      ); // 남작 구간
+      return progressPerLevel + ((userPoints - thresholds[1]) / (thresholds[2] - thresholds[1])) * progressPerLevel; // 남작 구간
     } else if (userPoints <= thresholds[3]) {
-      return (
-        2 * progressPerLevel +
-        ((userPoints - thresholds[2]) / (thresholds[3] - thresholds[2])) *
-          progressPerLevel
-      ); // 백작 구간
+      return 2 * progressPerLevel + ((userPoints - thresholds[2]) / (thresholds[3] - thresholds[2])) * progressPerLevel; // 백작 구간
     } else {
       return 100; // 최고 단계에 도달한 경우 (5500 포인트 이상)
     }
@@ -402,11 +384,7 @@ const MyPage = () => {
               <div id="etc1">
                 <div>
                   <p className="weight">나의 계정 설정</p>
-                  <p
-                    className="greyColor"
-                    onClick={goToMyInfoModify}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <p className="greyColor" onClick={goToMyInfoModify} style={{ cursor: "pointer" }}>
                     내 정보 수정
                   </p>
                 </div>
