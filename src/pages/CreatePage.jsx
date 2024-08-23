@@ -1,12 +1,14 @@
 import React, { useState, memo, useCallback } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import pageIcon from "../assets/paper.png";
 import timeIcon from "../assets/time.png";
 import duplicateIcon from "../assets/duplicate.png";
 import deleteIcon from "../assets/delete.png";
-
 import CreateMainHeader from "../components/CreateMainHeader";
 import SidebarWrapper from "../components/SidebarWrapper";
+import { useNavigate } from "react-router-dom";
+import navMascotImage from "../assets/navMascot.png";
+import SurveyModal from "../components/SurveyModal";
 
 const Container = styled.div`
   height: 100%;
@@ -96,7 +98,7 @@ const CardContainer = styled.div`
 
 const ContentContainer = styled.div`
   width: 75%;
-  
+
   div:first-child {
     width: 60%;
   }
@@ -148,7 +150,6 @@ const Select = styled.select`
 
 const QuestionContainer = styled.div`
   display: flex;
-  margin-top: 10px;
 `;
 
 const QContainer = styled.div`
@@ -367,6 +368,73 @@ const AddButton = styled.button`
     width: 20px;
     margin-right: 5px;
   }
+`;
+
+// 네비게이션 바 전체 컨테이너 스타일
+const NavbarContainer = styled.div`
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  left: 0;
+  top: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  box-sizing: border-box;
+
+  ${({ $isSpecialPage }) =>
+    $isSpecialPage &&
+    css`
+      background: #3e77ff;
+    `}
+`;
+
+// 마스코트 아이콘 스타일
+const SideMascot = styled.div`
+  width: 40px;
+  height: 40px;
+  background: url(${navMascotImage}) no-repeat center center;
+  background-size: cover;
+  cursor: pointer;
+`;
+
+// 제작, 응답버튼  div 스타일
+const MiddleBtnContainer = styled.div`
+  display: flex;
+  width: 13%;
+  margin-left: 10%;
+`;
+
+// 제작, 응답버튼 스타일
+const MiddleButton = styled.button`
+  width: 100%;
+  height: 35px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: ${(props) => (props.$isCreate ? "#4c76fe" : "#C5CCD5")};
+  color: ${(props) => (props.$isCreate ? "#fff" : "#000")};
+  font-weight: bold;
+`;
+
+// 등록/배포하기, 미리보기 div 스타일
+const LargeBtnContainer = styled.div`
+  display: flex;
+  width: 14%;
+`;
+
+// 등록/배포하기, 미리보기 스타일
+const LargeButton = styled.button`
+  width: ${(props) => (props.$isDistribute ? "100%" : "80%")};
+  height: 35px;
+  margin: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background-color: ${(props) => (props.$isDistribute ? "#4c76fe" : "#8EA9FF")};
+  color: #fff;
 `;
 
 const AddContainer = styled.div``;
@@ -597,13 +665,13 @@ const CreatePage = () => {
     }
   });
 
+  let answer = [];
   const sendRequestBody = (e) => {
     e.preventDefault();
 
     let formData = new FormData(e.target);
 
     let q = [];
-    let answer = [];
     for (let i = 0; i < 2; i++) {
       q.push({
         questionTitle: formData.get("questionTitle") || "",
@@ -655,18 +723,48 @@ const CreatePage = () => {
       sections: sections,
     };
 
+    console.log(answers);
     return answers;
+  };
+
+  const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // 마스코트 클릭 핸들러
+  const handleMascotClick = () => {
+    navigate("/");
   };
 
   return (
     <Container>
+      <NavbarContainer>
+        <SideMascot onClick={handleMascotClick} />
+        <MiddleBtnContainer>
+          <MiddleButton $isCreate={true}>제작</MiddleButton>
+          <MiddleButton>응답</MiddleButton>
+        </MiddleBtnContainer>
+        <LargeBtnContainer>
+          <LargeButton
+            $isDistribute={true}
+            onClick={() => {
+              console.log("모달이 켜짐");
+              setModalOpen(true);
+              surveyData = { answer: sendRequestBody() };
+            }}
+          >
+            등록/배포하기
+          </LargeButton>
+          <LargeButton>미리보기</LargeButton>
+        </LargeBtnContainer>
+      </NavbarContainer>
       <form onSubmit={sendRequestBody}>
-        <CreateMainHeader getData={sendRequestBody} />
+        <CreateMainHeader />
         <Card type={"title"} />
         <Card type={"section"} />
         <Card type={"question"} />
       </form>
       <SidebarWrapper />
+      <SurveyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} surveyData={(answer = { sendRequestBody })} />
     </Container>
   );
 };

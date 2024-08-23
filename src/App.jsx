@@ -18,7 +18,6 @@ import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
 import CreatePage from "./pages/CreatePage";
 import LandingPage from "./pages/LandingPage";
 import MyPagePoint from "./pages/mypage/MyPagePoint";
-import CreatePage from "./pages/CreatePage";
 
 function App() {
   return (
