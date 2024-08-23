@@ -388,6 +388,7 @@ const MyInfoModifyKakaoPage = () => {
             type="text" 
             value={nickname} 
             onChange={(e) => setNickname(e.target.value)}
+            readOnly
             />
             {/* {nickname !== originalNickname && (
               <UpdateButton 
