@@ -20,6 +20,7 @@ const Container = styled.div`
 
   p {
     font-weight: bold;
+    margin-top: 10px;
   }
 
   .complete {
