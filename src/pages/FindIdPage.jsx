@@ -45,7 +45,7 @@ const FindIdPage = () => {
           <FindIdForm />
         </Content>
       </Container>
-    </>
+      </>
   );
 };
 

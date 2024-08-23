@@ -69,8 +69,16 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
     const fetchUserPoints = async () => {
       setLoading(true);
 
+      const token = getToken();
+
+      // 토큰이 없으면 API 호출을 중단하고, 사용자에게 로그인하도록 안내
+      if (!token) {
+        setLoading(false);
+        setError("로그인이 필요합니다.");
+        return;
+      }
+
       try {
-        const token = getToken();
         const response = await axios.get("/api/v1/users/me/point", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -130,34 +138,36 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
   };
 
   // Axios 인터셉터 설정
+  // useEffect(() => {
+  //   const interceptor = axios.interceptors.response.use(
+  //     (response) => response,
+  //     async (error) => {
+  //       if (error.response && error.response.status === 401) {
+  //         // 401 에러가 발생하면 로그아웃 처리
+  //         sessionStorage.removeItem("accessToken");
+  //         sessionStorage.removeItem("refreshToken");
+  //         localStorage.removeItem("accessToken");
+  //         localStorage.removeItem("refreshToken");
+  //         setIsLoggedIn(false);
+  //         navigate("/login");
+  //       }
+  //       return Promise.reject(error);
+  //     }
+  //   );
+
+  //   return () => {
+  //     axios.interceptors.response.eject(interceptor);
+  //   };
+  // }, [navigate]);
+
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response && error.response.status === 401) {
-          try {
-            const refreshToken =
-              localStorage.getItem("refreshToken") ||
-              sessionStorage.getItem("refreshToken");
-            const response = await axios.post("/api/v1/auth/refresh", {
-              refreshToken,
-            });
-            const { accessToken } = response.data.data;
-            if (localStorage.getItem("accessToken")) {
-              localStorage.setItem("accessToken", accessToken);
-            } else {
-              sessionStorage.setItem("accessToken", accessToken);
-            }
-            error.config.headers.Authorization = `Bearer ${accessToken}`;
-            return axios(error.config);
-          } catch (err) {
-            sessionStorage.removeItem("accessToken");
-            sessionStorage.removeItem("refreshToken");
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            setIsLoggedIn(false);
-            navigate("/login");
-          }
+          // 401 에러 발생 시 콘솔에만 에러 출력
+          // console.error("401 Unauthorized error:", error.response.data);
+          // 로그아웃 처리 및 페이지 리다이렉트하지 않음
         }
         return Promise.reject(error);
       }
@@ -166,7 +176,7 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
-  }, [navigate]);
+  }, []);
 
   return (
     <SidebarContainer $isOpen={isOpen}>

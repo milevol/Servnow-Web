@@ -21,7 +21,7 @@ const NewSurveyButton = () => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate("/make");
+        navigate("/create");
     };
 
     return (

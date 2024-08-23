@@ -11,7 +11,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
 import PlusButton from "../components/PlusButton";
-import mascotImage from "../assets/mascot.png";
+import mascotImage from "/homeMascot.png";
 
 // 메인 페이지 전체 컨테이너 스타일
 const HomePageContainer = styled.div`
@@ -121,7 +121,6 @@ const customStyles = {
   }),
 };
 
-// HomePage 컴포넌트
 function HomePage() {
   const [sortOption, setSortOption] = useState("deadline"); // 현재 선택된 정렬 옵션 상태
   const [data, setData] = useState([]); // 설문 데이터 상태
@@ -160,44 +159,6 @@ function HomePage() {
   // 컴포넌트가 마운트될 때, 기본적으로 "기간 순"으로 데이터를 가져옴
   useEffect(() => {
     fetchSurveyData("deadline");
-  }, []);
-
-  // Axios 인터셉터 설정
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        if (error.response && error.response.status === 401) {
-          try {
-            const refreshToken =
-              localStorage.getItem("refreshToken") ||
-              sessionStorage.getItem("refreshToken");
-            const response = await axios.post("/api/v1/auth/refresh", {
-              refreshToken,
-            });
-            const { accessToken } = response.data.data;
-            if (localStorage.getItem("accessToken")) {
-              localStorage.setItem("accessToken", accessToken);
-            } else {
-              sessionStorage.setItem("accessToken", accessToken);
-            }
-            error.config.headers.Authorization = `Bearer ${accessToken}`;
-            return axios(error.config);
-          } catch (err) {
-            sessionStorage.removeItem("accessToken");
-            sessionStorage.removeItem("refreshToken");
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            window.location.href = "/login";
-          }
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
   }, []);
 
   // 정렬 옵션이 변경될 때 호출되는 핸들러
@@ -242,6 +203,7 @@ function HomePage() {
                   expiredAt={item.expiredAt}
                   participants={item.participants}
                   completed={item.status}
+                  surveyId={item.surveyId} // surveyId를 props로 전달
                 />
               ))
             ) : (

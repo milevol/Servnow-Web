@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom"; 
 
 export const SurveyBox = styled.div`
     width : 40%;
@@ -45,7 +46,7 @@ export const SurveyImageContainer = styled.div`
 
 export const CharacterBox = styled.div`
     height : 88%;
-    width : 16.5%;
+    width : 18.5%;
     margin-top : 1%;
     margin-left : 42%;
     background-image: url(${props => props.backgroundImage});
@@ -78,7 +79,7 @@ export const SurveyDateBox = styled.div`
     justify-content:center;
 `;
 
-const SurveyPrev = ({ survey }) => {
+const SurveyPrev = ({ survey, link }) => {
     const characters = [
         {value: "TYPE_ONE", label: "character1"},
         {value: "TYPE_TWO", label: "character2"},
@@ -134,8 +135,15 @@ const SurveyPrev = ({ survey }) => {
         return `${year}년 ${month}월 ${day}일 ${ampm} ${formattedHours}:${minutes}`;
     };
 
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        console.log(link)
+        navigate(`/${link}/${survey.surveyId}`);
+    };
+
     return (
-        <SurveyBox>
+        <SurveyBox onClick={handleClick}>
             <SurveyContainer finished={finished}>
                 <SurveyStatusButton finished={finished}>
                     {finished === 'yes' ? '종료' : '진행 중'}

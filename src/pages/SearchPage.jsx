@@ -139,11 +139,14 @@ function SearchPage() {
           });
           params.append("filter", filter);
 
-          const response = await axios.get(`/api/v1/survey?${params.toString()}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `/api/v1/survey?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           setSearchResults(response.data.data.survey || []);
         } catch (err) {
@@ -180,11 +183,14 @@ function SearchPage() {
           });
           params.append("filter", excludeCompleted.toString());
 
-          const response = await axios.get(`/api/v1/survey?${params.toString()}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            `/api/v1/survey?${params.toString()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
           setSearchResults(response.data.data.survey || []);
         } catch (err) {

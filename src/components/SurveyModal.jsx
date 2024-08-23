@@ -1,10 +1,12 @@
 // 목적: 설문지 등록 모달
 // 기능: 설문지 등록
-// 2024.08.02/곤/장고은
+// 2024.08.23/곤/장고은
+// 남은 작업: api연결
 
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IoLinkSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -80,16 +82,8 @@ const ModalInput = styled.input`
   background-color: #f2f5ff;
   border: none;
   border-radius: 5px;
-`;
-
-const ModalLinkP = styled.p`
-  width: 96.5%;
-  margin: 50px 0;
-  padding: 15px;
-  color: #5d6670;
-  background-color: #f2f5ff;
-  border: none;
-  border-radius: 5px;
+  margin: ${(props) => (props.$isEmail ? "50px 0" : "0 0 0 5px")};
+  padding: ${(props) => (props.$isEmail ? "15px" : "10px")};
 `;
 
 const OptionButton = styled.button`
@@ -165,9 +159,12 @@ const ToggleKnob = styled.div`
 `;
 
 const SurveyModal = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [reward, setReward] = useState("");
+  const [rewardCount, setRewardCount] = useState("");
+  const [expiredAt, setExpiredAt] = useState("");
   const [distribution, setDistribution] = useState("link");
-  const [dateTime, setDateTime] = useState("");
   const [emailContent, setEmailContent] = useState({
     email: "",
     recipient: "",
@@ -176,6 +173,16 @@ const SurveyModal = ({ isOpen, onClose }) => {
   });
   const [isEmailCollectionEnabled, setIsEmailCollectionEnabled] =
     useState(false);
+
+  const stringDate = new Date(expiredAt).toISOString();
+  const data = {
+    reward,
+    rewardCount,
+    stringDate,
+
+    //emailContent,
+    //distribution,
+  };
 
   const handleNext = () => {
     if (step < 3) {
@@ -203,6 +210,11 @@ const SurveyModal = ({ isOpen, onClose }) => {
 
   const handleToggleChange = () => {
     setIsEmailCollectionEnabled(!isEmailCollectionEnabled);
+  };
+
+  const handleSendClick = () => {
+    console.log(data);
+    navigate("/");
   };
 
   return (
@@ -238,11 +250,15 @@ const SurveyModal = ({ isOpen, onClose }) => {
               <ModalInput
                 type="text"
                 placeholder="리워드 명을 입력해 주세요."
+                value={reward}
+                onChange={(e) => setReward(e.target.value)}
               />
               <ModalFormP>리워드 갯수</ModalFormP>
               <ModalInput
                 type="text"
                 placeholder="리워드 갯수를 입력해 주세요."
+                value={rewardCount}
+                onChange={(e) => setRewardCount(e.target.value)}
               />
             </>
           )}
@@ -251,8 +267,8 @@ const SurveyModal = ({ isOpen, onClose }) => {
               <ModalFormP>마감 기간</ModalFormP>
               <ModalInput
                 type="datetime-local"
-                value={dateTime}
-                onChange={(e) => setDateTime(e.target.value)}
+                value={expiredAt}
+                onChange={(e) => setExpiredAt(e.target.value)}
               />
             </>
           )}
@@ -271,7 +287,13 @@ const SurveyModal = ({ isOpen, onClose }) => {
                 ✉ 이메일로 배포하기
               </OptionButton>
               {distribution === "link" && (
-                <ModalLinkP>http://servenow/130492</ModalLinkP>
+                <ModalInput
+                  type="text"
+                  $isEmail={true}
+                  placeholder="http://servenow/130492"
+                  value={emailContent.email}
+                  onChange={(e) => setEmailContent(e.target.value)}
+                />
               )}
               {distribution === "email" && (
                 <>
@@ -330,7 +352,9 @@ const SurveyModal = ({ isOpen, onClose }) => {
         <ButtonContainer center={step === 3}>
           {step > 1 && <PrevButton onClick={handlePrev}>이전</PrevButton>}
           {step < 3 && <NextButton onClick={handleNext}>다음</NextButton>}
-          {step === 3 && <NextButton onClick={handleNext}>보내기</NextButton>}
+          {step === 3 && (
+            <NextButton onClick={handleSendClick}>보내기</NextButton>
+          )}
         </ButtonContainer>
       </ModalContent>
     </ModalOverlay>

@@ -12,7 +12,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import ResultStructureDiagram from "./CustomSidebar/ResultStructureDiagram"; // **설문 구조도 임포트 자리**
 
 const InsightContainer = styled.div`
-  width: 559px;
+  width: 565px;
   background: #ffffff;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px 0px 0px 10px;
@@ -286,7 +286,7 @@ const InsightCard = ({
   notes,
   onNoteChange,
   onAddNote,
-  onDeleteNote, // 삭제 함수 추가
+  onDeleteNote,
   onSave,
   index,
   moveCard,
@@ -317,7 +317,7 @@ const InsightCard = ({
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    canDrag: isDirectlyOrdered, // 직접 나열일 때만 드래그 가능
+    canDrag: isDirectlyOrdered,
   });
 
   if (isDirectlyOrdered) {
@@ -339,12 +339,12 @@ const InsightCard = ({
               value={note.content}
               onChange={(e) => onNoteChange(index, noteIndex, e.target.value)}
               placeholder="메모를 입력하세요"
-              maxLength={300} // 최대 글자수 300자 제한
+              maxLength={300}
             />
             <DeleteButton onClick={() => onDeleteNote(index, noteIndex, note.id)}>x</DeleteButton>
           </NoteContainer>
         ))}
-        {notes.length < 4 && ( // 메모장이 4개 미만일 때만 추가 버튼 표시
+        {notes.length < 4 && (
           <AddNoteContainer onClick={() => onAddNote(index)}>
             <AddNoteIcon>+</AddNoteIcon>
           </AddNoteContainer>
@@ -367,7 +367,7 @@ const InsightSection = ({ surveyId }) => {
 
   useEffect(() => {
     fetchMemos();
-  }, [surveyId]); // surveyId가 변경될 때마다 데이터를 다시 가져옴
+  }, [surveyId]);
 
   const fetchMemos = async () => {
     try {
@@ -405,7 +405,6 @@ const InsightSection = ({ surveyId }) => {
     newQuestions[questionIndex].notes[noteIndex].content = value;
     setReorderedQuestions(newQuestions);
 
-    // 로컬 스토리지에 저장
     localStorage.setItem("tempMemos", JSON.stringify(newQuestions));
   };
 
@@ -422,7 +421,6 @@ const InsightSection = ({ surveyId }) => {
 
   const handleDeleteNote = async (questionIndex, noteIndex, noteId) => {
     if (!noteId) {
-      // 메모가 서버에 저장되지 않은 경우 (ID가 없는 경우)
       const newQuestions = [...reorderedQuestions];
       newQuestions[questionIndex].notes.splice(noteIndex, 1);
       setReorderedQuestions(newQuestions);
@@ -445,7 +443,6 @@ const InsightSection = ({ surveyId }) => {
         },
       });
 
-      // 메모 삭제가 성공하면 로컬에서 제거
       const newQuestions = [...reorderedQuestions];
       newQuestions[questionIndex].notes.splice(noteIndex, 1);
       setReorderedQuestions(newQuestions);
@@ -458,7 +455,7 @@ const InsightSection = ({ surveyId }) => {
   };
 
   const saveMemos = async (questionIndex) => {
-    setLoading(true); // 저장 버튼 클릭 시 로딩 상태로 변경
+    setLoading(true);
     try {
       const token = localStorage.getItem("accessToken")
         ? localStorage.getItem("accessToken")
@@ -470,12 +467,10 @@ const InsightSection = ({ surveyId }) => {
 
       const updatedQuestion = reorderedQuestions[questionIndex];
 
-      // id가 없는 새 메모만 필터링하여 전송
       const newMemos = updatedQuestion.notes
-        .filter((음표) => !note.id && note.content.trim() !== "")
-        .map((음표) => note.content);
+        .filter((note) => note.id === null && note.content.trim() !== "")
+        .map((note) => note.content);
 
-      // 새로운 메모가 없으면 저장 요청을 보내지 않음
       if (newMemos.length === 0) {
         console.log("새로운 메모가 없어서 저장하지 않습니다.");
         setLoading(false);
@@ -492,7 +487,6 @@ const InsightSection = ({ surveyId }) => {
         ],
       };
 
-      // 전송되는 데이터 확인용 로그
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
 
       const response = await axios.post(`/api/v1/users/me/survey/${surveyId}/memo`, requestBody, {
@@ -504,10 +498,9 @@ const InsightSection = ({ surveyId }) => {
 
       console.log("메모 저장 성공:", response.data);
 
-      // 메모 저장 후, 서버에서 최신 상태를 가져와서 화면에 반영
       await fetchMemos();
 
-      localStorage.removeItem("tempMemos"); // 저장 후 로컬 스토리지에서 삭제
+      localStorage.removeItem("tempMemos");
     } catch (error) {
       if (error.response) {
         console.error("메모 저장 실패:", error.response.data);
@@ -517,7 +510,65 @@ const InsightSection = ({ surveyId }) => {
         console.error("메모 저장 실패:", error.message);
       }
     } finally {
-      setLoading(false); // 저장이 완료되면 로딩 상태 해제
+      setLoading(false);
+    }
+  };
+
+  const updateMemos = async (questionIndex) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("accessToken")
+        ? localStorage.getItem("accessToken")
+        : sessionStorage.getItem("accessToken");
+
+      if (!token) {
+        throw new Error("토큰이 저장되어 있지 않습니다.");
+      }
+
+      const updatedQuestion = reorderedQuestions[questionIndex];
+
+      const modifiedMemos = updatedQuestion.notes
+        .filter((note) => note.id !== null && note.content.trim() !== "")
+        .map((note) => ({ id: note.id, content: note.content }));
+
+      if (modifiedMemos.length === 0) {
+        console.log("수정된 메모가 없어서 업데이트하지 않습니다.");
+        setLoading(false);
+        return;
+      }
+
+      const requestBody = {
+        memos: modifiedMemos,
+      };
+
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+
+      const response = await axios.patch(
+        `/api/v1/users/me/survey/memo`,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("메모 수정 성공:", response.data);
+
+      await fetchMemos();
+
+      localStorage.removeItem("tempMemos");
+    } catch (error) {
+      if (error.response) {
+        console.error("메모 수정 실패:", error.response.data);
+        console.error("상태 코드:", error.response.status);
+        console.error("헤더:", error.response.headers);
+      } else {
+        console.error("메모 수정 실패:", error.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -527,14 +578,13 @@ const InsightSection = ({ surveyId }) => {
     newOrder.splice(hoverIndex, 0, draggedItem);
     setReorderedQuestions(newOrder);
 
-    // 로컬 스토리지에 순서 저장
     const orderIds = newOrder.map((q) => q.questionId);
     localStorage.setItem("questionOrder", JSON.stringify(orderIds));
   };
 
   useEffect(() => {
     if (activeButton === "질문 순") {
-      setReorderedQuestions([...questions]); // 질문 순으로 돌아갔을 때 원래 순서로 복원
+      setReorderedQuestions([...questions]);
     } else {
       const savedOrder = JSON.parse(localStorage.getItem("questionOrder"));
       if (savedOrder) {
@@ -566,10 +616,16 @@ const InsightSection = ({ surveyId }) => {
           {activeTab === "insight" ? (
             <>
               <ButtonGroup>
-                <Button $active={activeButton === "질문 순"} onClick={() => setActiveButton("질문 순")}>
+                <Button
+                  $active={activeButton === "질문 순"}
+                  onClick={() => setActiveButton("질문 순")}
+                >
                   질문 순
                 </Button>
-                <Button $active={activeButton === "직접 나열"} onClick={() => setActiveButton("직접 나열")}>
+                <Button
+                  $active={activeButton === "직접 나열"}
+                  onClick={() => setActiveButton("직접 나열")}
+                >
                   직접 나열
                 </Button>
               </ButtonGroup>
@@ -583,13 +639,20 @@ const InsightSection = ({ surveyId }) => {
                   <InsightCard
                     key={question.questionId}
                     index={index}
-                    questionNumber={activeButton === "질문 순" ? question.questionOrder : index + 1}
+                    questionNumber={
+                      activeButton === "질문 순"
+                        ? question.questionOrder
+                        : index + 1
+                    }
                     questionText={question.title}
                     notes={question.notes}
                     onNoteChange={handleNoteChange}
                     onAddNote={handleAddNote}
                     onDeleteNote={handleDeleteNote}
-                    onSave={saveMemos}
+                    onSave={() => {
+                      saveMemos(index);
+                      updateMemos(index);
+                    }}
                     moveCard={moveCard}
                     isDirectlyOrdered={activeButton === "직접 나열"}
                   />
@@ -597,7 +660,7 @@ const InsightSection = ({ surveyId }) => {
               )}
             </>
           ) : (
-            <ResultStructureDiagram /> // **설문구조도 컴포넌트 자리**
+            <ResultStructureDiagram />
           )}
         </InnerContainer>
       </InsightContainer>

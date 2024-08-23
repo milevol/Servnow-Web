@@ -266,6 +266,9 @@ const FindIdForm = () => {
   const handleOkClick = () => {
     navigate("/login");
   };
+  const handleOkClick = () => {
+    navigate('/login');
+  };
 
   return (
     <FormContainer>
@@ -277,42 +280,39 @@ const FindIdForm = () => {
               아이디는 <HighlightedUserId>{userId}</HighlightedUserId> 입니다.
             </SuccessMessage>
           </SuccessContainer>
-
-          <ButtonContainer>
-            <ConfirmButton onClick={handleOkClick}>확인</ConfirmButton>
-            <FindPswdButton onClick={handleFindPasswordClick}>비밀번호 찾기</FindPswdButton>
-          </ButtonContainer>
-        </FindWrapper>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <InputWrapper>
-            <InputText>이메일</InputText>
-            <Input
-              type="email"
-              placeholder="이메일을 입력해주세요."
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <SendButton type="button" onClick={handleVerificationSend}>
-              인증번호 전송
+                <ButtonContainer>
+                    <ConfirmButton onClick={handleOkClick}>확인</ConfirmButton>
+                    <FindPswdButton onClick={handleFindPasswordClick}>비밀번호 찾기</FindPswdButton>
+                </ButtonContainer>
+            </FindWrapper>
+        ) : (
+      <form onSubmit={handleSubmit}>
+        <InputWrapper>
+          <InputText>이메일</InputText>
+          <Input
+            type="email"
+            placeholder="이메일을 입력해주세요."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <SendButton type='button' onClick={handleVerificationSend}>인증번호 전송</SendButton>
+        </InputWrapper>
+        {error && <ErrorText>{error}</ErrorText>}
+        <InputWrapper>
+          <InputText>인증번호</InputText>
+          <Input
+            type="text"
+            placeholder="인증번호를 입력해주세요."
+            value={validNumber}
+            onChange={(e) => setValidNumber(e.target.value)}
+          />
+           <SendButton type='button' onClick={handleVerificationConfirm}>
+            인증확인
             </SendButton>
-          </InputWrapper>
-          {error && <ErrorText>{error}</ErrorText>}
-          <InputWrapper>
-            <InputText>인증번호</InputText>
-            <Input
-              type="text"
-              placeholder="인증번호를 입력해주세요."
-              value={validNumber}
-              onChange={(e) => setValidNumber(e.target.value)}
-            />
-            <SendButton type="button" onClick={handleVerificationConfirm}>
-              인증확인
-            </SendButton>
-          </InputWrapper>
-          <FindButton type="submit">아이디 찾기</FindButton>
-        </form>
-      )}
+        </InputWrapper>
+        <FindButton type="submit">아이디 찾기</FindButton>
+      </form>
+    )}
     </FormContainer>
   );
 };

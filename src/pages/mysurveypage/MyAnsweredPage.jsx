@@ -119,27 +119,27 @@ const MyAnsweredPage = () => {
     const result = [
         {
             surveyId: 1,
-            title: '취업을 앞둔 대학생 인식 설문조사',
+            title: '추석날 아침메뉴 추천',
             description: 'Description for movie 1',
-            expiredAt: '2024-06-21T19:23:10.111Z',
+            expiredAt: '2024-09-13T19:23:10.111Z',
             finished: 'no',
-            characterType: "TYPE_ONE"
+            characterType: "TYPE_FOUR"
         },
         {
             surveyId: 2,
-            title: '도서관에서의 가상현실(VR) 콘텐츠 이용자 및...',
+            title: '추석 점심메뉴를 추천해주세요...',
             description: 'Description for movie 2',
-            expiredAt: '2024-06-19T16:53:10.111Z',
+            expiredAt: '2024-09-15T16:53:10.111Z',
             finished: 'no',
-            characterType: "TYPE_TWO"
+            characterType: "TYPE_ELEVEN"
         },
         {
             surveyId: 3,
-            title: '대학생 설문 서비스 플랫폼 관련 인식조사',
+            title: '대학생 맛집 게시판 필요조사',
             description: 'Description for movie 3',
             expiredAt: '2024-06-02T12:00:00.000Z',
             finished: 'yes',
-            characterType: "TYPE_THREE"
+            characterType: "TYPE_SEVEN"
         }
     ];
 
@@ -174,13 +174,15 @@ const MyAnsweredPage = () => {
     const getSurveyData = async (sortOrder) => {
         try {
             const token = getToken();
-            const response = await axios.get(`/api/v1/users/me/survey?sort=${sortOrder}`, {
+            const response = await axios.get(`/api/v1/users/me/survey/join?sort=${sortOrder}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
     
             // response.data.survey가 배열인지 확인하고, 그렇지 않으면 빈 배열로 초기화
+            console.log("data");
+            console.log(response.data);
             if (Array.isArray(response.data.data)) {
                 setSurveys(response.data.data);
             } else {
@@ -217,7 +219,10 @@ const MyAnsweredPage = () => {
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
                     {result.map((survey) => (
-                        <SurveyPrev key={survey.id} survey={survey} />
+                        <SurveyPrev key={survey.surveyId} survey={survey} link="answer"/>
+                    ))}
+                    {surveys.map((survey) => (
+                        <SurveyPrev key={survey.surveyId} survey={survey} link="answer"/>
                     ))}
                     {surveys.map((survey) => (
                         <SurveyPrev key={survey.id} survey={survey} />
