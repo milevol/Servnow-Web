@@ -138,7 +138,7 @@ const SurveyPrev = ({ survey }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/result/${survey.serveyId}`);
+        navigate(`/result/${survey.surveyId}`);
     };
 
     return (
