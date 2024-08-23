@@ -138,18 +138,36 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
   };
 
   // Axios 인터셉터 설정
+  // useEffect(() => {
+  //   const interceptor = axios.interceptors.response.use(
+  //     (response) => response,
+  //     async (error) => {
+  //       if (error.response && error.response.status === 401) {
+  //         // 401 에러가 발생하면 로그아웃 처리
+  //         sessionStorage.removeItem("accessToken");
+  //         sessionStorage.removeItem("refreshToken");
+  //         localStorage.removeItem("accessToken");
+  //         localStorage.removeItem("refreshToken");
+  //         setIsLoggedIn(false);
+  //         navigate("/login");
+  //       }
+  //       return Promise.reject(error);
+  //     }
+  //   );
+
+  //   return () => {
+  //     axios.interceptors.response.eject(interceptor);
+  //   };
+  // }, [navigate]);
+
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response && error.response.status === 401) {
-          // 401 에러가 발생하면 로그아웃 처리
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("refreshToken");
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          setIsLoggedIn(false);
-          navigate("/login");
+          // 401 에러 발생 시 콘솔에만 에러 출력
+          // console.error("401 Unauthorized error:", error.response.data);
+          // 로그아웃 처리 및 페이지 리다이렉트하지 않음
         }
         return Promise.reject(error);
       }
@@ -158,7 +176,7 @@ const Sidebar = ({ isOpen, onClose, setIsLoggedIn }) => {
     return () => {
       axios.interceptors.response.eject(interceptor);
     };
-  }, [navigate]);
+  }, []);
 
   return (
     <SidebarContainer $isOpen={isOpen}>
