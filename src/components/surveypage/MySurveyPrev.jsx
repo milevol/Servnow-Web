@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom"; 
 
 export const SurveyBox = styled.div`
     width : 40%;
@@ -134,8 +135,14 @@ const SurveyPrev = ({ survey }) => {
         return `${year}년 ${month}월 ${day}일 ${ampm} ${formattedHours}:${minutes}`;
     };
 
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/result/${survey.serveyId}`);
+    };
+
     return (
-        <SurveyBox>
+        <SurveyBox onClick={handleClick}>
             <SurveyContainer finished={finished}>
                 <SurveyStatusButton finished={finished}>
                     {finished === 'yes' ? '종료' : '진행 중'}
