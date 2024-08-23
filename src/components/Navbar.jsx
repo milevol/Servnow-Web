@@ -201,18 +201,35 @@ const Navbar = () => {
   }, [isLoggedIn]);
 
   // Axios 인터셉터 설정
+  // useEffect(() => {
+  //   const interceptor = axios.interceptors.response.use(
+  //     (response) => response,
+  //     (error) => {
+  //       if (error.response && error.response.status === 401) {
+  //         // 401 에러 발생 시 로그아웃 처리
+  //         sessionStorage.removeItem("accessToken");
+  //         sessionStorage.removeItem("refreshToken");
+  //         localStorage.removeItem("accessToken");
+  //         localStorage.removeItem("refreshToken");
+  //         setIsLoggedIn(false);
+  //         navigate("/login"); // 로그인 페이지로 리다이렉트
+  //       }
+  //       return Promise.reject(error);
+  //     }
+  //   );
+
+  //   return () => {
+  //     axios.interceptors.response.eject(interceptor);
+  //   };
+  // }, [navigate]);
+
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
-          // 401 에러 발생 시 로그아웃 처리
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("refreshToken");
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          setIsLoggedIn(false);
-          navigate("/login"); // 로그인 페이지로 리다이렉트
+          // 401 에러 발생 시 로그아웃 처리 로직 제거
+          console.error("401 Unauthorized error:", error.response.data);
         }
         return Promise.reject(error);
       }
