@@ -7,7 +7,6 @@
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
-7;
 import navMascotImage from "../assets/navMascot.png";
 import SurveyModal from "../components/SurveyModal";
 
