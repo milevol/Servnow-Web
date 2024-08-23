@@ -174,13 +174,15 @@ const MyAnsweredPage = () => {
     const getSurveyData = async (sortOrder) => {
         try {
             const token = getToken();
-            const response = await axios.get(`/api/v1/users/me/survey?sort=${sortOrder}`, {
+            const response = await axios.get(`/api/v1/users/me/survey/join?sort=${sortOrder}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
     
             // response.data.survey가 배열인지 확인하고, 그렇지 않으면 빈 배열로 초기화
+            console.log("data");
+            console.log(response.data);
             if (Array.isArray(response.data.data)) {
                 setSurveys(response.data.data);
             } else {
