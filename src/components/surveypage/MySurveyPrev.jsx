@@ -46,7 +46,7 @@ export const SurveyImageContainer = styled.div`
 
 export const CharacterBox = styled.div`
     height : 88%;
-    width : 16.5%;
+    width : 18.5%;
     margin-top : 1%;
     margin-left : 42%;
     background-image: url(${props => props.backgroundImage});
@@ -79,7 +79,7 @@ export const SurveyDateBox = styled.div`
     justify-content:center;
 `;
 
-const SurveyPrev = ({ survey }) => {
+const SurveyPrev = ({ survey, link }) => {
     const characters = [
         {value: "TYPE_ONE", label: "character1"},
         {value: "TYPE_TWO", label: "character2"},
@@ -138,7 +138,8 @@ const SurveyPrev = ({ survey }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(`/result/${survey.surveyId}`);
+        console.log(link)
+        navigate(`/${link}/${survey.surveyId}`);
     };
 
     return (

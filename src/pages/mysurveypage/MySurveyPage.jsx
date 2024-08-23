@@ -218,10 +218,10 @@ const MySurveyPage = () => {
                 </SurveyOnerContainer>
                 <TortalSurveyContainer>
                     {result.map((survey) => (
-                        <SurveyPrev key={survey.id} survey={survey} />
+                        <SurveyPrev key={survey.surveyId} survey={survey} link="result"/>
                     ))}
                     {surveys.map((survey) => (
-                        <SurveyPrev key={survey.surveId} survey={survey} />
+                        <SurveyPrev key={survey.surveId} survey={survey} link="result"/>
                     ))}
                     <SurveyBox>
                         <NewSurveyBox>
