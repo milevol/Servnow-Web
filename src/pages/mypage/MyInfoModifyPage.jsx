@@ -506,38 +506,63 @@ const MyInfoModifyPage = () => {
   };
 
   return (
-    <PageContainer>
-      <Navbar />
-      <Header>내 정보 수정</Header>
-      <HorizontalLine />
-      <ProfileImageWrapper>
-        <ProfileImage
-          src={profileImage}
-          alt="Profile"
-          onClick={() => document.getElementById("profileImageInput").click()} //클릭 시 파일 선택 창 열기
-          onError={handleImageError}
-        />
-        <HiddenFileInput type="file" accept="image/*" id="profileImageInput" onChange={handleImageChange} />
-        <IconButton
-          onClick={handleIconButtonClick}
-          style={{ position: "absolute", top: "70px", right: "0", width: "25px", height: "25px", padding: "0" }}
-        >
-          ✎
-        </IconButton>
-      </ProfileImageWrapper>
+    <>
+      <PageContainer>
+        <Navbar />
+        <Header>내 정보 수정</Header>
+        <HorizontalLine />
+        <ProfileImageWrapper>
+          <ProfileImage
+            src={profileImage}
+            alt="Profile"
+            onClick={() => document.getElementById("profileImageInput").click()} //클릭 시 파일 선택 창 열기
+            onError={handleImageError}
+          />
+          <HiddenFileInput type="file" accept="image/*" id="profileImageInput" onChange={handleImageChange} />
+          <IconButton
+            onClick={handleIconButtonClick}
+            style={{
+              position: "absolute",
+              top: "70px",
+              right: "0",
+              width: "25px",
+              height: "25px",
+              padding: "0",
+            }}
+          >
+            ✎
+          </IconButton>
+        </ProfileImageWrapper>
 
-      <InfoContainer>
-        <InfoItem>
-          <InfoLabel>닉네임</InfoLabel>
-          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} readOnly />
-        </InfoItem>
-        <InfoItem>
-          <InfoLabel>아이디 *</InfoLabel>
-          <InfoInput type="text" value={userId} onChange={(e) => handleIdChange(e.target.value)} />
-          <OverlapButton onClick={handleIdDuplicateCheck}>중복확인</OverlapButton>
-        </InfoItem>
-        {emailChange ? (
-          <>
+        <InfoContainer>
+          <InfoItem>
+            <InfoLabel>닉네임</InfoLabel>
+            <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>아이디 *</InfoLabel>
+            <InfoInput type="text" value={userId} onChange={(e) => handleIdChange(e.target.value)} />
+            <OverlapButton onClick={handleIdDuplicateCheck}>중복확인</OverlapButton>
+          </InfoItem>
+          {emailChange ? (
+            <>
+              <InfoItem>
+                <InfoLabel>이메일 *</InfoLabel>
+                <InfoInput
+                  type="email"
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  placeholder="이메일을 입력해 주세요."
+                />
+                <VerifyButton onClick={handleEmailVerification}>본인인증</VerifyButton>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>인증번호</InfoLabel>
+                <InfoInput type="text" value={validNumber} onChange={(e) => setValidNumber(e.target.value)} />
+                <VerifyButton onClick={handleEmailCertification}>인증확인</VerifyButton>
+              </InfoItem>
+            </>
+          ) : (
             <InfoItem>
               <InfoLabel>이메일 *</InfoLabel>
               <InfoInput
@@ -546,56 +571,40 @@ const MyInfoModifyPage = () => {
                 onChange={(e) => handleEmailChange(e.target.value)}
                 placeholder="이메일을 입력해 주세요."
               />
-              <VerifyButton onClick={handleEmailVerification}>본인인증</VerifyButton>
+              <OverlapButton onClick={() => setEmailChange(true)}>변경하기</OverlapButton>
+            </InfoItem>
+          )}
+        </InfoContainer>
+        <HorizontalSemiLine />
+        <PasswordSection>
+          <SecondSectionTitle>비밀번호 변경하기</SecondSectionTitle>
+          <PasswordContainer>
+            <InfoItem>
+              <InfoLabel>새로운 비밀번호 *</InfoLabel>
+              <PasswordInput
+                type="password"
+                value={newPassword}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
+              />
             </InfoItem>
             <InfoItem>
-              <InfoLabel>인증번호</InfoLabel>
-              <InfoInput type="text" value={validNumber} onChange={(e) => setValidNumber(e.target.value)} />
-              <VerifyButton onClick={handleEmailCertification}>인증확인</VerifyButton>
+              <InfoLabel>비밀번호 재확인 *</InfoLabel>
+              <PasswordInput
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+              />
             </InfoItem>
-          </>
-        ) : (
-          <InfoItem>
-            <InfoLabel>이메일 *</InfoLabel>
-            <InfoInput
-              type="email"
-              value={email}
-              onChange={(e) => handleEmailChange(e.target.value)}
-              placeholder="이메일을 입력해 주세요."
-            />
-            <OverlapButton onClick={() => setEmailChange(true)}>변경하기</OverlapButton>
-          </InfoItem>
-        )}
-      </InfoContainer>
-      <HorizontalSemiLine />
-      <PasswordSection>
-        <SecondSectionTitle>비밀번호 변경하기</SecondSectionTitle>
-        <PasswordContainer>
-          <InfoItem>
-            <InfoLabel>새로운 비밀번호 *</InfoLabel>
-            <PasswordInput
-              type="password"
-              value={newPassword}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
-            />
-          </InfoItem>
-          <InfoItem>
-            <InfoLabel>비밀번호 재확인 *</InfoLabel>
-            <PasswordInput
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-            />
-          </InfoItem>
-          {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
-        </PasswordContainer>
-      </PasswordSection>
-      <ButtonContainer>
-        <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
-        <SaveButton onClick={handleSave}>저장하기</SaveButton>
-      </ButtonContainer>
-    </PageContainer>
+            {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+          </PasswordContainer>
+        </PasswordSection>
+        <ButtonContainer>
+          <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
+          <SaveButton onClick={handleSave}>저장하기</SaveButton>
+        </ButtonContainer>
+      </PageContainer>
+    </>
   );
 };
 
