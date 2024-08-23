@@ -204,7 +204,6 @@ const MyInfoModifyPage = () => {
       const accessToken =
         localStorage.getItem("accessToken") ||
         sessionStorage.getItem("accessToken");
-
       if (!accessToken) {
         console.log("Access token not found.");
         alert("액세스 토큰을 찾을 수 없습니다.");
@@ -355,6 +354,7 @@ const MyInfoModifyPage = () => {
     const accessToken =
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
+
     if (!accessToken) {
       console.log("Access token not found.");
       alert("액세스 토큰을 찾을 수 없습니다.");
@@ -530,9 +530,7 @@ const MyInfoModifyPage = () => {
       } else {
         console.error(
           "saving changed info failed:",
-          error.response
-            ? (error.response.data.message, error.response.status)
-            : error.message
+          error.response ? (error.response.data.message, error.response.status) : error.message
         );
         alert(error.response.data.message);
       }

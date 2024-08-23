@@ -77,7 +77,7 @@ const LargeButton = styled.button`
   color: #fff;
 `;
 
-const CreateMainHeader = () => {
+const CreateMainHeader = ({ getData }) => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
