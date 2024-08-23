@@ -201,8 +201,9 @@ const MyInfoModifyPage = () => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-
+      const accessToken =
+        localStorage.getItem("accessToken") ||
+        sessionStorage.getItem("accessToken");
       if (!accessToken) {
         console.log("Access token not found.");
         alert("액세스 토큰을 찾을 수 없습니다.");
@@ -232,7 +233,9 @@ const MyInfoModifyPage = () => {
       } catch (error) {
         console.error(
           "내정보 불러오기 중 오류 발생",
-          error.response ? (error.response.data.message, error.response.status) : error.message
+          error.response
+            ? (error.response.data.message, error.response.status)
+            : error.message
         );
         alert(error.response.data.message);
       }
@@ -255,7 +258,9 @@ const MyInfoModifyPage = () => {
   };
 
   const handleIconButtonClick = async () => {
-    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
     if (!accessToken) {
       alert("액세스 토큰을 찾을 수 없습니다.");
       return;
@@ -272,12 +277,16 @@ const MyInfoModifyPage = () => {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const response = await axios.patch("/api/v1/users/me/info/profile-img", formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.patch(
+        "/api/v1/users/me/info/profile-img",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       if (response.data.code === 200) {
         alert("프로필 이미지가 변경되었습니다.");
         console.log("Profile Image changed");
@@ -288,7 +297,9 @@ const MyInfoModifyPage = () => {
     } catch (error) {
       console.error(
         "fail to saving profile image: ",
-        error.response ? (error.response.data.message, error.response.status) : error.message
+        error.response
+          ? (error.response.data.message, error.response.status)
+          : error.message
       );
       alert(error.response.data.message);
     }
@@ -340,7 +351,10 @@ const MyInfoModifyPage = () => {
 
   //이메일로 인증번호 전송 api
   const handleEmailVerification = async () => {
-    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
+
     if (!accessToken) {
       console.log("Access token not found.");
       alert("액세스 토큰을 찾을 수 없습니다.");
@@ -371,7 +385,9 @@ const MyInfoModifyPage = () => {
     } catch (error) {
       console.error(
         "Email verification failed:",
-        error.response ? (error.response.data.message, error.response.status) : error.message
+        error.response
+          ? (error.response.data.message, error.response.status)
+          : error.message
       );
       alert("이메일 인증번호 전송에 실패했습니다.");
       setEmailValid(false);
@@ -380,7 +396,9 @@ const MyInfoModifyPage = () => {
 
   //이메일 인증번호 검증 api
   const handleEmailCertification = async () => {
-    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
 
     if (!accessToken) {
       console.log("Access token not found.");
@@ -404,21 +422,28 @@ const MyInfoModifyPage = () => {
         console.log("email certification success");
         setEmailValid(true);
       } else {
-        console.error("Failed to Email certification:", response.data.message, response.data.code);
+        console.error(
+          "Failed to Email certification:",
+          response.data.message,
+          response.data.code
+        );
         alert(response.data.message);
         setEmailValid(false);
       }
     } catch (error) {
       console.error(
         "Email certification failed:",
-        error.response ? (error.response.data.message, error.response.status) : error.message
+        error.response
+          ? (error.response.data.message, error.response.status)
+          : error.message
       );
       alert("이메일 인증 요청에 실패했습니다.");
       setEmailValid(false);
     }
   };
   //비밀번호 검증
-  const passwordValidation = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,20}$/;
+  const passwordValidation =
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,20}$/;
 
   const handlePasswordChange = (password) => {
     setNewPassword(password);
@@ -434,7 +459,9 @@ const MyInfoModifyPage = () => {
       setPasswordError("");
       setPasswordValid(true);
     } else if (!passwordValidation.test(newPassword)) {
-      setPasswordError("비밀번호는 8~20자, 영문, 숫자, 특수문자 혼합으로 입력해주세요.");
+      setPasswordError(
+        "비밀번호는 8~20자, 영문, 숫자, 특수문자 혼합으로 입력해주세요."
+      );
       setPasswordValid(false);
     } else {
       setPasswordValid(true);
@@ -458,7 +485,9 @@ const MyInfoModifyPage = () => {
       alert("비밀번호를 올바르게 입력해주세요.");
       return;
     }
-    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+    const accessToken =
+      localStorage.getItem("accessToken") ||
+      sessionStorage.getItem("accessToken");
 
     if (!accessToken) {
       console.log("Access token not found.");
@@ -485,11 +514,18 @@ const MyInfoModifyPage = () => {
         alert("내 정보 수정이 완료 되었습니다.");
         console.log(response.data.message);
       } else {
-        console.error("Failed to saving changed info:", response.data.message, response.data.code);
+        console.error(
+          "Failed to saving changed info:",
+          response.data.message,
+          response.data.code
+        );
         alert(response.data.message);
       }
     } catch (error) {
-      if (error.response.data.code === 401 && error.response.data.message === "인증번호가 일치하지 않습니다.") {
+      if (
+        error.response.data.code === 401 &&
+        error.response.data.message === "인증번호가 일치하지 않습니다."
+      ) {
         alert("변경 사항을 저장했습니다.");
       } else {
         console.error(
@@ -506,45 +542,38 @@ const MyInfoModifyPage = () => {
   };
 
   return (
-    <>
-      <PageContainer>
-        <Navbar />
-        <Header>내 정보 수정</Header>
-        <HorizontalLine />
-        <ProfileImageWrapper>
-          <ProfileImage
-            src={profileImage}
-            alt="Profile"
-            onClick={() => document.getElementById("profileImageInput").click()} //클릭 시 파일 선택 창 열기
-            onError={handleImageError}
-          />
-          <HiddenFileInput type="file" accept="image/*" id="profileImageInput" onChange={handleImageChange} />
-          <IconButton
-            onClick={handleIconButtonClick}
-            style={{
-              position: "absolute",
-              top: "70px",
-              right: "0",
-              width: "25px",
-              height: "25px",
-              padding: "0",
-            }}
-          >
-            ✎
-          </IconButton>
-        </ProfileImageWrapper>
+    <PageContainer>
+      <Navbar />
+      <Header>내 정보 수정</Header>
+      <HorizontalLine />
+      <ProfileImageWrapper>
+        <ProfileImage 
+          src={profileImage} 
+          alt="Profile"
+          onClick={() => document.getElementById('profileImageInput').click()}//클릭 시 파일 선택 창 열기
+          onError={handleImageError} />
+        <HiddenFileInput 
+          type='file'
+          accept='image/*'
+          id='profileImageInput'
+          onChange={handleImageChange}
+        />
+        <IconButton 
+          onClick={handleIconButtonClick}
+          style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
+      </ProfileImageWrapper>
 
-        <InfoContainer>
-          <InfoItem>
-            <InfoLabel>닉네임</InfoLabel>
-            <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-          </InfoItem>
-          <InfoItem>
-            <InfoLabel>아이디 *</InfoLabel>
-            <InfoInput type="text" value={userId} onChange={(e) => handleIdChange(e.target.value)} />
-            <OverlapButton onClick={handleIdDuplicateCheck}>중복확인</OverlapButton>
-          </InfoItem>
-          {emailChange ? (
+      <InfoContainer>
+        <InfoItem>
+          <InfoLabel>닉네임</InfoLabel>
+          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} readOnly/>
+        </InfoItem>
+        <InfoItem>
+          <InfoLabel>아이디 *</InfoLabel>
+          <InfoInput type="text" value={userId} onChange={(e) => handleIdChange(e.target.value)}/>
+          <OverlapButton onClick={handleIdDuplicateCheck}>중복확인</OverlapButton>
+        </InfoItem>
+        {emailChange ? (
             <>
               <InfoItem>
                 <InfoLabel>이메일 *</InfoLabel>
@@ -554,12 +583,20 @@ const MyInfoModifyPage = () => {
                   onChange={(e) => handleEmailChange(e.target.value)}
                   placeholder="이메일을 입력해 주세요."
                 />
-                <VerifyButton onClick={handleEmailVerification}>본인인증</VerifyButton>
+                <VerifyButton onClick={handleEmailVerification}>
+                  본인인증
+                </VerifyButton>
               </InfoItem>
               <InfoItem>
                 <InfoLabel>인증번호</InfoLabel>
-                <InfoInput type="text" value={validNumber} onChange={(e) => setValidNumber(e.target.value)} />
-                <VerifyButton onClick={handleEmailCertification}>인증확인</VerifyButton>
+                <InfoInput
+                  type="text"
+                  value={validNumber}
+                  onChange={(e) => setValidNumber(e.target.value)}
+                />
+                <VerifyButton onClick={handleEmailCertification}>
+                  인증확인
+                </VerifyButton>
               </InfoItem>
             </>
           ) : (
@@ -571,40 +608,40 @@ const MyInfoModifyPage = () => {
                 onChange={(e) => handleEmailChange(e.target.value)}
                 placeholder="이메일을 입력해 주세요."
               />
-              <OverlapButton onClick={() => setEmailChange(true)}>변경하기</OverlapButton>
+              <OverlapButton onClick={() => setEmailChange(true)}>
+                변경하기
+              </OverlapButton>
             </InfoItem>
           )}
-        </InfoContainer>
-        <HorizontalSemiLine />
-        <PasswordSection>
-          <SecondSectionTitle>비밀번호 변경하기</SecondSectionTitle>
-          <PasswordContainer>
-            <InfoItem>
-              <InfoLabel>새로운 비밀번호 *</InfoLabel>
-              <PasswordInput
-                type="password"
-                value={newPassword}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                placeholder="영문 숫자 특수문자 포함 8~20자 입니다."
-              />
-            </InfoItem>
-            <InfoItem>
-              <InfoLabel>비밀번호 재확인 *</InfoLabel>
-              <PasswordInput
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-              />
-            </InfoItem>
-            {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
-          </PasswordContainer>
-        </PasswordSection>
-        <ButtonContainer>
-          <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
-          <SaveButton onClick={handleSave}>저장하기</SaveButton>
-        </ButtonContainer>
-      </PageContainer>
-    </>
+      </InfoContainer>
+      <HorizontalSemiLine />
+      <PasswordSection>
+        <SecondSectionTitle>비밀번호 변경하기</SecondSectionTitle>
+        <PasswordContainer>
+          <InfoItem>
+            <InfoLabel>새로운 비밀번호 *</InfoLabel>
+            <PasswordInput 
+              type="password" 
+              value={newPassword} 
+              onChange={(e) => handlePasswordChange(e.target.value)} 
+              placeholder="영문 숫자 특수문자 포함 8~20자 입니다."  />
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>비밀번호 재확인 *</InfoLabel>
+            <PasswordInput 
+              type="password" 
+              value={confirmPassword} 
+              onChange={(e) => handleConfirmPasswordChange(e.target.value)} 
+            />
+          </InfoItem>
+          {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+        </PasswordContainer>
+      </PasswordSection>
+      <ButtonContainer>
+        <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
+        <SaveButton onClick={handleSave}>저장하기</SaveButton>
+      </ButtonContainer>
+    </PageContainer>
   );
 };
 
