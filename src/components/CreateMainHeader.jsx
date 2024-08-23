@@ -7,7 +7,6 @@
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { useNavigate } from "react-router-dom";
-7;
 import navMascotImage from "../assets/navMascot.png";
 import SurveyModal from "../components/SurveyModal";
 
@@ -78,7 +77,7 @@ const LargeButton = styled.button`
   color: #fff;
 `;
 
-const CreateMainHeader = () => {
+const CreateMainHeader = ({ getData }) => {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
 
