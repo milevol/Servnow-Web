@@ -498,6 +498,7 @@ const MyInfoModifyPage = () => {
       const response = await axios.patch(
         "/api/v1/users/me/info/save",
         {
+          nickname: nickname,
           serialId: userId,
           email: email,
           certificationNumber: validNumber,
@@ -568,7 +569,7 @@ const MyInfoModifyPage = () => {
       <InfoContainer>
         <InfoItem>
           <InfoLabel>닉네임</InfoLabel>
-          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} readOnly/>
+          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
         </InfoItem>
         <InfoItem>
           <InfoLabel>아이디 *</InfoLabel>
