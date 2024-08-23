@@ -11,7 +11,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import SurveyCard from "../components/SurveyCard";
 import PlusButton from "../components/PlusButton";
-import mascotImage from "../assets/mascot.png";
+import mascotImage from "/homeMascot.png";
 
 // 메인 페이지 전체 컨테이너 스타일
 const HomePageContainer = styled.div`

@@ -6,7 +6,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import ResultStructureDiagram from "./CustomSidebar/ResultStructureDiagram"; // **설문 구조도 임포트 자리**
 
 const InsightContainer = styled.div`
-  width: 559px;
+  width: 565px;
   background: #ffffff;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px 0px 0px 10px;

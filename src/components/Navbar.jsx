@@ -176,6 +176,9 @@ const Navbar = () => {
       const token =
         sessionStorage.getItem("accessToken") ||
         localStorage.getItem("accessToken");
+
+      if (!token) return;
+
       const response = await axios.get("/api/v1/users/me", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -190,35 +193,26 @@ const Navbar = () => {
     }
   };
 
+  // 로그인된 상태일 때 프로필 이미지 가져오기
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchProfile();
+    }
+  }, [isLoggedIn]);
+
   // Axios 인터셉터 설정
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
-      async (error) => {
+      (error) => {
         if (error.response && error.response.status === 401) {
-          try {
-            const refreshToken =
-              localStorage.getItem("refreshToken") ||
-              sessionStorage.getItem("refreshToken");
-            const response = await axios.post("/api/v1/auth/refresh", {
-              refreshToken,
-            });
-            const { accessToken } = response.data.data;
-            if (localStorage.getItem("accessToken")) {
-              localStorage.setItem("accessToken", accessToken);
-            } else {
-              sessionStorage.setItem("accessToken", accessToken);
-            }
-            error.config.headers.Authorization = `Bearer ${accessToken}`;
-            return axios(error.config);
-          } catch (err) {
-            sessionStorage.removeItem("accessToken");
-            sessionStorage.removeItem("refreshToken");
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            setIsLoggedIn(false);
-            navigate("/login"); // 로그인 페이지로 리다이렉트
-          }
+          // 401 에러 발생 시 로그아웃 처리
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("refreshToken");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          setIsLoggedIn(false);
+          navigate("/login"); // 로그인 페이지로 리다이렉트
         }
         return Promise.reject(error);
       }
@@ -228,13 +222,6 @@ const Navbar = () => {
       axios.interceptors.response.eject(interceptor);
     };
   }, [navigate]);
-
-  // 로그인된 상태일 때 프로필 이미지 가져오기
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchProfile();
-    }
-  }, [isLoggedIn]);
 
   // 검색어 입력 핸들러
   const handleSearchChange = (e) => {
