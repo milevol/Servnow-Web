@@ -4,6 +4,7 @@ import pageIcon from "../assets/paper.png";
 import timeIcon from "../assets/time.png";
 import duplicateIcon from "../assets/duplicate.png";
 import deleteIcon from "../assets/delete.png";
+
 import CreateMainHeader from "../components/CreateMainHeader";
 import SidebarWrapper from "../components/SidebarWrapper";
 
@@ -95,7 +96,7 @@ const CardContainer = styled.div`
 
 const ContentContainer = styled.div`
   width: 75%;
-
+  
   div:first-child {
     width: 60%;
   }
@@ -147,6 +148,7 @@ const Select = styled.select`
 
 const QuestionContainer = styled.div`
   display: flex;
+  margin-top: 10px;
 `;
 
 const QContainer = styled.div`
@@ -653,7 +655,6 @@ const CreatePage = () => {
       sections: sections,
     };
 
-    console.log(answers);
     return answers;
   };
 

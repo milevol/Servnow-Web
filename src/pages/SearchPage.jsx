@@ -69,8 +69,7 @@ const ExcludeCompletedButton = styled.div`
   border-radius: 22.3358px;
   display: flex;
   align-items: center;
-  justify-content: ${({ $isActive }) =>
-    $isActive ? "flex-end" : "flex-start"};
+  justify-content: ${({ $isActive }) => ($isActive ? "flex-end" : "flex-start")};
   cursor: pointer;
   position: relative;
   padding: 0 5px;
@@ -112,10 +111,7 @@ function SearchPage() {
   const navigate = useNavigate();
 
   const getToken = () => {
-    return (
-      sessionStorage.getItem("accessToken") ||
-      localStorage.getItem("accessToken")
-    );
+    return sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
   };
 
   useEffect(() => {
@@ -213,9 +209,7 @@ function SearchPage() {
       async (error) => {
         if (error.response && error.response.status === 401) {
           try {
-            const refreshToken =
-              localStorage.getItem("refreshToken") ||
-              sessionStorage.getItem("refreshToken");
+            const refreshToken = localStorage.getItem("refreshToken") || sessionStorage.getItem("refreshToken");
             const response = await axios.post("/api/v1/auth/refresh", {
               refreshToken,
             });
@@ -254,10 +248,7 @@ function SearchPage() {
               <KeywordTag key={index}>#{keyword}</KeywordTag>
             ))}
           </KeywordContainer>
-          <ExcludeCompletedButton
-            $isActive={excludeCompleted}
-            onClick={() => setExcludeCompleted(!excludeCompleted)}
-          >
+          <ExcludeCompletedButton $isActive={excludeCompleted} onClick={() => setExcludeCompleted(!excludeCompleted)}>
             <ExcludeCompletedIcon $isActive={excludeCompleted}>
               <ExcludeIcon $isActive={excludeCompleted} />
             </ExcludeCompletedIcon>
@@ -265,9 +256,7 @@ function SearchPage() {
         </FilterContainer>
         <SurveyCardWrapper>
           {searchResults.length > 0 ? (
-            searchResults.map((item, index) => (
-              <SurveyCard key={index} {...item} completed={item.status} />
-            ))
+            searchResults.map((item, index) => <SurveyCard key={index} {...item} completed={item.status} />)
           ) : (
             <div>설문이 존재하지 않아요 :(</div>
           )}

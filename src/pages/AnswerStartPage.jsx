@@ -10,6 +10,7 @@ import character from "../assets/logo1.png";
 
 const Container = styled.div`
   height: auto;
+  
   padding: 48px;
   background-color: #f2f5ff;
 `;

@@ -3,10 +3,10 @@
 //2024.07.25 데이-이연
 //더 추가할기능: api 연결
 
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import axios from 'axios';
-import { useNavigate } from 'react-router';
+import React, { useState } from "react";
+import styled from "styled-components";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
 const FormContainer = styled.div`
   width: 800px;
@@ -24,26 +24,26 @@ const InputWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   margin-top: 2rem;
-  margin-left:0px;
+  margin-left: 0px;
   width: 700px;
 `;
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 100%
+  width: 100%;
 `;
 const InputText = styled.p`
   font-size: 1.1rem;
   margin-right: 1rem;
-  color: #5D6670;
-  width:20%;
+  color: #5d6670;
+  width: 20%;
   text-align: left;
-`
+`;
 const Input = styled.input`
   width: 23rem;
   padding: 0.8rem;
-  border: 2px solid #D9D9D9;
+  border: 2px solid #d9d9d9;
   border-radius: 8px;
   font-size: 1rem;
 `;
@@ -59,14 +59,14 @@ const SendButton = styled.button`
   font-size: 1rem;
   margin-left: 1rem;
   font-weight: bold;
-  `
+`;
 
 const FindButton = styled.button`
   width: 100%;
   padding: 0.8rem;
   margin-top: 5rem;
   margin-bottom: 2rem;
-  background-color: #4C76FE;
+  background-color: #4c76fe;
   color: white;
   border: none;
   border-radius: 8px;
@@ -88,7 +88,7 @@ const ErrorText = styled.p`
 const ConfirmButton = styled.button`
   width: 50%;
   padding: 0.8rem;
-  background-color: #4C76FE;
+  background-color: #4c76fe;
   margin-right: 1.5rem;
   color: white;
   border: none;
@@ -105,7 +105,7 @@ const FindPswdButton = styled.button`
   padding: 0.8rem;
   background-color: white;
   margin-left: 1.5rem;
-  border: 2.3px solid #4C76FE ;
+  border: 2.3px solid #4c76fe;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
@@ -114,13 +114,13 @@ const FindPswdButton = styled.button`
     background-color: white;
   }
 `;
-const ButtonContainer =styled.div`
+const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-top: 5rem;
   width: 550px;
-`
+`;
 
 const FindText = styled.p`
   font-size: 1.2rem;
@@ -131,71 +131,68 @@ const SuccessMessage = styled.p`
   font-size: 1.5rem;
   margin: 2.5rem;
   font-woight: bold;
-`
+`;
 const SuccessContainer = styled.div`
   width: 550px;
   padding: 2rem;
   background-color: white;
   border-radius: 10px;
-  border: 3px solid #4C76FE;
+  border: 3px solid #4c76fe;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
 
 const FindWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-`
+`;
 const HighlightedUserId = styled.span`
-  color: #4C76FE;
+  color: #4c76fe;
 `;
 
 const FindIdForm = () => {
   const navigate = useNavigate();
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [certificationSuccess, setCertificationSuccess] = useState(false);
-  const [userId, setUserId] = useState('');
-  const [email, setEmail] = useState('');
-  const [validNumber, setValidNumber] = useState('');
+  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
+  const [validNumber, setValidNumber] = useState("");
   const [verificationSent, setVerificationSent] = useState(false);
   const [userIdExist, setUserIdExist] = useState(false);
 
   // 인증번호 전송 버튼 클릭시 작동할 기능
   const handleVerificationSend = async () => {
-    if(!email) {
-      alert('이메일을 입력해주세요.');
-      setError('');
-      return
+    if (!email) {
+      alert("이메일을 입력해주세요.");
+      setError("");
+      return;
     }
-    if (!verificationSent){
+    if (!verificationSent) {
       try {
-        const response = await axios.post(
-          '/api/v1/find/email/identity-verification', 
-          { 
-            email: email
-          },
-        );
-        
+        const response = await axios.post("/api/v1/find/email/identity-verification", {
+          email: email,
+        });
+
         if (response.data.code === 200) {
           setVerificationSent(true);
-          alert('인증번호가 이메일로 전송되었습니다.');
-          setError('');
+          alert("인증번호가 이메일로 전송되었습니다.");
+          setError("");
         } else {
-          alert('등록되지 않은 이메일입니다.');
+          alert("등록되지 않은 이메일입니다.");
           setVerificationSent(false);
-        } 
+        }
       } catch (error) {
         if (error.response) {
           const { status, data } = error.response;
           if (status === 500) {
             console.error("서버 내부 오류:", data.message);
             alert(data.message || "서버 내부 오류가 발생했습니다.");
-          } else if (status === 404){
+          } else if (status === 404) {
             console.error("인증번호 전송 중 오류 발생:", data.message);
             alert(data.message || "사용자를 찾을 수 없습니다.");
           } else {
@@ -212,34 +209,31 @@ const FindIdForm = () => {
 
   const handleVerificationConfirm = async () => {
     if (!validNumber) {
-      alert('인증번호를 입력해주세요.');
+      alert("인증번호를 입력해주세요.");
       return;
     }
 
     try {
-      const response = await axios.post(
-        '/api/v1/find/email/certification',
-        {
-          certificationNumber: validNumber
-        },
-      );
+      const response = await axios.post("/api/v1/find/email/certification", {
+        certificationNumber: validNumber,
+      });
       if (response.data.code === 200) {
-        console.log('User ID:', response.data.data);
-        console.log('message:', response.data.message);
+        console.log("User ID:", response.data.data);
+        console.log("message:", response.data.message);
         setUserId(response.data.data);
         setCertificationSuccess(true);
-        alert('인증이 완료되었습니다.');
-        setError('');
+        alert("인증이 완료되었습니다.");
+        setError("");
       } else {
-        alert('인증번호가 일치하지 않습니다.');
+        alert("인증번호가 일치하지 않습니다.");
       }
-    } catch(error) {
+    } catch (error) {
       if (error.response) {
         const { status, data } = error.response;
         if (status === 500) {
           console.error("서버 내부 오류:", data.message);
           alert(data.message || "서버 내부 오류가 발생했습니다.");
-        } else if (status === 404){
+        } else if (status === 404) {
           console.error("인증번호 확인 중 오류 발생:", data.message);
           alert(data.message || "사용자를 찾을 수 없습니다.");
         } else {
@@ -251,23 +245,26 @@ const FindIdForm = () => {
         alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인하세요.");
       }
     }
-  } 
-  
-// 아이디찾기 버튼 클릭 시 작동할 기능
+  };
+
+  // 아이디찾기 버튼 클릭 시 작동할 기능
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!certificationSuccess) {
-      alert('이메일 인증을 먼저 진행해주세요.');
+      alert("이메일 인증을 먼저 진행해주세요.");
       return;
     }
-      if(certificationSuccess){
-        setUserIdExist(true);
-      }
+    if (certificationSuccess) {
+      setUserIdExist(true);
+    }
   };
 
   const handleFindPasswordClick = () => {
-    navigate('/find-pswd');
+    navigate("/find-pswd");
+  };
+  const handleOkClick = () => {
+    navigate("/login");
   };
   const handleOkClick = () => {
     navigate('/login');
@@ -275,13 +272,14 @@ const FindIdForm = () => {
 
   return (
     <FormContainer>
-        {userIdExist ? (
-            <FindWrapper>
-                <FindText>입력하신 정보와 일치하는 아이디는 다음과 같습니다.</FindText>
-                <SuccessContainer>
-                  <SuccessMessage>아이디는 <HighlightedUserId>{userId}</HighlightedUserId> 입니다.</SuccessMessage>
-                </SuccessContainer>
-
+      {userIdExist ? (
+        <FindWrapper>
+          <FindText>입력하신 정보와 일치하는 아이디는 다음과 같습니다.</FindText>
+          <SuccessContainer>
+            <SuccessMessage>
+              아이디는 <HighlightedUserId>{userId}</HighlightedUserId> 입니다.
+            </SuccessMessage>
+          </SuccessContainer>
                 <ButtonContainer>
                     <ConfirmButton onClick={handleOkClick}>확인</ConfirmButton>
                     <FindPswdButton onClick={handleFindPasswordClick}>비밀번호 찾기</FindPswdButton>
@@ -316,7 +314,6 @@ const FindIdForm = () => {
       </form>
     )}
     </FormContainer>
-  
   );
 };
 

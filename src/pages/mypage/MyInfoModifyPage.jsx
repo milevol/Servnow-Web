@@ -181,7 +181,7 @@ const ErrorMessage = styled.p`
   font-size: 14px;
 `;
 
-const MyInfoModifyPage = () => {
+  const MyInfoModifyPage = () => {
   const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState("/roundLogo1.png");
   const [nickname, setNickname] = useState("");
@@ -396,6 +396,7 @@ const MyInfoModifyPage = () => {
 
   //이메일 인증번호 검증 api
   const handleEmailCertification = async () => {
+
     const accessToken =
       localStorage.getItem("accessToken") ||
       sessionStorage.getItem("accessToken");
@@ -543,6 +544,7 @@ const MyInfoModifyPage = () => {
   };
 
   return (
+  <>
     <PageContainer>
       <Navbar />
       <Header>내 정보 수정</Header>
@@ -643,6 +645,7 @@ const MyInfoModifyPage = () => {
         <SaveButton onClick={handleSave}>저장하기</SaveButton>
       </ButtonContainer>
     </PageContainer>
+    </>
   );
 };
 

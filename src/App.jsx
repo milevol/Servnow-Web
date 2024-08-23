@@ -18,6 +18,7 @@ import MyAnsweredPage from "./pages/mysurveypage/MyAnsweredPage";
 import CreatePage from "./pages/CreatePage";
 import LandingPage from "./pages/LandingPage";
 import MyPagePoint from "./pages/mypage/MyPagePoint";
+import CreatePage from "./pages/CreatePage";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
       <Route path="/create" element={<CreatePage />} />
       <Route path="/answerstart" element={<AnswerStartPage />} />
       <Route path="/landing" element={<LandingPage />} />
+      <Route path="/create" element={<CreatePage />} />
     </Routes>
   );
 }

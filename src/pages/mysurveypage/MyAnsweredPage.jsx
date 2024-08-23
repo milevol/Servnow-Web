@@ -224,6 +224,9 @@ const MyAnsweredPage = () => {
                     {surveys.map((survey) => (
                         <SurveyPrev key={survey.surveyId} survey={survey} link="answer"/>
                     ))}
+                    {surveys.map((survey) => (
+                        <SurveyPrev key={survey.id} survey={survey} />
+                    ))}
                 </TortalSurveyContainer>
             </MyPageTotalContainer>
         </MyPageContainer>

@@ -1,3 +1,9 @@
+// InsightSection.jsx
+// 목적: 결과페이지의 인사이트 부분 구현
+// 기능: 인사이트&설문 구조도 토글, 질문 순 직접 나열, 메모장 자동저장
+// 작성자: 임사랑
+// 작성일: 2024.08.07
+
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
@@ -319,11 +325,7 @@ const InsightCard = ({
   }
 
   return (
-    <InsightCardContainer
-      ref={ref}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-      isDirectlyOrdered={isDirectlyOrdered}
-    >
+    <InsightCardContainer ref={ref} style={{ opacity: isDragging ? 0.5 : 1 }} isDirectlyOrdered={isDirectlyOrdered}>
       <QuestionContainer>
         <QuestionText>
           <QuestionNumber>{questionNumber}</QuestionNumber>
@@ -339,11 +341,7 @@ const InsightCard = ({
               placeholder="메모를 입력하세요"
               maxLength={300}
             />
-            <DeleteButton
-              onClick={() => onDeleteNote(index, noteIndex, note.id)}
-            >
-              x
-            </DeleteButton>
+            <DeleteButton onClick={() => onDeleteNote(index, noteIndex, note.id)}>x</DeleteButton>
           </NoteContainer>
         ))}
         {notes.length < 4 && (
@@ -377,14 +375,11 @@ const InsightSection = ({ surveyId }) => {
         ? localStorage.getItem("accessToken")
         : sessionStorage.getItem("accessToken");
 
-      const response = await axios.get(
-        `/api/v1/users/me/survey/${surveyId}/memo/list`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`/api/v1/users/me/survey/${surveyId}/memo/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = response.data.data.questions.map((question) => ({
         questionId: question.questionId,
@@ -494,16 +489,12 @@ const InsightSection = ({ surveyId }) => {
 
       console.log("Request Body:", JSON.stringify(requestBody, null, 2));
 
-      const response = await axios.post(
-        `/api/v1/users/me/survey/${surveyId}/memo`,
-        requestBody,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axios.post(`/api/v1/users/me/survey/${surveyId}/memo`, requestBody, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("메모 저장 성공:", response.data);
 
@@ -597,9 +588,7 @@ const InsightSection = ({ surveyId }) => {
     } else {
       const savedOrder = JSON.parse(localStorage.getItem("questionOrder"));
       if (savedOrder) {
-        const orderedData = savedOrder.map((orderId) =>
-          questions.find((q) => q.questionId === orderId)
-        );
+        const orderedData = savedOrder.map((orderId) => questions.find((q) => q.questionId === orderId));
         setReorderedQuestions(orderedData);
       } else {
         setReorderedQuestions([...questions]);
@@ -607,8 +596,7 @@ const InsightSection = ({ surveyId }) => {
     }
   }, [activeButton, questions]);
 
-  const displayQuestions =
-    activeButton === "질문 순" ? questions : reorderedQuestions;
+  const displayQuestions = activeButton === "질문 순" ? questions : reorderedQuestions;
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -616,16 +604,10 @@ const InsightSection = ({ surveyId }) => {
         <InnerContainer>
           <SectionTitleContainer>
             <SectionTitleWrapper>
-              <SectionTitle
-                $active={activeTab === "insight"}
-                onClick={() => setActiveTab("insight")}
-              >
+              <SectionTitle $active={activeTab === "insight"} onClick={() => setActiveTab("insight")}>
                 인사이트
               </SectionTitle>
-              <SectionTitle
-                $active={activeTab === "structure"}
-                onClick={() => setActiveTab("structure")}
-              >
+              <SectionTitle $active={activeTab === "structure"} onClick={() => setActiveTab("structure")}>
                 설문 구조도
               </SectionTitle>
             </SectionTitleWrapper>

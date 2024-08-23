@@ -409,11 +409,25 @@ const MyInfoModifyKakaoPage = () => {
         </KakaoButton>
       </Section>
       <HorizontalSemiLine/>
+      {/* <Section>
+        <SecondSectionTitle>본인 인증된 회원 정보</SecondSectionTitle>
+        <InfoContainer>
+          <InfoItem>
+            <InfoLabel>성명</InfoLabel>
+            <InfoInput type="text" value={userName} readOnly />
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>연락처</InfoLabel>
+            <InfoInput type="text" value={phoneNumber} readOnly />
+          </InfoItem>
+        </InfoContainer>
+      </Section> */}
       <ButtonContainer>
         <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
         <ReAuthButton>저장하기</ReAuthButton>
       </ButtonContainer>
     </PageContainer>
+    </>
   );
 };
 

@@ -223,6 +223,9 @@ const MySurveyPage = () => {
                     {surveys.map((survey) => (
                         <SurveyPrev key={survey.surveId} survey={survey} link="result"/>
                     ))}
+                    {surveys.map((survey) => (
+                        <SurveyPrev key={survey.surveId} survey={survey} />
+                    ))}
                     <SurveyBox>
                         <NewSurveyBox>
                             <NewSurveyButton>+</NewSurveyButton>

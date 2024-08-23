@@ -1,6 +1,7 @@
 //목적: 꾸미기 구조도 사이드바의 구조도 컴포넌트 담당
 //기능: 제작된 설문지의 구조를 보여줌
 //2024.08.10 데이-이연
+
 import React from "react";
 import styled from "styled-components";
 
@@ -75,7 +76,7 @@ const VerticalLine = styled.div`
   margin-bottom: 15px;
   margin-top: 3px;
 
-  &::after {
+  &::after 
     content: "";
     position: absolute;
     bottom: -10px;
