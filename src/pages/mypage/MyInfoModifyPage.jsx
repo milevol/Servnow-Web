@@ -496,7 +496,6 @@ const ErrorMessage = styled.p`
 
 
   return (
-  <>
     <PageContainer>
       <Navbar />
       <Header>내 정보 수정</Header>
@@ -521,7 +520,7 @@ const ErrorMessage = styled.p`
       <InfoContainer>
         <InfoItem>
           <InfoLabel>닉네임</InfoLabel>
-          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+          <InfoInput type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} readOnly/>
         </InfoItem>
         <InfoItem>
           <InfoLabel>아이디 *</InfoLabel>
@@ -591,7 +590,6 @@ const ErrorMessage = styled.p`
         <SaveButton onClick={handleSave}>저장하기</SaveButton>
       </ButtonContainer>
     </PageContainer>
-    </>
   );
 };
 

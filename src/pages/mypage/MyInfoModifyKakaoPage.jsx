@@ -50,6 +50,7 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   margin-bottom: 2rem;
   object-fit: cover;
+  cursor: pointer;
 `;
 
 const HiddenFileInput = styled.input`
@@ -240,9 +241,9 @@ const MyInfoModifyKakaoPage = () => {
           if (response.data.code === 200) {
             console.log(response.data.data);
             const { nickname, profile_url } = response.data.data;
-            setProfileImage(nickname);
-            setOriginalNickname(profile_url);
-            setNickname(profile_url);
+            setProfileImage(profile_url);
+            setOriginalNickname(nickname);
+            setNickname(nickname);
           }
           else {
               console.error("내정보 불러오기 중 오류 발생", response.data.message);
@@ -258,18 +259,12 @@ const MyInfoModifyKakaoPage = () => {
     fetchUserInfoKakao();
 }, []);
 
-  const handleUpdateNickname = () => {
-    axios.post('', {nickname})
-      .then(response => {
-        alert('닉네임이 수정되었습니다.');
-        setOriginalNickname(nickname);
-      })
-      .catch(error => {
-        console.error('There was an error updating the nickname!', error);
-        alert('닉네임 수정에 실패했습니다.');
-      });
-  }
+  //이미지 오류 시 핸들러
+  const handleImageError = () => {
+    setProfileImage('/roundLogo1.png');
+  };
 
+  //프로필 이미지 변경
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -278,27 +273,113 @@ const MyInfoModifyKakaoPage = () => {
     }
   };
 
+  const handleIconButtonClick = async () => {
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert("액세스 토큰을 찾을 수 없습니다.");
+      return;
+    }
+    //이미지파일가져오기
+    const fileInput = document.getElementById('profileImageInput');
+    const file = fileInput.files[0];
+    console.log("프로필파일", fileInput.files[0]);
+    if (!file) {
+      alert("업로드할 이미지를 선택해주세요.");
+      return;
+    }
+    //전송할 폼데이타 준비
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axios.patch(
+        '/api/v1/users/me/info/profile-img', 
+          formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      if (response.data.code === 200) {
+        alert("프로필 이미지가 변경되었습니다.");
+        console.log("Profile Image changed");
+      } else {
+        alert("프로필 이미지 변경에 실패했습니다.");
+        console.log(response.data.message, response.data.code);
+      }
+    } catch(error) {
+      console.error("fail to saving profile image: ", error.response ? (error.response.data.message, error.response.status) : error.message);
+      alert(error.response.data.message);
+    }
+};
+
+  const handleSave = async () => {
+
+    const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        console.log("Access token not found.");
+        alert("액세스 토큰을 찾을 수 없습니다.");
+        return;
+      }
+    try {
+      const response = await axios.patch(
+        '/api/v1/users/me/info/save', {
+          serialId: nickname,
+          email: "",
+          certificationNumber: "",
+          password: "",
+          reconfirmPassword: ""
+        }, {
+          headers: {
+          Authorization: `Bearer ${accessToken}`,
+          }
+        }
+      );
+      if (response.data.code === 200) {
+        alert("내 정보 수정이 완료 되었습니다.");
+        console.log(response.data.message);
+      } else {
+        console.error("Failed to saving changed info:", response.data.message, response.data.code);
+        alert(response.data.message);
+      }
+    } catch(error) {
+        if ( error.response.data.code === 401 && error.response.data.message === "인증번호가 일치하지 않습니다.")
+        {
+          alert("변경 사항을 저장했습니다.")
+        } else {
+          console.error("saving changed info failed:", error.response ? (error.response.data.message, error.response.status) : error.message);
+          alert(error.response.data.message);
+        }
+    }
+
+  };
+
   const handlePreviousButton = () => {
     navigate('/mypage')
   }
 
   return (
-    <>
+   <PageContainer>
     <Navbar />
-    <PageContainer>
       <Header>내 정보 수정</Header>
       <HorizontalLine></HorizontalLine>
       <ProfileImageWrapper>
-        <ProfileImage src={profileImage} alt='profile image'/>
+        <ProfileImage 
+          src={profileImage} 
+          alt="Profile"
+          onClick={() => document.getElementById('profileImageInput').click()}//클릭 시 파일 선택 창 열기
+          onError={handleImageError} />
         <HiddenFileInput 
-            type='file'
-            accept='image/*'
-            id='profileImageInput'
-            onChange={handleImageChange}
-          />
-          <IconButton 
-            onClick={ () => document.getElementById('profileImageInput').click()}
-            style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
+          type='file'
+          accept='image/*'
+          id='profileImageInput'
+          onChange={handleImageChange}
+        />
+        <IconButton 
+          onClick={handleIconButtonClick}
+          style={{ position: 'absolute', top: '70px', right: '0', width: '25px', height: '25px', padding: '0' }}>✎</IconButton>
       </ProfileImageWrapper>
       <ProfileContainer> 
         <NicknameContainer>
@@ -308,14 +389,14 @@ const MyInfoModifyKakaoPage = () => {
             value={nickname} 
             onChange={(e) => setNickname(e.target.value)}
             />
-            {nickname !== originalNickname && (
+            {/* {nickname !== originalNickname && (
               <UpdateButton 
                 type='button' 
                 onClick={handleUpdateNickname}
                 visible={nickname !== originalNickname}
                 >수정하기</UpdateButton>
               )
-            }
+            } */}
         </NicknameContainer>
       </ProfileContainer>
       <HorizontalSemiLine/>
@@ -327,25 +408,11 @@ const MyInfoModifyKakaoPage = () => {
         </KakaoButton>
       </Section>
       <HorizontalSemiLine/>
-      {/* <Section>
-        <SecondSectionTitle>본인 인증된 회원 정보</SecondSectionTitle>
-        <InfoContainer>
-          <InfoItem>
-            <InfoLabel>성명</InfoLabel>
-            <InfoInput type="text" value={userName} readOnly />
-          </InfoItem>
-          <InfoItem>
-            <InfoLabel>연락처</InfoLabel>
-            <InfoInput type="text" value={phoneNumber} readOnly />
-          </InfoItem>
-        </InfoContainer>
-      </Section> */}
       <ButtonContainer>
         <PrevButton onClick={handlePreviousButton}>이전</PrevButton>
         <ReAuthButton>저장하기</ReAuthButton>
       </ButtonContainer>
     </PageContainer>
-    </>
   );
 };
 
