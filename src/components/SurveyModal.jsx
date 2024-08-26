@@ -1,12 +1,12 @@
 // 목적: 설문지 등록 모달
 // 기능: 설문지 등록
-// 2024.08.23/곤/장고은
-// 남은 작업: api연결
+// 2024.08.23/곤/장고은, 엠마/신윤지
 
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IoLinkSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -158,7 +158,7 @@ const ToggleKnob = styled.div`
   transition: left 0.3s;
 `;
 
-const SurveyModal = ({ isOpen, onClose }) => {
+const SurveyModal = ({ isOpen, onClose, surveyData }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [reward, setReward] = useState("");
@@ -171,10 +171,9 @@ const SurveyModal = ({ isOpen, onClose }) => {
     subject: "",
     message: "",
   });
-  const [isEmailCollectionEnabled, setIsEmailCollectionEnabled] =
-    useState(false);
+  const [isEmailCollectionEnabled, setIsEmailCollectionEnabled] = useState(false);
 
-  const stringDate = new Date(expiredAt).toISOString();
+  const stringDate = new Date(expiredAt).toString();
   const data = {
     reward,
     rewardCount,
@@ -212,32 +211,63 @@ const SurveyModal = ({ isOpen, onClose }) => {
     setIsEmailCollectionEnabled(!isEmailCollectionEnabled);
   };
 
-  const handleSendClick = () => {
-    console.log(data);
-    navigate("/");
+  const getToken = () => {
+    return sessionStorage.getItem("accessToken") || localStorage.getItem("accessToken");
+  };
+
+  const handleSendClick = async () => {
+    let dataList = surveyData;
+
+    console.log("dataList: ", JSON.stringify(dataList, null, 2));
+    console.log(dataList.title);
+
+    try {
+      const token = getToken();
+      const body = {
+        title: dataList.title,
+        content1: dataList.content1,
+        content2: dataList.content2,
+        duration: dataList.duration,
+        characterType: dataList.characterType,
+        mainColor: dataList.mainColor,
+        subColor: dataList.subColor,
+        font: dataList.font,
+        reward: data.reward,
+        rewardCount: parseInt(data.rewardCount, 10),
+        expiredAt: data.stringDate,
+        sections: dataList.sections,
+      };
+
+      const response = await axios.post("/api/v1/survey", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("설문지 제작 성공:", response.data);
+      navigate("/");
+    } catch (error) {
+      //console.error(data.message);
+    }
   };
 
   return (
     <ModalOverlay isOpen={isOpen} onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <HeaderTitle>
-            {step === 1 ? "설문지 등록하기" : "설문지 배포하기"}
-          </HeaderTitle>
-          <CloseButton onClick={onClose}>X</CloseButton>
+          <HeaderTitle>{step === 1 ? "설문지 등록하기" : "설문지 배포하기"}</HeaderTitle>
+          <CloseButton onClick={onClose} type="button">
+            X
+          </CloseButton>
         </ModalHeader>
         {step === 1 && <ModalContentTitle>리워드 여부</ModalContentTitle>}
-        {step === 2 && (
-          <ModalContentTitle>설문지 마감 기간 설정</ModalContentTitle>
-        )}
+        {step === 2 && <ModalContentTitle>설문지 마감 기간 설정</ModalContentTitle>}
         {step === 3 && (
           <ModalContentTitle>
             이메일 정보 수집{" "}
             <ToggleContainer>
-              <ToggleSwitch
-                onClick={handleToggleChange}
-                isChecked={isEmailCollectionEnabled}
-              >
+              <ToggleSwitch onClick={handleToggleChange} isChecked={isEmailCollectionEnabled}>
                 <ToggleKnob isChecked={isEmailCollectionEnabled} />
               </ToggleSwitch>
             </ToggleContainer>
@@ -265,25 +295,15 @@ const SurveyModal = ({ isOpen, onClose }) => {
           {step === 2 && (
             <>
               <ModalFormP>마감 기간</ModalFormP>
-              <ModalInput
-                type="datetime-local"
-                value={expiredAt}
-                onChange={(e) => setExpiredAt(e.target.value)}
-              />
+              <ModalInput type="datetime-local" value={expiredAt} onChange={(e) => setExpiredAt(e.target.value)} />
             </>
           )}
           {step === 3 && (
             <>
-              <OptionButton
-                selected={distribution === "link"}
-                onClick={() => handleDistributionChange("link")}
-              >
+              <OptionButton selected={distribution === "link"} onClick={() => handleDistributionChange("link")}>
                 <IoLinkSharp /> 링크로 배포하기
               </OptionButton>
-              <OptionButton
-                selected={distribution === "email"}
-                onClick={() => handleDistributionChange("email")}
-              >
+              <OptionButton selected={distribution === "email"} onClick={() => handleDistributionChange("email")}>
                 ✉ 이메일로 배포하기
               </OptionButton>
               {distribution === "link" && (
@@ -350,11 +370,17 @@ const SurveyModal = ({ isOpen, onClose }) => {
           )}
         </ModalForm>
         <ButtonContainer center={step === 3}>
-          {step > 1 && <PrevButton onClick={handlePrev}>이전</PrevButton>}
-          {step < 3 && <NextButton onClick={handleNext}>다음</NextButton>}
-          {step === 3 && (
-            <NextButton onClick={handleSendClick}>보내기</NextButton>
+          {step > 1 && (
+            <PrevButton onClick={handlePrev} type="button">
+              이전
+            </PrevButton>
           )}
+          {step < 3 && (
+            <NextButton onClick={handleNext} type="button">
+              다음
+            </NextButton>
+          )}
+          {step === 3 && <NextButton onClick={handleSendClick}>보내기</NextButton>}
         </ButtonContainer>
       </ModalContent>
     </ModalOverlay>
