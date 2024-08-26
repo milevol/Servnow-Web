@@ -1,10 +1,12 @@
-import React, { useState, memo, useCallback } from "react";
-import styled, { css } from "styled-components";
+// 목적: 설문지 등록 페이지 구현
+// 기능: 설문지 등록 페이지
+// 2024.08.23/곤/장고은, 엠마/신윤지
+import React, { useState, memo } from "react";
+import styled from "styled-components";
 import pageIcon from "../assets/paper.png";
 import timeIcon from "../assets/time.png";
 import duplicateIcon from "../assets/duplicate.png";
 import deleteIcon from "../assets/delete.png";
-import CreateMainHeader from "../components/CreateMainHeader";
 import SidebarWrapper from "../components/SidebarWrapper";
 import { useNavigate } from "react-router-dom";
 import navMascotImage from "../assets/navMascot.png";
@@ -426,14 +428,25 @@ const LargeBtnContainer = styled.div`
   width: 14%;
 `;
 
-// 등록/배포하기, 미리보기 스타일
-const LargeButton = styled.button`
-  width: ${(props) => (props.$isDistribute ? "100%" : "80%")};
+// 등록, 배포하기 스타일
+const SubmitButton = styled.input`
+  width: 100%;
   height: 35px;
   margin: 0 8px;
   border: none;
   border-radius: 8px;
-  background-color: ${(props) => (props.$isDistribute ? "#4c76fe" : "#8EA9FF")};
+  background-color: #4c76fe;
+  color: #fff;
+`;
+
+// 미리보기 스타일
+const LargeButton = styled.button`
+  width: 80%;
+  height: 35px;
+  margin: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background-color: #8ea9ff;
   color: #fff;
 `;
 
@@ -442,6 +455,8 @@ const AddContainer = styled.div``;
 const MemoizedCardContainer = memo(CardContainer);
 
 const CreatePage = () => {
+  const [sendData, setSendData] = useState({});
+
   const MoveSection = () => {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [selectedSection, setSelectedSection] = useState("다음 섹션으로 진행하기");
@@ -455,7 +470,7 @@ const CreatePage = () => {
       setIsSelectOpen((prev) => !prev);
     };
 
-    // TODO : 구현
+    // TODO : 버튼 클릭 시 구현
     // const onClickCopySection = () => {};
     // const onClickDeleteSection = () => {};
     // const onClickAddChoice = () => {};
@@ -626,8 +641,12 @@ const CreatePage = () => {
                       <Img src="/surveyCreateRound.png" />
                       <Input type="text" name="answerContent2" placeholder="항목 2의 자리입니다." />
                     </Content>
-                    <Button className="addBtn">기타추가</Button>
-                    <Button className="addBtn">선택지 추가</Button>
+                    <Button className="addBtn" type="button">
+                      기타추가
+                    </Button>
+                    <Button className="addBtn" type="button">
+                      선택지 추가
+                    </Button>
                   </>
                 ) : (
                   <>
@@ -665,17 +684,19 @@ const CreatePage = () => {
     }
   });
 
-  let answer = [];
   const sendRequestBody = (e) => {
     e.preventDefault();
+
+    let answer = [];
+    let answers = [];
 
     let formData = new FormData(e.target);
 
     let q = [];
     for (let i = 0; i < 2; i++) {
       q.push({
-        questionTitle: formData.get("questionTitle") || "",
-        questionContent: formData.get("questionContent") || "",
+        questionTitle: formData.get("questionTitle") || "questionTile",
+        questionContent: formData.get("questionContent") || "questionTitleContent",
         questionOrder: i,
         questionType: formData.get("questionType") == "객관식" ? "MULTIPLE_CHOICE" : "SUBJECTIVE_LONG",
         isEssential: false,
@@ -687,11 +708,11 @@ const CreatePage = () => {
         q.push({ answer: null });
       } else {
         answer.push({
-          answerContent: formData.get("answerContent1") || "",
+          answerContent: formData.get("answerContent1") || "answerContent1",
           nextSectionNo: 2,
         });
         answer.push({
-          answerContent: formData.get("answerContent2") || "",
+          answerContent: formData.get("answerContent2") || "answerContent2",
           nextSectionNo: 2,
         });
         q.push(answer);
@@ -708,10 +729,10 @@ const CreatePage = () => {
       },
     ];
 
-    let answers = {
-      title: formData.get("title") || "",
-      content1: formData.get("content1") || "",
-      content2: formData.get("content2") || "",
+    answers = {
+      title: formData.get("title") || "title",
+      content1: formData.get("content1") || "t c 1",
+      content2: formData.get("content2") || "t c 2",
       duration: "180",
       characterType: "TYPE_ONE",
       mainColor: "#FFFFFF",
@@ -723,13 +744,19 @@ const CreatePage = () => {
       sections: sections,
     };
 
-    console.log(answers);
+    setSendData(answers);
+    setModalOpen(true);
+
     return answers;
+  };
+
+  const handleRegister = () => {
+    console.log("모달이 켜짐");
+    setModalOpen(true);
   };
 
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
-
   // 마스코트 클릭 핸들러
   const handleMascotClick = () => {
     navigate("/");
@@ -737,34 +764,24 @@ const CreatePage = () => {
 
   return (
     <Container>
-      <NavbarContainer>
-        <SideMascot onClick={handleMascotClick} />
-        <MiddleBtnContainer>
-          <MiddleButton $isCreate={true}>제작</MiddleButton>
-          <MiddleButton>응답</MiddleButton>
-        </MiddleBtnContainer>
-        <LargeBtnContainer>
-          <LargeButton
-            $isDistribute={true}
-            onClick={() => {
-              console.log("모달이 켜짐");
-              setModalOpen(true);
-              surveyData = { answer: sendRequestBody() };
-            }}
-          >
-            등록/배포하기
-          </LargeButton>
-          <LargeButton>미리보기</LargeButton>
-        </LargeBtnContainer>
-      </NavbarContainer>
       <form onSubmit={sendRequestBody}>
-        <CreateMainHeader />
+        <NavbarContainer>
+          <SideMascot onClick={handleMascotClick} />
+          <MiddleBtnContainer>
+            <MiddleButton $isCreate={true}>제작</MiddleButton>
+            <MiddleButton>응답</MiddleButton>
+          </MiddleBtnContainer>
+          <LargeBtnContainer>
+            <SubmitButton onClick={handleRegister} type="submit" value={"등록/배포하기"} />
+            <LargeButton>미리보기</LargeButton>
+          </LargeBtnContainer>
+        </NavbarContainer>
+        <SurveyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} surveyData={sendData} />
         <Card type={"title"} />
         <Card type={"section"} />
         <Card type={"question"} />
       </form>
       <SidebarWrapper />
-      <SurveyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} surveyData={(answer = { sendRequestBody })} />
     </Container>
   );
 };
