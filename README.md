@@ -21,3 +21,12 @@ UMC 6기 팀 프로젝트
 - 데이/이연
 - 헤드위그/박상현
 - 러브/임사랑
+
+https://github.com/user-attachments/assets/ec044390-c89b-42de-8c3a-c50d70b2385b
+
+
+
+https://github.com/user-attachments/assets/5dc4e739-183a-4c0d-b61e-618e542e07e0
+
+
+
